@@ -1,0 +1,24 @@
+<div class="section-optimized">
+    <div class="pane-left-optmized">
+        <div class="title-panel"><h3>CODIGO SIN OPTIMIZAR</h3></div>
+        <ngx-codemirror 
+        #editorLeft
+        [(ngModel)]="codeLeft" 
+        [options]="editorConfig"
+    
+        (cursorActivity)="onCursorActivityLeft()"
+        class="custom-editor"
+        ></ngx-codemirror>
+    </div>
+    <div class="pane-right-optmized">
+        <div class="title-panel"><h3>CODIGO OPTIMIZADO</h3></div>
+        <ngx-codemirror 
+        #editorRight 
+        [(ngModel)]="codeRight" 
+        [options]="editorConfig"
+    
+        (cursorActivity)="onCursorActivityRight()"
+        class="custom-editor "
+        ></ngx-codemirror>
+    </div>
+</div>

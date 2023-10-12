@@ -1,0 +1,61 @@
+<nav class="navbar">
+    <h1 class="title-navbar">TitleProject</h1>
+    <ul class="menu">
+        <li class="has-children"
+        (click)="toggleSubMenu(menuItems[0])" 
+        (mouseenter)="showSubMenu(menuItems[0])" 
+        (mouseleave)="hideSubMenu(menuItems[0])"
+        >
+            <a>Archivo</a>
+            <ul *ngIf="menuItems[0].showSubMenu && menuItems[0].clicked" class="sub-menu">
+                <li><a (click)="modalNewProject.openModal()">Nuevo Proyecto</a></li>
+                <li><a (click)="modalNewFile.openModal()">Nuevo Archivo</a></li>
+                <li><a (click)="modalOpenProject.openModal()">Abrir Proyecto</a></li>
+                <!-- <li><a (click)="modalOpenFile.openModal()">Abrir Archivo</a></li> -->
+                <li><a>Guardar</a></li>
+                <li><a (click)="modalSaveAs.openModal()">Guardar Como</a></li>
+                <li><a>Cerrar Proyecto</a></li>
+            </ul>
+        </li>
+        <li class="has-children" 
+        (click)="toggleSubMenu(menuItems[1])" 
+        (mouseenter)="showSubMenu(menuItems[1])" 
+        (mouseleave)="hideSubMenu(menuItems[1])"
+        >
+            <a>Generar Codigo</a>
+            <ul *ngIf="menuItems[1].showSubMenu && menuItems[1].clicked" class="sub-menu">
+                <li><a>Codigo de Tres Direcciones</a></li>
+                <li><a>Codigo Optimizado</a></li>
+                <li><a>Codigo Assembler</a></li>
+            </ul>
+        </li>
+        <li class="has-children" 
+        (click)="toggleSubMenu(menuItems[2])" 
+        (mouseenter)="showSubMenu(menuItems[2])" 
+        (mouseleave)="hideSubMenu(menuItems[2])"
+        >
+            <a>Descargar</a>
+            <ul *ngIf="menuItems[2].showSubMenu && menuItems[2].clicked" class="sub-menu">
+                <li><a>Codigo de Tres Direcciones</a></li>
+                <li><a>Codigo Optimizado</a></li>
+                <li><a>Codigo Assembler</a></li>
+            </ul>
+        </li>
+        <li class="has-children" 
+        (click)="toggleSubMenu(menuItems[3])" 
+        (mouseenter)="showSubMenu(menuItems[3])" 
+        (mouseleave)="hideSubMenu(menuItems[3])"
+        >
+            <a>Reporte</a>
+            <ul *ngIf="menuItems[3].showSubMenu && menuItems[3].clicked" class="sub-menu">
+                <li><a>Reporte Optimizacion</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<app-modal-new-project #modalNewProject/>
+<app-modal-new-file #modalNewFile/>
+<app-modal-open-project #modalOpenProject/>
+<app-modal-open-file #modalOpenFile/>
+<app-modal-save-as #modalSaveAs/>

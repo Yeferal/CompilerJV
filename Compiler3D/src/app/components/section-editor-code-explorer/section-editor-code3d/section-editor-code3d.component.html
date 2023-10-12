@@ -1,0 +1,10 @@
+<div class="section-editor-code-file ">
+    <ngx-codemirror 
+    #editor 
+    [(ngModel)]="code" 
+    [options]="editorConfig"
+
+    (cursorActivity)="onCursorActivity()"
+    class="custom-editor "
+    ></ngx-codemirror>
+</div>

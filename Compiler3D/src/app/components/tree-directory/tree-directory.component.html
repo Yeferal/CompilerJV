@@ -1,0 +1,16 @@
+<section class="wrapper-tree-directory">
+    <div class="top-tree">
+        <!-- Aqui los botones de opciones de crear archivo, carpeta, etc -->
+    </div>
+    <div class="tree-directory scrolling-mode">
+        <!-- Aqui el arbol de directorios -->
+        <div *ngIf="listProjects.length>0" class="container-directories">
+            <ng-container *ngFor="let item of listProjects">
+                <app-child-directory *ngIf="item.typeNode=='root'" [data]="item"></app-child-directory>
+            </ng-container>
+        </div>
+    </div>
+    <div class="footer-tree">
+        <!-- El footer del directorybar si es necesario-->
+    </div>
+</section>

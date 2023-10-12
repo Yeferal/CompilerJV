@@ -1,0 +1,30 @@
+<app-modal [isShowModal]="isOpen" [titleModal]="'Abrir Proyecto'" (closeModalMsg)="receiveCloseModal($event)" #modalChild>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="row content-list-projects scrolling-mode">
+                    <ul class="list-projects col-12 p-0">
+                        <li class="">
+                            <label> Project 1</label>
+                        </li>
+                        <li>
+                            <label> Project 2</label>
+                        </li>
+                        <li>
+                            <label> Project 3</label>
+                        </li>
+                        <li>
+                            <label> Project 4</label>
+                        </li>
+                        <li>
+                            <label> Project 5</label>
+                        </li>
+                        <li>
+                            <label> Project 6</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-modal>

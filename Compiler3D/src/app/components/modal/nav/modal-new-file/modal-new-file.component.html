@@ -1,0 +1,29 @@
+<app-modal [isShowModal]="isOpen" [titleModal]="'Nuevo Archivo'" (closeModalMsg)="receiveCloseModal($event)" #modalChild>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <label>ProjectName.dir.dir1.dir2.</label>
+            </div>
+            <div class="col-12 p-0">
+                <form class="row p-0 m-0" [formGroup]="form" (ngSubmit)="sendData()">
+                    <div class="col-12 p-0">
+                        <div class="textfield">
+                            <input formControlName="name" type="text" class="input-text" id="name" placeholder="Nombre del Proyecto" [required]="true">
+                            <label for="name" class="input-label">
+                                <span>Nombre del Archivo</span>
+                                <span>*</span>
+                            </label>
+                            <div class="legend" *ngIf="(form.get('name').hasError('required') && form.get('name').touched) || 
+                            (form.get('name').hasError('required') && isSend)">
+                                <p class="helper-text helper-text-visible text-danger">El campo Nombre de Archivo es requerido</p>
+                            </div>
+                        </div>
+                    </div>
+                <div class="col-12 row justify-content-center p-0">
+                    <button class="btn btn-success" type="submit">Crear</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</app-modal>

@@ -1,0 +1,55 @@
+
+<app-modal [isShowModal]="isOpen" [titleModal]="'Nuevo Proyecto'" (closeModalMsg)="receiveCloseModal($event)" #modalChild>
+    <div class="container p-0 m-0">
+        <form class="row justify-content-center p-0 m-0" [formGroup]="form" (ngSubmit)="sendData()">
+            <!-- <div class="row"> -->
+                <div class="col-12">
+                    <div class="textfield">
+                        <input formControlName="name" type="text" class="input-text" id="name" placeholder="Nombre del Proyecto" [required]="true">
+                        <label for="name" class="input-label">
+                            <span>Nombre del Proyecto</span>
+                            <span>*</span>
+                        </label>
+                        <div class="legend" *ngIf="(form.get('name').hasError('required') && form.get('name').touched) || 
+                        (form.get('name').hasError('required') && isSend)
+                        ">
+                            <p class="helper-text helper-text-visible text-danger">El campo Nombre de Proyecto es requerido</p>
+                        </div>
+                    </div>
+                </div>
+            <div class="col-12 row justify-content-center">
+                <!-- <div class="row col-md-6 justify-content-center"> -->
+                    <button class="btn btn-success" type="submit">Crear</button>
+                <!-- </div> -->
+            </div>
+            
+        </form>
+    </div>
+</app-modal>
+
+<!-- <div class="col-12">
+                    <div class="textfield">
+                        <input type="password" class="input-password" id="name" placeholder="Nombre del Proyecto">
+                        <label for="name" class="input-label">
+                            <span>Nombre del Proyecto</span>
+                            <span>*</span>
+                        </label>
+                    </div>
+                </div> -->
+                <!-- <div class="col-12">
+                    <div class="textfield">
+                        <input type="text" class="input-text textfield-error" id="name" placeholder="Nombre del Proyecto" >
+                        <label for="name" class="input-label">
+                            <span>Nombre del Proyecto</span>
+                            <span>*</span>
+                        </label>
+                        <div class="legend">
+                            <p class="helper-text helper-text-visible text-danger">MENSAJE DE ERROR</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label for="">Nombre</label>
+                    <input type="text" class="form-control" value="">
+                </div> -->
+            <!-- </div> -->

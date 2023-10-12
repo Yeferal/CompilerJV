@@ -1,0 +1,51 @@
+
+<div class="directorybar directory-wrapper">
+    <div class="pane-option">
+        <!-- Aqui van los botones laterales -->
+
+        <!-- Boton de Arbol de directorios -->
+        <div class="option-section">
+            <button (click)="changeSection(1)" class="btn-option-pane" [class.btn-selected]="listSection[0].state">
+                    <fa-icon class="icon-opt" [icon]="faFiles"></fa-icon>
+                    <span class="description-icon">Explorador</span>
+            </button>
+        </div>
+
+        <!-- Boton de Codigo de 3D -->
+        <div class="option-section">
+            <button (click)="changeSection(2)" class="btn-option-pane" [class.btn-selected]="listSection[1].state">
+                <fa-icon class="icon-opt" [icon]="faCode3D"></fa-icon>
+                <span class="description-icon">Codigo 3D</span>
+            </button>
+        </div>
+        
+        <!-- Boton de Codigo de Optimizado -->
+        <div class="option-section">
+            <button (click)="changeSection(3)" class="btn-option-pane" [class.btn-selected]="listSection[2].state">
+                <fa-icon class="icon-opt" [icon]="faCodeOptim"></fa-icon>
+                <span class="description-icon">Optimizacion</span>
+            </button>
+        </div>
+
+        <!-- Boton de Codigo de Assembler -->
+        <div class="option-section">
+            <button (click)="changeSection(4)" class="btn-option-pane" [class.btn-selected]="listSection[3].state">
+                <fa-icon class="icon-opt" [icon]="faCodeAssem"></fa-icon>
+                <span class="description-icon">Assembler</span>
+            </button>
+        </div>
+
+        <!-- Boton de Reporte de Optimizacion -->
+        <div class="option-section">
+            <button (click)="changeSection(5)" class="btn-option-pane" [class.btn-selected]="listSection[4].state">
+                    <fa-icon class="icon-opt" [icon]="faReport"></fa-icon>
+                    <span class="description-icon">Reporte</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="pane-content">
+
+        <app-tree-directory></app-tree-directory>
+    </div>
+</div>
