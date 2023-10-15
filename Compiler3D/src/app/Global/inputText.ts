@@ -2,68 +2,48 @@
 
 
 export const enterText = 
-`
+`package org.example;
 
-%%PY
+public class Clase1 {
+    private int val1;
+    private int val2;
+    private final int val3 = 1;
+    private String valS;
+    var a = "hola";
 
+    public Clase1(int val1, int val2, String valS) {
+        this.val1 = val1;
+        this.val2 = val2;
+        this.valS = valS;
+    }
 
+    public int getVal1() {
+        return val1;
+    }
 
-%%JAVA
+    public void setVal1(int val1) {
+        this.val1 = val1;
+    }
 
+    public int getVal2() {
+        return val2;
+    }
 
+    public void setVal2(int val2) {
+        this.val2 = val2;
+    }
 
-%%PROGRAMA
-/* ---------------------------------------------
-	Sección de Librerias
-   --------------------------------------------- */
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include "VB"
-    #include "JAVA.OperacionAlgebraica"
-    #include "JAVA.*"
-    #include "PY"
-   
-/* ---------------------------------------------
-    Declaracion de Constantes
-   --------------------------------------------- */
-   
-   const int tamano = 10;
-   // Constantes
-   const int constante1 = 10;
+    public int getVal3() {
+        return val3;
+    }
 
-   const int Dim1 = 2;
-   const int Dim2 = 2;
+    public String getValS() {
+        return valS;
+    }
 
-/* ---------------------------------------------
-    Declaracion de Variables Globales
-   --------------------------------------------- */
-   
-   int arreglo[tamano];		 
-   int i=0;
-   int j=0;
-   int tmp;
-
-   char Op = 's';
-
-   // Variables globales
-   int Arreglo1[1][4];
-
-   int Arreglo1[Dim1][Dim2];
-   int a = 0;
-   int b = 1;
-   int c = 3;
-   int d = 4;
-   int Valor1, Valor2;
-   double Resultado_1 ;
-   int Respuesta1;
-   int Respuesta2;
-   int Respuesta3;
-   int Respuesta4;
-   int Contador=0; 
-   
-   void main () {
-    // Programa principal
-   }
-
+    public void setValS(String valS) {
+        this.valS = valS;
+    }
+}
 
 `

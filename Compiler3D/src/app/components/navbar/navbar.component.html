@@ -14,7 +14,7 @@
                 <!-- <li><a (click)="modalOpenFile.openModal()">Abrir Archivo</a></li> -->
                 <li><a>Guardar</a></li>
                 <li><a (click)="modalSaveAs.openModal()">Guardar Como</a></li>
-                <li><a>Cerrar Proyecto</a></li>
+                <li><a (click)="closeProejct()">Cerrar Proyecto</a></li>
             </ul>
         </li>
         <li class="has-children" 
@@ -25,7 +25,7 @@
             <a>Generar Codigo</a>
             <ul *ngIf="menuItems[1].showSubMenu && menuItems[1].clicked" class="sub-menu">
                 <li><a>Codigo de Tres Direcciones</a></li>
-                <li><a>Codigo Optimizado</a></li>
+                <!-- <li><a>Codigo Optimizado</a></li> -->
                 <li><a>Codigo Assembler</a></li>
             </ul>
         </li>
@@ -37,7 +37,7 @@
             <a>Descargar</a>
             <ul *ngIf="menuItems[2].showSubMenu && menuItems[2].clicked" class="sub-menu">
                 <li><a>Codigo de Tres Direcciones</a></li>
-                <li><a>Codigo Optimizado</a></li>
+                <!-- <li><a>Codigo Optimizado</a></li> -->
                 <li><a>Codigo Assembler</a></li>
             </ul>
         </li>
@@ -48,7 +48,7 @@
         >
             <a>Reporte</a>
             <ul *ngIf="menuItems[3].showSubMenu && menuItems[3].clicked" class="sub-menu">
-                <li><a>Reporte Optimizacion</a></li>
+                <!-- <li><a>Reporte Optimizacion</a></li> -->
             </ul>
         </li>
     </ul>

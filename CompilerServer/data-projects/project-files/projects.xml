@@ -1,0 +1,20 @@
+<libreria>
+	<proyecto nombre="pro">
+	</proyecto>
+	<proyecto nombre="pueba">
+	</proyecto>
+	<proyecto nombre="raiz">
+		<carpeta nombre="cap1">
+			<archivo path="cap2">cap2.java</archivo>
+			<carpeta nombre="car22">
+				<carpeta nombre="cad">
+					<archivo path="asd">asd.java</archivo>
+				</carpeta>
+			</carpeta>
+		</carpeta>
+		<archivo path="test">test.java</archivo>
+		<archivo path="test2">test2.java</archivo>
+	</proyecto>
+	<proyecto nombre="arbol">
+	</proyecto>
+</libreria>

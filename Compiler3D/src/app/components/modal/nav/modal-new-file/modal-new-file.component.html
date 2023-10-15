@@ -1,21 +1,29 @@
 <app-modal [isShowModal]="isOpen" [titleModal]="'Nuevo Archivo'" (closeModalMsg)="receiveCloseModal($event)" #modalChild>
     <div class="container">
         <div class="row">
-            <div class="col-12">
-                <label>ProjectName.dir.dir1.dir2.</label>
+            <div class="col-12 mb-3">
+                <label *ngIf="actualDir">{{getStringPath()}}</label>
             </div>
             <div class="col-12 p-0">
-                <form class="row p-0 m-0" [formGroup]="form" (ngSubmit)="sendData()">
+                <form class="row p-0 m-0" [formGroup]="form" (ngSubmit)="sendData(modalChild)">
                     <div class="col-12 p-0">
+                        <div class="col-12">
+                            <a (click)="setIsFile(true)" class="btn btn-sm mr-0" [class.btn-info]="isFile">
+                                <span><fa-icon [icon]="faFileIcon"></fa-icon></span>
+                            </a>
+                            <a (click)="setIsFile(false)" class="btn btn-sm" [class.btn-info]="!isFile">
+                                <span><fa-icon [icon]="faDirCloseIcon"></fa-icon></span>
+                            </a>
+                        </div>
                         <div class="textfield">
                             <input formControlName="name" type="text" class="input-text" id="name" placeholder="Nombre del Proyecto" [required]="true">
                             <label for="name" class="input-label">
-                                <span>Nombre del Archivo</span>
+                                <span>Nombre</span>
                                 <span>*</span>
                             </label>
                             <div class="legend" *ngIf="(form.get('name').hasError('required') && form.get('name').touched) || 
                             (form.get('name').hasError('required') && isSend)">
-                                <p class="helper-text helper-text-visible text-danger">El campo Nombre de Archivo es requerido</p>
+                                <p class="helper-text helper-text-visible text-danger">El campo Nombre requerido</p>
                             </div>
                         </div>
                     </div>

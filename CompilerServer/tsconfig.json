@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "CommonJS",
+      "outDir": "./dist",  // Directorio de salida para los archivos JavaScript
+    //   "rootDir": "./src"   // Directorio donde se encuentran tus archivos TypeScript
+      "rootDir": "./"   // Directorio donde se encuentran tus archivos TypeScript
+    },
+    "include": [
+      "src/**/*.ts",
+      "services/analyzer/**/*.ts",
+      "services/file/**/*.ts"
+    ]
+  }
+  

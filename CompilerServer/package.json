@@ -1,0 +1,33 @@
+{
+  "name": "compilerserver",
+  "version": "1.0.0",
+  "description": "server for compiler of 3d",
+  "main": "./bin/www",
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www",
+    "test": "nodemon ./bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yeferal/CompilerJV.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yeferal/CompilerJV/issues"
+  },
+  "homepage": "https://github.com/Yeferal/CompilerJV#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "config": "^3.3.9",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

@@ -4,24 +4,11 @@
             <div class="card-body">
                 <div class="row content-list-projects scrolling-mode">
                     <ul class="list-projects col-12 p-0">
-                        <li class="">
-                            <label> Project 1</label>
-                        </li>
-                        <li>
-                            <label> Project 2</label>
-                        </li>
-                        <li>
-                            <label> Project 3</label>
-                        </li>
-                        <li>
-                            <label> Project 4</label>
-                        </li>
-                        <li>
-                            <label> Project 5</label>
-                        </li>
-                        <li>
-                            <label> Project 6</label>
-                        </li>
+                        <ng-container *ngFor="let item of listProjects; let i = index">
+                            <li (dblclick)="openProject(i, modalChild)" class="">
+                                <label> {{item.name}}</label>
+                            </li>
+                        </ng-container>
                     </ul>
                 </div>
             </div>

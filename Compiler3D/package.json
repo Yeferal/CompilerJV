@@ -24,6 +24,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "codemirror": "^5.65.15",
     "jison": "^0.4.18",
+    "ngx-cookie-service": "^16.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "typescript-collections": "^1.3.3",

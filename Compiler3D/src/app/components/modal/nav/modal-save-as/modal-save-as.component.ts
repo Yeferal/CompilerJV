@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NodeDir, actualProject } from 'src/app/core/models/NodeDir';
+import { NodeDir } from 'src/app/core/models/NodeDir';
 
 @Component({
   selector: 'app-modal-save-as',
@@ -9,7 +9,7 @@ import { NodeDir, actualProject } from 'src/app/core/models/NodeDir';
 export class ModalSaveAsComponent {
 
   isOpen: boolean = false;
-  listProjects: Array<NodeDir> = [actualProject]
+  listProjects: Array<NodeDir> = []
 
   resetData(){
     //Reset de los datos del modal, en este caso el formulario

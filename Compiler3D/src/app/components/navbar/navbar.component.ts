@@ -1,5 +1,8 @@
 import { Component, ElementRef, HostListener } from "@angular/core";
 import { ModalComponent } from "../modal/modal.component";
+import { CookieService } from "ngx-cookie-service";
+import { ShareProjectService } from "src/app/services/share-project.service";
+import { FilesService } from "src/app/services/files.service";
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -31,7 +34,10 @@ export class NavbarComponent {
     }
   ];
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef, 
+    private filesService: FilesService, 
+    private shareProjectService: ShareProjectService, 
+    private cookieService: CookieService) {}
 
   toggleSubMenu(menuItem: any): void {
 
@@ -99,7 +105,9 @@ export class NavbarComponent {
   }
 
   closeProejct(){
-
+    this.cookieService.delete("project");
+    this.shareProjectService.setRoot(null);
+    this.shareProjectService.sendDataRoot(null);
   }
 
   generateCode3D(){

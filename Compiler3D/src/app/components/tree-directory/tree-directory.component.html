@@ -4,10 +4,8 @@
     </div>
     <div class="tree-directory scrolling-mode">
         <!-- Aqui el arbol de directorios -->
-        <div *ngIf="listProjects.length>0" class="container-directories">
-            <ng-container *ngFor="let item of listProjects">
-                <app-child-directory *ngIf="item.typeNode=='root'" [data]="item"></app-child-directory>
-            </ng-container>
+        <div *ngIf="projectsNow" class="container-directories">
+                <app-child-directory *ngIf="projectsNow.typeNode=='root'" [data]="projectsNow"></app-child-directory>
         </div>
     </div>
     <div class="footer-tree">

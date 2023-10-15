@@ -1,7 +1,7 @@
 
 <app-modal [isShowModal]="isOpen" [titleModal]="'Nuevo Proyecto'" (closeModalMsg)="receiveCloseModal($event)" #modalChild>
     <div class="container p-0 m-0">
-        <form class="row justify-content-center p-0 m-0" [formGroup]="form" (ngSubmit)="sendData()">
+        <form class="row justify-content-center p-0 m-0" [formGroup]="form" (ngSubmit)="sendData(modalChild)">
             <!-- <div class="row"> -->
                 <div class="col-12">
                     <div class="textfield">

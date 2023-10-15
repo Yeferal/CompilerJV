@@ -1,15 +1,17 @@
 
 <ul *ngIf="data" class="father-directory">
     <li class="child-directory">
-        <a class="container-item-directory">
+        <a class="container-item-directory" (click)="showContent()">
             <span class="icon-child">
-                <fa-icon class="icon-1" [icon]="faDirArrowOpen"></fa-icon> 
-                <fa-icon class="icon-2" [icon]="faDirOpenIcon"></fa-icon> 
+                <fa-icon *ngIf="show" class="icon-1" [icon]="faDirArrowOpen"></fa-icon> 
+                <fa-icon *ngIf="show" class="icon-2" [icon]="faDirOpenIcon"></fa-icon> 
+                <fa-icon *ngIf="!show" class="icon-1" [icon]="faDirArrowClose"></fa-icon> 
+                <fa-icon *ngIf="!show" class="icon-2" [icon]="faDirCloseIcon"></fa-icon> 
             </span>
             <span class="name-child">{{data.name}}</span>
         </a>
         
-        <ul *ngIf="data.nodeChilds.length > 0" class="list-childs">
+        <ul *ngIf="data.nodeChilds.length > 0 && show" class="list-childs">
             <ng-container *ngFor="let item of data.nodeChilds">
                 <app-child-directory *ngIf="item.typeNode==='directory'" [data]="item"></app-child-directory>
                 <app-child-file *ngIf="item.typeNode==='file'" [data]="item"></app-child-file>

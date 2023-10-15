@@ -1,6 +1,6 @@
 <li class="child-file" *ngIf="data">
 
-    <a class="container-item-directory ">
+    <a (dblclick)="openFile()" class="container-item-directory">
         <!-- Icono de archivo -->
         <span class="icon-child"> <fa-icon [icon]="faFileIcon"></fa-icon> </span>
         <!-- nombre -->
