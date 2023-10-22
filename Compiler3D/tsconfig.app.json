@@ -9,12 +9,13 @@
     "src/main.ts"
   ],
   "include": [
-    // "src/assets/gramm/mlg/MLGParser.js",
-    "src/assets/gramm/mlg/gramm-mlg.js",
-    // "src/assets/gramm/test/calculator.js",
+    "src/assets/gramm/main/gramm-main.js",
     "src/**/*.d.ts",
-    "src/app/core/models/mlg/error/position-token.ts",
-    "src/app/core/models/mlg/error/error-gramm.ts",
+    "src/app/core/models/ast/error/position-token.ts",
+    "src/app/core/models/ast/error/error-gramm.ts",
+    "src/app/core/models/ast/error/ErrorType.ts",
+    "src/app/core/models/ast/error/*.ts",
+    "src/assets/gramm/main/error/*.ts",
     "src/app/Global/**/*.ts",
     "src/app/Global/*.ts"
 

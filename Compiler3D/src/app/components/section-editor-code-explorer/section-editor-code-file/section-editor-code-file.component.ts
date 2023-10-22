@@ -1,9 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { enterText } from 'src/app/Global/inputText';
-import { PositionToken } from 'src/app/core/models/mlg/error/position-token';
+import { ErrorType } from 'src/app/core/models/ast/error/ErrorType';
+import { PositionToken } from 'src/app/core/models/ast/error/position-token';
 import { CursorCode, ShareCodeEditorService } from 'src/app/services/share-code-editor.service';
-import {parser as Parser} from 'src/assets/gramm/mlg/gramm-mlg.js'
+import {parser as Parser} from 'src/assets/gramm/main/gramm-main.js'
 
 @Component({
   selector: 'app-section-editor-code-file',
@@ -40,19 +41,26 @@ export class SectionEditorCodeFileComponent {
   }
 
   ngOnInit() {
-    
+    this.compile();
   }
 
   compile(){
+    let result: any;
     try {
       // Evalúa la expresión utilizando el parser
-      const txtEnter = this.codeMirror.codeMirror.getValue();
-      const result: PositionToken = this.parser.parse(txtEnter);
-      console.log(result.toString());
+      // console.log(enterText);
+      console.log(ErrorType.LEXICAL);
+      
+      // const txtEnter = this.codeMirror.codeMirror.getValue();
+      const txtEnter = enterText;
+      result = this.parser.parse(txtEnter);
+      console.log('Salida: \n',result);
       
       return 1;
     } catch (error) {
-      console.error('Error al evaluar la expresión:', error);
+      // console.error('Error al evaluar la expresión:', error);
+      console.error('Error al evaluar la expresión:', result);
+
       return NaN;
     }
   }

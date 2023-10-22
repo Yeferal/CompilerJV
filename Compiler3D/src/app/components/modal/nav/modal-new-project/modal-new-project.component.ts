@@ -31,12 +31,12 @@ export class ModalNewProjectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(){
-    console.log("Monto Init");
+    // console.log("Monto Init");
     
   }
 
   ngOnDestroy(): void {
-    console.log("Desmonto Destroy");
+    // console.log("Desmonto Destroy");
     
   }
 

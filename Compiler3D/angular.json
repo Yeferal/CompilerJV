@@ -33,10 +33,10 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "src/assets/gramm/mlg/gramm-mlg.js"
+              "src/assets/gramm/main/gramm-main.js"
             ],
             "allowedCommonJsDependencies": [
-              "src/assets/gramm/mlg/gramm-mlg.js"
+              "src/assets/gramm/main/gramm-main.js"
             ]
           },
           "configurations": {

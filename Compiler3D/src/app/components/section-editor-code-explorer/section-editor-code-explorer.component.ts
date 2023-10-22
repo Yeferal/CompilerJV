@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { PositionToken } from 'src/app/core/models/mlg/error/position-token';
-import { enterText } from 'src/app/Global/inputText';
+// import { PositionToken } from 'src/app/core/models/mlg/error/position-token';
+// import { enterText } from 'src/app/Global/inputText';
 import { SectionService } from 'src/app/services/section.service';
-import {parser as Parser} from 'src/assets/gramm/mlg/gramm-mlg.js'
 
 interface SectionData {
   id: number;
@@ -30,7 +29,7 @@ export class SectionEditorCodeExplorerComponent {
 
   constructor(private sectionService: SectionService) {
     // Crea una instancia del parser generado
-    this.parser = Parser;
+    // this.parser = Parser;
 
     this.sectionService.data$.subscribe(
       id => {
@@ -44,18 +43,18 @@ export class SectionEditorCodeExplorerComponent {
     // this.evaluateExpression(enterText);
   }
 
-  evaluateExpression(expression: string): number {
-    try {
-      // Evalúa la expresión utilizando el parser
-      const result: PositionToken = this.parser.parse(expression);
-      console.log(result.toString());
+  // evaluateExpression(expression: string): number {
+  //   try {
+  //     // Evalúa la expresión utilizando el parser
+  //     const result: PositionToken = this.parser.parse(expression);
+  //     console.log(result.toString());
       
-      return 1;
-    } catch (error) {
-      console.error('Error al evaluar la expresión:', error);
-      return NaN;
-    }
-  }
+  //     return 1;
+  //   } catch (error) {
+  //     console.error('Error al evaluar la expresión:', error);
+  //     return NaN;
+  //   }
+  // }
 
   updateSection(id: number){
     if (id !== -1) {

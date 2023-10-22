@@ -2,7 +2,6 @@ import { Component, ViewChild } from '@angular/core';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { enterText } from 'src/app/Global/inputText';
 import { CursorCode, ShareCodeEditorService } from 'src/app/services/share-code-editor.service';
-import {parser as Parser} from 'src/assets/gramm/mlg/gramm-mlg.js'
 
 @Component({
   selector: 'app-section-editor-code-optimized',
