@@ -415,8 +415,13 @@ BLOCK_CONTENT_MAIN
 ======================================================================================================================================
 */
 STRUCT_CLASS
-    :public STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $4, $4, $5, true, $2, $7); }
-    |STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $3, $3, $4, true, $1, $6); }
+    :public STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), false, false, $4, $4, $5, true, $2, $7); }
+    |STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), false, false, $3, $3, $4, true, $1, $6); }
+    |getter setter public STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), true, true, $4, $4, $5, true, $2, $7); }
+    |setter getter STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), true, true, $3, $3, $4, true, $1, $6); }
+    |getter public STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), true, false, $4, $4, $5, true, $2, $7); }
+    |setter STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), false, true, $3, $3, $4, true, $1, $6); }
+
 
     |error class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la estructura de la clase", ErrorType.SYNTACTIC);
@@ -458,22 +463,112 @@ CODE_CLASS
 */
 STATE_DECLARATION_ATRIB
     :STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $1;
+        $$.isGetter = false;
+        $$.isSetter = false;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
     |getter STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $2;
+        $$.isGetter = true;
+        $$.isSetter = false;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
     |setter STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $2;
+        $$.isGetter = false;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
     |getter setter STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $3;
+        $$.isGetter = true;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
     |setter getter STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $3;
+        $$.isGetter = true;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
 
     |private STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $2;
+        $$.isGetter = false;
+        $$.isSetter = false;
+        $$.encapsulationType = EncapsulationType.PRIVATE;
+    }
     |getter private STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $3;
+        $$.isGetter = true;
+        $$.isSetter = false;
+        $$.encapsulationType = EncapsulationType.PRIVATE;
+    }
     |setter private STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $3;
+        $$.isGetter = false;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PRIVATE;
+    }
     |getter setter private STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $4;
+        $$.isGetter = true;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PRIVATE;
+    }
     |setter getter private STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $4;
+        $$.isGetter = true;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PRIVATE;
+    }
 
     |public STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $2;
+        $$.isGetter = false;
+        $$.isSetter = false;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
     |getter public STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $3;
+        $$.isGetter = true;
+        $$.isSetter = false;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
     |setter public STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $3;
+        $$.isGetter = false;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
     |getter setter public STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $4;
+        $$.isGetter = true;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
     |setter getter public STRUCT_DECLARATION_ATRIB semicolon
+    {
+        $$ = $4;
+        $$.isGetter = true;
+        $$.isSetter = true;
+        $$.encapsulationType = EncapsulationType.PUBLIC;
+    }
 
     |error public STRUCT_DECLARATION_ATRIB semicolon {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -483,11 +578,39 @@ STATE_DECLARATION_ATRIB
 
 STRUCT_DECLARATION_ATRIB
     :STRUCT_DECLARATION_ATRIB comma id STATE_ASIGNATION_ATRIB
-    |final static DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB
-    |static final DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB
-    |final DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB
+    {
+        $$ = $1;
+        $$.listDeclaration.push(new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), null, $3, $3, $4));
+    }
+    |final static DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB 
+    { $$ = new ListDeclaration(
+        new PositionToken(this._$.first_line, this._$.first_column), 
+        $1, $2, DeclarationType.ATRIBUT, false, false, null, true, true, 
+        [new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $2, $3)]); 
+    }
+    |static final DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB 
+    { $$ = new ListDeclaration(
+        new PositionToken(this._$.first_line, this._$.first_column), 
+        $1, $2, DeclarationType.ATRIBUT, false, false, null, true, true, 
+        [new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $2, $3)]); 
+    }
+    |final DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB { $$ = new ListDeclaration(
+        new PositionToken(this._$.first_line, this._$.first_column), 
+        $1, $2, DeclarationType.ATRIBUT, false, false, null, true, false, 
+        [new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), null, $2, $2, $3)]); 
+    }
     |static DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB
+    { $$ = new ListDeclaration(
+        new PositionToken(this._$.first_line, this._$.first_column), 
+        $1, $2, DeclarationType.ATRIBUT, false, false, null, false, true, 
+        [new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $2, $3)]); 
+    }
     |DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB
+    { $$ = new ListDeclaration(
+        new PositionToken(this._$.first_line, this._$.first_column), 
+        $1, $2, DeclarationType.ATRIBUT, false, false, null, false, false, 
+        [new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $2, $3)]); 
+    }
 
     |error DATATYPE_PRIMITIVE id STATE_ASIGNATION_ATRIB {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -498,8 +621,8 @@ STRUCT_DECLARATION_ATRIB
 ;
 
 STATE_ASIGNATION_ATRIB
-    :equal_mark ASIGNATION_ATRIB
-    |
+    :equal_mark ASIGNATION_ATRIB  { $$ = $1; }
+    |  { $$ = null; }
 
     |error ASIGNATION_ATRIB {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -507,7 +630,7 @@ STATE_ASIGNATION_ATRIB
 ;
 
 ASIGNATION_ATRIB
-    :STATE_VALUE
+    :STATE_VALUE { $$ = $1; }
 ;
 
 
@@ -629,9 +752,9 @@ STRUCT_ASIGNATION_VAR
 ;
 
 STRUCT_VAR
-    :var id equal_mark ASIGNATION_VAR semicolon
-    |var id equal_mark new id parentheses_l parentheses_r semicolon
-    |var id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
+    :STATE_FINAL var id equal_mark ASIGNATION_VAR semicolon
+    |STATE_FINAL var id equal_mark new id parentheses_l parentheses_r semicolon
+    |STATE_FINAL var id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
 
     |var error new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon {
         addError(this._$.first_line, this._$.first_column, $2, "Error en la Expresion", ErrorType.SYNTACTIC);

@@ -140,7 +140,7 @@ export class FunctionProcedure extends Node {
             false,                                  //isArray
             null,                                   //listDims
             false,                                  //isReference
-            this.encapsulation,                     //encapsulation
+            null,                     //encapsulation
             handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
             false                                   //isConst
         );

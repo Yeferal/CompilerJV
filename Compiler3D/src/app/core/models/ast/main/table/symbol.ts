@@ -1,5 +1,6 @@
 
 import { DynamicDataType } from "../utils/DynamicDataType";
+import { EncapsulationType } from "../utils/encapsulation-type";
 import { SymbolType } from "./symbol-type";
 
 export class Symbol {
@@ -20,7 +21,7 @@ export class Symbol {
     private _listDims: Array<number>;
     private _listDimsTemps: Array<string>; //para guardar los temporales de las dimensiones
     private _isReference: boolean = false;
-    private _encapsulation: string = "public";
+    private _encapsulation: EncapsulationType = EncapsulationType.PUBLIC;
     private _fullName: string;
     private _isConst: boolean = false;
     private _value: any;
@@ -47,7 +48,7 @@ export class Symbol {
      * @param isConst si es un simbolo de tipo var o atributo que sea una constante o no
      */
 
-	constructor(id: number, nameCode: string, name: string, symbolType: SymbolType, isFunction: boolean , type: DynamicDataType, numParams: number , listParams: Array<DynamicDataType>, direction: number, size: number, isArray: boolean , listDims: Array<number>, isReference: boolean , encapsulation: string , fullName: string, isConst: boolean ) {
+	constructor(id: number, nameCode: string, name: string, symbolType: SymbolType, isFunction: boolean , type: DynamicDataType, numParams: number , listParams: Array<DynamicDataType>, direction: number, size: number, isArray: boolean , listDims: Array<number>, isReference: boolean , encapsulation: EncapsulationType , fullName: string, isConst: boolean ) {
 		this._id = id;
 		this._nameCode = nameCode;
 		this._name = name;
@@ -178,11 +179,11 @@ export class Symbol {
         this._isReference = value;
     }
 
-    public get encapsulation(): string {
+    public get encapsulation(): EncapsulationType {
         return this._encapsulation;
     }
 
-    public set encapsulation(value: string) {
+    public set encapsulation(value: EncapsulationType) {
         this._encapsulation = value;
     }
 
