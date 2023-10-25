@@ -39,7 +39,7 @@
     const { InstanceArray } = require("src/app/core/models/ast/main/instructions/instance-array.ts");
     const { InstanceObject } = require("src/app/core/models/ast/main/instructions/instance-object.ts");
     const { ListDeclaration } = require("src/app/core/models/ast/main/instructions/list-declaration.ts");
-    const { NodeMain } = require("src/app/core/models/ast/main/instructions/node-main.ts");
+    const { MainNode } = require("src/app/core/models/ast/main/instructions/main-node.ts");
     const { PrintNode } = require("src/app/core/models/ast/main/instructions/print-node.ts");
     const { SuperInst } = require("src/app/core/models/ast/main/instructions/super-inst.ts");
     const { TostringNode } = require("src/app/core/models/ast/main/instructions/tostring-node.ts");
@@ -86,7 +86,7 @@
         console.log("Entro en los errores");
         const newError = new ErrorGramm(new PositionToken(row, column), token, description, errorType);
         listErrors.push(newError);
-        console.log(listErrors);
+        console.log(newError.toString());
     }
 %}
 
@@ -259,7 +259,7 @@ Decimal         {Numero} [.] {Numero}
 
 
 ini
-    :CODE EOF { /*console.log($1);*/ /*resultado = $1;*/ /*return $1;*/ return new TreeAST([], getListErrors());}
+    :CODE EOF { /*console.log($1);*/ /*resultado = $1;*/ /*return $1;*/ return new TreeAST($1, getListErrors());}
     // |error EOF
 ;
 
@@ -426,9 +426,6 @@ BLOCK_CONTENT_MAIN
     |BLOCK_CONTENT_MAIN STRUCT_INPUT { $$ = $1; $$.push($2); }
     |BLOCK_CONTENT_MAIN STATE_RETURN { $$ = $1; $$.push($2); }
     |BLOCK_CONTENT_MAIN STATE_TOSTRING { $$ = $1; $$.push($2); }
-    // |BLOCK_CONTENT_MAIN
-    // |BLOCK_CONTENT_MAIN
-    // |BLOCK_CONTENT_MAIN
     | { $$ = []; }
 ;
 
@@ -438,13 +435,33 @@ BLOCK_CONTENT_MAIN
 ======================================================================================================================================
 */
 STRUCT_CLASS
-    :public STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), false, false, $4, $4, $5, true, $2, $7); }
-    |STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), false, false, $3, $3, $4, true, $1, $6); }
-    |getter setter public STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), true, true, $4, $4, $5, true, $2, $7); }
-    |setter getter STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), true, true, $3, $3, $4, true, $1, $6); }
-    |getter public STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), true, false, $4, $4, $5, true, $2, $7); }
-    |setter STATE_FINAL class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), false, true, $3, $3, $4, true, $1, $6); }
-
+    :public class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, false, $3, $4, true, false, $6); }
+    |public final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, false, $4, $5, true, true, $7); }
+    
+    |class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, false, $2, $3, true, false, $5); }
+    |final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, false, $3, $3, true, true, $6); }
+    
+    |getter setter public class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $5, $6, true, false, $8); }
+    |getter setter public final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $6, $7, true, true, $9); }
+    |setter getter class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $4, $5, true, false, $7); }
+    |setter getter final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $5, $6, true, true, $8); }
+    
+    |getter public class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, false, $4, $5, true, false, $7); }
+    |getter public final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, false, $5, $6, true, true, $8); }
+    |setter class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, true, $3, $4, true, false, $6); }
+    |setter final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, true, $4, $5, true, true, $7); }
 
     |error class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la estructura de la clase", ErrorType.SYNTACTIC);
@@ -472,10 +489,6 @@ CODE_CLASS
     |CODE_CLASS STATE_FUNCTION { $$ = $1; $$.push($2); }
     |CODE_CLASS STATE_METOD { $$ = $1; $$.push($2); }
     |CODE_CLASS STATE_CONSTRUCTOR { $$ = $1; $$.push($2); }
-    // |CODE_CLASS
-    // |CODE_CLASS
-    // |CODE_CLASS
-    // |CODE_CLASS
     | { $$ = []; }
 ;
 
@@ -882,7 +895,7 @@ STRUCT_ASIGNATION_VAR
     :id equal_mark ASIGNATION_VAR semicolon {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, false, false); }
     |id plus_plus semicolon
     {
-        const arithPlus = new ArithmeticOperation(new PositionToken(
+        var arithPlus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.ADD,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
@@ -891,7 +904,7 @@ STRUCT_ASIGNATION_VAR
     }
     |id minus_minus semicolon
     {
-        const arithMinus = new ArithmeticOperation(new PositionToken(
+        var arithMinus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.SUBTRAC,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
@@ -937,7 +950,7 @@ STRUCT_ASIGNATION_VAR
     |this id equal_mark ASIGNATION_VAR semicolon {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3, true, false); }
     |this id plus_plus semicolon
     {
-        const arithPlus = new ArithmeticOperation(new PositionToken(
+        var arithPlus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.ADD,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
@@ -946,7 +959,7 @@ STRUCT_ASIGNATION_VAR
     }
     |this id minus_minus semicolon
     {
-        const arithMinus = new ArithmeticOperation(new PositionToken(
+        var arithMinus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.SUBTRAC,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
@@ -996,19 +1009,34 @@ STRUCT_ASIGNATION_VAR
 ;
 
 STRUCT_VAR
-    :STATE_FINAL var id equal_mark ASIGNATION_VAR semicolon
-    {$$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3, $5, $1);}
-    |STATE_FINAL var id equal_mark new id parentheses_l parentheses_r semicolon
+    :var id equal_mark ASIGNATION_VAR semicolon
+    {$$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3, $5, false);}
+    |final var id equal_mark ASIGNATION_VAR semicolon
+    {$$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3, $5, true);}
+
+    |var id equal_mark new id parentheses_l parentheses_r semicolon
     {
         $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3,
         new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, []),
-        $1);
+        false);
     }
-    |STATE_FINAL var id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
+    |final var id equal_mark new id parentheses_l parentheses_r semicolon
+    {
+        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3,
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, []),
+        true);
+    }
+    |var id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
     {
         $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3,
         new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, $8),
-        $1);
+        false);
+    }
+    |final var id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
+    {
+        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3,
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, $8),
+        true);
     }
 
     |var error new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon {
@@ -1744,7 +1772,7 @@ SENTENCE_STATE_FOR
     :id equal_mark ASIGNATION_VAR {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, false, false); }
     |id plus_plus 
     {
-        const arithPlus = new ArithmeticOperation(new PositionToken(
+        var arithPlus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.ADD,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
@@ -1753,7 +1781,7 @@ SENTENCE_STATE_FOR
     }
     |id minus_minus
     {
-        const arithMinus = new ArithmeticOperation(new PositionToken(
+        var arithMinus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.SUBTRAC,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
@@ -1771,7 +1799,7 @@ SENTENCE_STATE_FOR
     |this id equal_mark ASIGNATION_VAR {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3, true, false); }
     |this id plus_plus
     {
-        const arithPlus = new ArithmeticOperation(new PositionToken(
+        var arithPlus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.ADD,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
@@ -1780,7 +1808,7 @@ SENTENCE_STATE_FOR
     }
     |this id minus_minus
     {
-        const arithMinus = new ArithmeticOperation(new PositionToken(
+        var arithMinus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.SUBTRAC,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
@@ -1976,32 +2004,32 @@ STATE_FUNCTION
     }
     |override STRUCT_FUNCTION 
     {
-        $$ = $1; 
+        $$ = $2; 
         $$.isOverride = true;
         $$.encapsulationType = EncapsulationType.PUBLIC;
     }
 
     |public STRUCT_FUNCTION 
     {
-        $$ = $1; 
+        $$ = $2; 
         $$.isOverride = false;
         $$.encapsulationType = EncapsulationType.PUBLIC;
     }
     |override public STRUCT_FUNCTION 
     {
-        $$ = $1; 
+        $$ = $3; 
         $$.isOverride = true;
         $$.encapsulationType = EncapsulationType.PUBLIC;
     }
 
     |private STRUCT_FUNCTION {
-        $$ = $1; 
+        $$ = $2; 
         $$.isOverride = false;
         $$.encapsulationType = EncapsulationType.PRIVATE;
     }
     |override private STRUCT_FUNCTION 
     {
-        $$ = $1; 
+        $$ = $3; 
         $$.isOverride = true;
         $$.encapsulationType = EncapsulationType.PRIVATE;
     }
@@ -2080,33 +2108,33 @@ STATE_METOD
     }
     |override STRUCT_METOD
     {
-        $$ = $1; 
+        $$ = $2; 
         $$.isOverride = true;
         $$.encapsulationType = EncapsulationType.PUBLIC;
     }
 
     |public STRUCT_METOD
     {
-        $$ = $1; 
+        $$ = $2; 
         $$.isOverride = false;
         $$.encapsulationType = EncapsulationType.PUBLIC;
     }
     |override public STRUCT_METOD
     {
-        $$ = $1; 
+        $$ = $3; 
         $$.isOverride = true;
         $$.encapsulationType = EncapsulationType.PUBLIC;
     }
 
     |private STRUCT_METOD
     {
-        $$ = $1; 
+        $$ = $2; 
         $$.isOverride = false;
         $$.encapsulationType = EncapsulationType.PRIVATE;
     }
     |override private STRUCT_METOD
     {
-        $$ = $1; 
+        $$ = $3; 
         $$.isOverride = true;
         $$.encapsulationType = EncapsulationType.PRIVATE;
     }

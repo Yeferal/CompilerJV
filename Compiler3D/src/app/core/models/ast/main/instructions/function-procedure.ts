@@ -20,7 +20,7 @@ export class FunctionProcedure extends Node {
     private _listParams: Array<Node>;
     private _instructions: Array<Node>;
     private _encapsulationType: EncapsulationType;
-    private _isOverride: boolean;
+    private _isOverride: boolean = false;
     size: number = 0;
 
 	constructor(positionToken: PositionToken, type: DynamicDataType, token: string, isStatic: boolean, isFunction: boolean, id: string, listParams: Array<Node>, instructions: Array<Node>) {

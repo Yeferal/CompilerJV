@@ -49,7 +49,7 @@ export class SectionEditorCodeFileComponent {
     try {
       // Evalúa la expresión utilizando el parser
       // console.log(enterText);
-      console.log(ErrorType.LEXICAL);
+      // console.log(ErrorType.LEXICAL);
       
       // const txtEnter = this.codeMirror.codeMirror.getValue();
       const txtEnter = enterText;
@@ -58,7 +58,7 @@ export class SectionEditorCodeFileComponent {
       
       return 1;
     } catch (error) {
-      // console.error('Error al evaluar la expresión:', error);
+      console.error('Error al evaluar la expresión:', error);
       console.error('Error al evaluar la expresión:', result);
 
       return NaN;

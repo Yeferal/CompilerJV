@@ -24,29 +24,55 @@ export abstract class Node {
 		this._token = token;
 	}
 
-    public get positionToken(): PositionToken {
-        return this._positionToken;
-    }
 
-    public set positionToken(value: PositionToken) {
-        this._positionToken = value;
-    }
+    /**
+     * Getter positionToken
+     * @return {PositionToken}
+     */
+	public get positionToken(): PositionToken {
+		return this._positionToken;
+	}
 
-    public get type(): DynamicDataType {
-        return this._type;
-    }
+    /**
+     * Getter type
+     * @return {DynamicDataType}
+     */
+	public get type(): DynamicDataType {
+		return this._type;
+	}
 
-    public set type(value: DynamicDataType) {
-        this._type = value;
-    }
+    /**
+     * Getter token
+     * @return {string}
+     */
+	public get token(): string {
+		return this._token;
+	}
 
-    public get token(): string {
-        return this._token;
-    }
+    /**
+     * Setter positionToken
+     * @param {PositionToken} value
+     */
+	public set positionToken(value: PositionToken) {
+		this._positionToken = value;
+	}
+
+    /**
+     * Setter type
+     * @param {DynamicDataType} value
+     */
+	public set type(value: DynamicDataType) {
+		this._type = value;
+	}
+
+    /**
+     * Setter token
+     * @param {string} value
+     */
+	public set token(value: string) {
+		this._token = value;
+	}
     
-    public set token(value: string) {
-        this._token = value;
-    }
 
     /**
      * @Tipos_de_Comprobaciones 

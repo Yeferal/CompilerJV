@@ -15,6 +15,7 @@
     "src/app/core/models/ast/error/error-gramm.ts",
     "src/app/core/models/ast/error/ErrorType.ts",
     "src/app/core/models/ast/error/*.ts",
+    "src/app/core/models/ast/main/**/*.ts",
     "src/assets/gramm/main/error/*.ts",
     "src/app/Global/**/*.ts",
     "src/app/Global/*.ts"

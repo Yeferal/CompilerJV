@@ -28,7 +28,7 @@ export const enterText =
     @Setter private final static int [][] arr = new int[2][3], [] ads  = new int[3];
     @Getter private boolean bol = (5+5)<val3 || val3>25;
 
-    void main) {
+    void main() {
         Clase1 [] ar = new Clase1[4];
         /*int arr [][] new int[2][3], ads [] = new int[3];
             */
@@ -118,19 +118,19 @@ export const enterText =
                 
         }
     }
-    @Override
-    public int condFor() {
-        int [] arr = {1, 2 , 5 , 8, 2 , 4};
-        for (int i = 0; i < arr.length; i++) {
-            System.out.println(arr[i]);
-        }
+    // @Override
+    // public int condFor() {
+    //     int [] arr = {1, 2 , 5 , 8, 2 , 4};
+    //     for (int i = 0; i < arr.length; i++) {
+    //         System.out.println(arr[i]);
+    //     }
 
-        for (var i = 0; i < 5 ; i++) {
+    //     for (var i = 0; i < 5 ; i++) {
 
-        }
-        return a;
+    //     }
+    //     return a;
 
-    }
+    // }
 
     static void condDoWhile(){
         while (true){
