@@ -14,8 +14,8 @@ export class ArithmeticOperation extends Node {
     private _nodeRight: Node;
     private _value: any;
 
-    constructor(positionToken: PositionToken, toke: string, arithType: ArithType, nodeLeft: Node, nodeRight: Node) {
-        super(positionToken, null, toke);
+    constructor(positionToken: PositionToken, token: string, arithType: ArithType, nodeLeft: Node, nodeRight: Node) {
+        super(positionToken, null, token);
 		this._arithType = arithType;
         this._nodeLeft = nodeLeft;
         this._nodeRight = nodeRight;
@@ -62,11 +62,11 @@ export class ArithmeticOperation extends Node {
             if (resLeft) {
                 return resType;
             } else {
-                const errorGramm = new ErrorGramm(this.positionToken, this.toke, `No es posible realizar la operacion << ${this.nodeLeft.toke} ${this.toke} ${this.nodeRight.toke} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la operacion << ${this.nodeLeft.token} ${this.token} ${this.nodeRight.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
             }
         }else{
-            const errorGramm = new ErrorGramm(this.positionToken, this.toke, `No es posible realizar la operacion << ${this.nodeLeft.toke} ${this.toke} ${this.nodeRight.toke} >>.`, ErrorType.SEMANTIC); 
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la operacion << ${this.nodeLeft.token} ${this.token} ${this.nodeRight.token} >>.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
         }
     }

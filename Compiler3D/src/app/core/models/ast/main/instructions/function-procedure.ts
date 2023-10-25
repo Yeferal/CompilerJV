@@ -7,27 +7,38 @@ import { Node } from "../node";
 import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
+import { EncapsulationType } from "../utils/encapsulation-type";
 import { DeclarationArray } from "./declaration-array";
 import { DeclarationParam } from "./declaration-param";
 import { DeclarationVar } from "./declaration-var";
 import { ListDeclaration } from "./list-declaration";
 
 export class FunctionProcedure extends Node {
+    private _isStatic: boolean;
     private _isFunction: boolean; //Si es false, entonces es un procedimiento
     private _id: string;
     private _listParams: Array<Node>;
     private _instructions: Array<Node>;
-    private _encapsulation: string = "public"
+    private _encapsulationType: EncapsulationType;
+    private _isOverride: boolean;
     size: number = 0;
 
-	constructor(positionToken: PositionToken, type: DynamicDataType, toke: string, isFunction: boolean, id: string, listParams: Array<Node>, instructions: Array<Node>) {
-		super(positionToken, type, toke);
-        this._isFunction = isFunction;
+	constructor(positionToken: PositionToken, type: DynamicDataType, token: string, isStatic: boolean, isFunction: boolean, id: string, listParams: Array<Node>, instructions: Array<Node>) {
+		super(positionToken, type, token);
+        this._isStatic = isStatic;
+		this._isFunction = isFunction;
 		this._id = id;
 		this._listParams = listParams;
 		this._instructions = instructions;
 	}
-    
+
+    /**
+     * Getter isStatic
+     * @return {boolean}
+     */
+	public get isStatic(): boolean {
+		return this._isStatic;
+	}
 
     /**
      * Getter isFunction
@@ -59,6 +70,30 @@ export class FunctionProcedure extends Node {
      */
 	public get instructions(): Array<Node> {
 		return this._instructions;
+	}
+
+    /**
+     * Getter encapsulationType
+     * @return {EncapsulationType}
+     */
+	public get encapsulationType(): EncapsulationType {
+		return this._encapsulationType;
+	}
+
+    /**
+     * Getter isOverride
+     * @return {boolean}
+     */
+	public get isOverride(): boolean {
+		return this._isOverride;
+	}
+
+    /**
+     * Setter isStatic
+     * @param {boolean} value
+     */
+	public set isStatic(value: boolean) {
+		this._isStatic = value;
 	}
 
     /**
@@ -94,20 +129,22 @@ export class FunctionProcedure extends Node {
 	}
 
     /**
-     * Getter encapsulation
-     * @return {string }
+     * Setter encapsulationType
+     * @param {EncapsulationType} value
      */
-	public get encapsulation(): string  {
-		return this._encapsulation;
+	public set encapsulationType(value: EncapsulationType) {
+		this._encapsulationType = value;
 	}
 
     /**
-     * Setter encapsulation
-     * @param {string } value
+     * Setter isOverride
+     * @param {boolean} value
      */
-	public set encapsulation(value: string ) {
-		this._encapsulation = value;
+	public set isOverride(value: boolean) {
+		this._isOverride = value;
 	}
+
+    
 
     public isTypeCorrect(typeAsig: SymbolType): boolean{
         const typesCorrect = [SymbolType.FUNCTION, SymbolType.PROCEDURE, SymbolType.VOID];
@@ -140,7 +177,7 @@ export class FunctionProcedure extends Node {
             false,                                  //isArray
             null,                                   //listDims
             false,                                  //isReference
-            null,                     //encapsulation
+            null,                     //encapsulationType
             handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
             false                                   //isConst
         );
@@ -155,7 +192,7 @@ export class FunctionProcedure extends Node {
         const symbolFunc = handlerComprobation.symbolTable.searchSymbol(this.id);
         if (symbolFunc) {
             //Error ya existe alguna simbolo con ese nombre
-            const errorGramm = new ErrorGramm(this.positionToken, this.toke, `Ya existe una simbolo con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `Ya existe una simbolo con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
             return this.type;
         }
@@ -170,7 +207,7 @@ export class FunctionProcedure extends Node {
             const resParam = this.listParams[j].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             if (!this.isTypeCorrectParam(resParam)) {
                 //Error tipo de dato no admitido
-                const errorGramm = new ErrorGramm(this.positionToken, this.toke, `El tipo de dato del parametro no es correcto.`, ErrorType.SEMANTIC); 
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato del parametro no es correcto.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
                 return this.type;
             }

@@ -3,37 +3,50 @@ import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
 
-export class ConditionalElse extends Node {
+export class PrintNode extends Node {
+    private _value: Node;
+    private _isLn: boolean;
 
-    private _instructions: Array<Node>;
-
-
-	constructor(positionToken: PositionToken, toke: string, instructions: Array<Node>) {
+	constructor(positionToken: PositionToken, toke: string, value: Node, isLn: boolean) {
         super(positionToken, null, toke);
-		this._instructions = instructions;
-	}
-
-
-    /**
-     * Getter instructions
-     * @return {Array<Node>}
-     */
-	public get instructions(): Array<Node> {
-		return this._instructions;
+        this._value = value;
+		this._isLn = isLn;
 	}
 
     /**
-     * Setter instructions
-     * @param {Array<Node>} value
+     * Getter value
+     * @return {Node}
      */
-	public set instructions(value: Array<Node>) {
-		this._instructions = value;
+	public get value(): Node {
+		return this._value;
 	}
 
+    /**
+     * Getter isLn
+     * @return {boolean}
+     */
+	public get isLn(): boolean {
+		return this._isLn;
+	}
+
+    /**
+     * Setter value
+     * @param {Node} value
+     */
+	public set value(value: Node) {
+		this._value = value;
+	}
+
+    /**
+     * Setter isLn
+     * @param {boolean} value
+     */
+	public set isLn(value: boolean) {
+		this._isLn = value;
+	}
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         throw new Error("Method not implemented.");
-
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {

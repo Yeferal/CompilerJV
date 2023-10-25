@@ -21,8 +21,8 @@ export class DeclarationAtribute extends Node{
     private _asignation: Node;
 
 
-	constructor(positionToken: PositionToken, type: DynamicDataType, toke: string, id: string, asignation: Node) {
-		super(positionToken, type, toke);
+	constructor(positionToken: PositionToken, type: DynamicDataType, token: string, id: string, asignation: Node) {
+		super(positionToken, type, token);
 		this._id = id;
 		this._asignation = asignation;
 	}
@@ -173,7 +173,7 @@ export class DeclarationAtribute extends Node{
         //Falta agregar si el simbolo es un parametro entonces que use el this como referencia
         if (resName) {
             //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
-            const errorGramm = new ErrorGramm(this.positionToken, this.toke, `Ya existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `Ya existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
         }
 
@@ -194,13 +194,13 @@ export class DeclarationAtribute extends Node{
                         return this.type;
                     }
                     //error
-                    const errorGramm = new ErrorGramm(this.positionToken, this.toke, `No es posible realizar la asignacion << ${this.toke} ${this.asignation.toke} >> El tipo de dato de la variable ${this.id} no es compatible con el tipo de dato de la asignacion.`, ErrorType.SEMANTIC); 
+                    const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> El tipo de dato de la variable ${this.id} no es compatible con el tipo de dato de la asignacion.`, ErrorType.SEMANTIC); 
                     handlerComprobation.listError.push(errorGramm);
 
                 }
             }else {
                 //error
-                const errorGramm = new ErrorGramm(this.positionToken, this.toke, `No es posible realizar la asignacion << ${this.toke} ${this.asignation.toke} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
             }
         } else {

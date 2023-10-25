@@ -1,18 +1,16 @@
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { Primitive } from "../expressions/primitive";
 import { Node } from "../node";
 
-export class ConditionalElse extends Node {
-
+export class DefaultNode extends Node {
     private _instructions: Array<Node>;
 
-
 	constructor(positionToken: PositionToken, toke: string, instructions: Array<Node>) {
-        super(positionToken, null, toke);
+		super(positionToken, null, toke);
 		this._instructions = instructions;
 	}
-
 
     /**
      * Getter instructions

@@ -4,17 +4,17 @@ import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
 import { MathType } from "../utils/math-type";
 
-export class MathNode extends Node{
+export class CallMath extends Node {
     private _mathType: MathType;
-    private _nodeLeft: Node;
-    private _nodeRigth: Node;
+    private _paramRight: Node;
+    private _paramLeft: Node;
 
 
-	constructor(positionToken: PositionToken, token: string, mathType: MathType, nodeLeft: Node, nodeRigth: Node) {
+	constructor(positionToken: PositionToken, token: string, mathType: MathType, paramRight: Node, paramLeft: Node) {
 		super(positionToken, null, token);
         this._mathType = mathType;
-		this._nodeLeft = nodeLeft;
-		this._nodeRigth = nodeRigth;
+		this._paramRight = paramRight;
+		this._paramLeft = paramLeft;
 	}
 
     /**
@@ -26,19 +26,19 @@ export class MathNode extends Node{
 	}
 
     /**
-     * Getter nodeLeft
+     * Getter paramRight
      * @return {Node}
      */
-	public get nodeLeft(): Node {
-		return this._nodeLeft;
+	public get paramRight(): Node {
+		return this._paramRight;
 	}
 
     /**
-     * Getter nodeRigth
+     * Getter paramLeft
      * @return {Node}
      */
-	public get nodeRigth(): Node {
-		return this._nodeRigth;
+	public get paramLeft(): Node {
+		return this._paramLeft;
 	}
 
     /**
@@ -50,36 +50,40 @@ export class MathNode extends Node{
 	}
 
     /**
-     * Setter nodeLeft
+     * Setter paramRight
      * @param {Node} value
      */
-	public set nodeLeft(value: Node) {
-		this._nodeLeft = value;
+	public set paramRight(value: Node) {
+		this._paramRight = value;
 	}
 
     /**
-     * Setter nodeRigth
+     * Setter paramLeft
      * @param {Node} value
      */
-	public set nodeRigth(value: Node) {
-		this._nodeRigth = value;
+	public set paramLeft(value: Node) {
+		this._paramLeft = value;
 	}
 
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         throw new Error("Method not implemented.");
+
     }
+
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {
         throw new Error("Method not implemented.");
     }
+
     public override executeComprobationAccess(handlerComprobation: HandlerComprobation): any {
         throw new Error("Method not implemented.");
     }
+
     public override executeComprobation(handlerComprobation: HandlerComprobation): any {
         throw new Error("Method not implemented.");
     }
+
     public override execute(environment: Environment): any {
         throw new Error("Method not implemented.");
     }
-
 }

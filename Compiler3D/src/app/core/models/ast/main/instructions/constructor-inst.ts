@@ -6,17 +6,35 @@ import { Symbol } from "../table/symbol";
 import { DynamicDataType } from "../utils/DynamicDataType";
 
 export class ConstructorInst extends Node {
+    private _id: string;
     private _listParams: Array<Node>;
     private _instructions: Array<Node>;
     private _encapsulation: string = "public"
     size: number = 0;
 
-    constructor(positionToken: PositionToken, toke: string, listParams: Array<Node>, instructions: Array<Node>) {
+    constructor(positionToken: PositionToken, toke: string, id: string, listParams: Array<Node>, instructions: Array<Node>) {
 		super(positionToken, null, toke);
-		this._listParams = listParams;
+		this._id = id;
+        this._listParams = listParams;
 		this._instructions = instructions;
 	}
 
+
+    /**
+     * Getter id
+     * @return {string}
+     */
+	public get id(): string {
+		return this._id;
+	}
+
+    /**
+     * Setter id
+     * @param {string} value
+     */
+	public set id(value: string) {
+		this._id = value;
+	}
 
     /**
      * Getter listParams

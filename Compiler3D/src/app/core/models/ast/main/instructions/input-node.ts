@@ -2,38 +2,35 @@ import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
+import { DynamicDataType } from "../utils/DynamicDataType";
 
-export class ConditionalElse extends Node {
+export class InputNode extends Node {
+    private _id: string;
 
-    private _instructions: Array<Node>;
-
-
-	constructor(positionToken: PositionToken, toke: string, instructions: Array<Node>) {
-        super(positionToken, null, toke);
-		this._instructions = instructions;
-	}
-
-
-    /**
-     * Getter instructions
-     * @return {Array<Node>}
-     */
-	public get instructions(): Array<Node> {
-		return this._instructions;
+	constructor(positionToken: PositionToken, type: DynamicDataType, toke: string, id: string) {
+        super(positionToken, type, toke);
+        this._id = id;
 	}
 
     /**
-     * Setter instructions
-     * @param {Array<Node>} value
+     * Getter id
+     * @return {string}
      */
-	public set instructions(value: Array<Node>) {
-		this._instructions = value;
+	public get id(): string {
+		return this._id;
+	}
+
+    /**
+     * Setter id
+     * @param {string} value
+     */
+	public set id(value: string) {
+		this._id = value;
 	}
 
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         throw new Error("Method not implemented.");
-
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {

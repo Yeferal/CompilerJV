@@ -7,16 +7,34 @@ import { Node } from "../node";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
 
-export class CallFunction extends Node {
+export class CallFunctionObject extends Node {
+    private _idObj: string;
     private _id: string;
     private _params: Array<Node>;
     private _isThis: boolean;
 
-	constructor(positionToken: PositionToken, token: string, id: string, params: Array<Node>, isThis: boolean) {
+	constructor(positionToken: PositionToken, token: string, idObj: string, id: string, params: Array<Node>, isThis: boolean) {
         super(positionToken, null, token);
-		this._id = id;
+		this._idObj = idObj;
+        this._id = id;
 		this._params = params;
         this._isThis = isThis;
+	}
+
+    /**
+     * Getter idObj
+     * @return {string}
+     */
+	public get idObj(): string {
+		return this._idObj;
+	}
+
+    /**
+     * Setter idObj
+     * @param {string} value
+     */
+	public set idObj(value: string) {
+		this._idObj = value;
 	}
 
     /**

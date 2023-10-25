@@ -9,19 +9,19 @@ export abstract class Node {
 
     private _positionToken: PositionToken;
     private _type: DynamicDataType;
-    private _toke: string;
+    private _token: string;
     public _typeVerifier: TypeVerifier = new TypeVerifier();
 
     /**
      * @constructor
      * @param positionToken fila y columna del token
      * @param type tipo de dato del token, solo aplica para lo que tenga un tipo de dato
-     * @param toke para cuando tenga un token en especifico para los posibles reportes
+     * @param token para cuando tenga un token en especifico para los posibles reportes
      */
-	constructor(positionToken: PositionToken, type: DynamicDataType, toke: string) {
+	constructor(positionToken: PositionToken, type: DynamicDataType, token: string) {
 		this._positionToken = positionToken;
 		this._type = type;
-		this._toke = toke;
+		this._token = token;
 	}
 
     public get positionToken(): PositionToken {
@@ -40,12 +40,12 @@ export abstract class Node {
         this._type = value;
     }
 
-    public get toke(): string {
-        return this._toke;
+    public get token(): string {
+        return this._token;
     }
     
-    public set toke(value: string) {
-        this._toke = value;
+    public set token(value: string) {
+        this._token = value;
     }
 
     /**

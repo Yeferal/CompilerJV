@@ -11,8 +11,8 @@ export class CallArray extends Node {
     private _dimensions: Array<Node>;
 
 
-	constructor(positionToken: PositionToken, toke: string, id: string, dimensions: Array<Node>) {
-		super(positionToken, null, toke);
+	constructor(positionToken: PositionToken, token: string, id: string, dimensions: Array<Node>) {
+		super(positionToken, null, token);
         this._id = id;
 		this._dimensions = dimensions;
 	}
@@ -55,7 +55,7 @@ export class CallArray extends Node {
         this.type = symbolArray.type;
         if (!symbolArray.isArray) {
             //Error no es un arreglo
-            const errorGramm = new ErrorGramm(this.positionToken, this.toke, `El simbolo << ${this.id} >> no es un arreglo.`, ErrorType.SEMANTIC); 
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El simbolo << ${this.id} >> no es un arreglo.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
             return this.type;
         }
@@ -63,7 +63,7 @@ export class CallArray extends Node {
         //Verifica el numero de dims osea [] [] [] que conicida con el # de dims de la llamada
         if (symbolArray.listDims.length != this.dimensions.length) {
             //Error
-            const errorGramm = new ErrorGramm(this.positionToken, this.toke, `el numero de parametros de las dimensiones no coincide en el arreglo << ${this.id} >>.`, ErrorType.SEMANTIC); 
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `el numero de parametros de las dimensiones no coincide en el arreglo << ${this.id} >>.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
         }
 
@@ -72,7 +72,7 @@ export class CallArray extends Node {
             const resType = this.dimensions[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             if (resType != handlerComprobation.typeTable.getDataType("INTEGER")) {
                 //Error no es un entero
-                const errorGramm = new ErrorGramm(this.positionToken, this.toke, `El valor de la dimension no es un entero en el arrglo << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `El valor de la dimension no es un entero en el arrglo << ${this.id} >>.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
             }
         }

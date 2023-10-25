@@ -10,41 +10,19 @@ import { DynamicDataType } from "../utils/DynamicDataType";
 import { DataArray } from "./data-array";
 
 export class AsignationArray extends Node {
-    private _isConst: boolean;
-    private _DynamicDataType: DynamicDataType;
+
     private _id: string;
-    private _asignation: DataArray;
     private _dimensions: Array<Node>;
+    private _asignation: Node;
     private _sizeArray: number; // Tamanio total del arreglo, pero creo que no se va usar porque no es necesario calcularlo
-    private _isParama: boolean = false;
+    private _isThis: boolean;
 
-
-	constructor(positionToken: PositionToken, toke: string, isConst: boolean, DynamicDataType: DynamicDataType, id: string, asignation: DataArray, dimensions: Array<Node>, sizeArray: number, isParama: boolean ) {
+	constructor(positionToken: PositionToken, toke: string, id: string, dimensions: Array<Node>, asignation: Node, isThis: boolean) {
 		super(positionToken, null, toke);
-        this._isConst = isConst;
-		this._DynamicDataType = DynamicDataType;
-		this._id = id;
-		this._asignation = asignation;
+        this._id = id;
 		this._dimensions = dimensions;
-		this._sizeArray = sizeArray;
-		this._isParama = isParama;
-	}
-
-
-    /**
-     * Getter isConst
-     * @return {boolean}
-     */
-	public get isConst(): boolean {
-		return this._isConst;
-	}
-
-    /**
-     * Getter DynamicDataType
-     * @return {DynamicDataType}
-     */
-	public get DynamicDataType(): DynamicDataType {
-		return this._DynamicDataType;
+		this._asignation = asignation;
+        this._isThis = isThis;
 	}
 
     /**
@@ -56,19 +34,19 @@ export class AsignationArray extends Node {
 	}
 
     /**
-     * Getter asignation
-     * @return {DataArray}
-     */
-	public get asignation(): DataArray {
-		return this._asignation;
-	}
-
-    /**
      * Getter dimensions
      * @return {Array<Node>}
      */
 	public get dimensions(): Array<Node> {
 		return this._dimensions;
+	}
+
+    /**
+     * Getter asignation
+     * @return {Node}
+     */
+	public get asignation(): Node {
+		return this._asignation;
 	}
 
     /**
@@ -80,43 +58,11 @@ export class AsignationArray extends Node {
 	}
 
     /**
-     * Getter isParama
-     * @return {boolean }
-     */
-	public get isParama(): boolean  {
-		return this._isParama;
-	}
-
-    /**
-     * Setter isConst
-     * @param {boolean} value
-     */
-	public set isConst(value: boolean) {
-		this._isConst = value;
-	}
-
-    /**
-     * Setter DynamicDataType
-     * @param {DynamicDataType} value
-     */
-	public set DynamicDataType(value: DynamicDataType) {
-		this._DynamicDataType = value;
-	}
-
-    /**
      * Setter id
      * @param {string} value
      */
 	public set id(value: string) {
 		this._id = value;
-	}
-
-    /**
-     * Setter asignation
-     * @param {DataArray} value
-     */
-	public set asignation(value: DataArray) {
-		this._asignation = value;
 	}
 
     /**
@@ -128,6 +74,14 @@ export class AsignationArray extends Node {
 	}
 
     /**
+     * Setter asignation
+     * @param {Node} value
+     */
+	public set asignation(value: Node) {
+		this._asignation = value;
+	}
+
+    /**
      * Setter sizeArray
      * @param {number} value
      */
@@ -136,13 +90,20 @@ export class AsignationArray extends Node {
 	}
 
     /**
-     * Setter isParama
-     * @param {boolean } value
+     * Getter isThis
+     * @return {boolean}
      */
-	public set isParama(value: boolean ) {
-		this._isParama = value;
+	public get isThis(): boolean {
+		return this._isThis;
 	}
 
+    /**
+     * Setter isThis
+     * @param {boolean} value
+     */
+	public set isThis(value: boolean) {
+		this._isThis = value;
+	}
 
     public isTypeCorrect(typeAsig: SymbolType): boolean{
         const typesCorrect = [SymbolType.ATRIBUT, SymbolType.KEY_WORD, SymbolType.PARAM, SymbolType.VAR];
@@ -150,64 +111,64 @@ export class AsignationArray extends Node {
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        const resName = handlerComprobation.symbolTable.searchSymbol(this.id);
-        if (!resName) {
-            //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
-            const errorGramm = new ErrorGramm(this.positionToken, this.toke, `No existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
-            handlerComprobation.listError.push(errorGramm);
-        } else {
-            this.type = resName.type;
+        // const resName = handlerComprobation.symbolTable.searchSymbol(this.id);
+        // if (!resName) {
+        //     //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
+        //     const errorGramm = new ErrorGramm(this.positionToken, this.token, `No existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
+        //     handlerComprobation.listError.push(errorGramm);
+        // } else {
+        //     this.type = resName.type;
             
-            if (!resName.isArray) {
-                //error de tipo de simbolo, no es un arreglo
-                const errorGramm = new ErrorGramm(this.positionToken, this.toke, `La variable << ${this.id}>> no es un arreglo.`, ErrorType.SEMANTIC); 
-                handlerComprobation.listError.push(errorGramm);
-            }
+        //     if (!resName.isArray) {
+        //         //error de tipo de simbolo, no es un arreglo
+        //         const errorGramm = new ErrorGramm(this.positionToken, this.token, `La variable << ${this.id}>> no es un arreglo.`, ErrorType.SEMANTIC); 
+        //         handlerComprobation.listError.push(errorGramm);
+        //     }
 
-            if (!this.isTypeCorrect(resName.symbolType)) {
-                //error de tipo de simbolo, no es un simbolo de tipo variable asignable
-                const errorGramm = new ErrorGramm(this.positionToken, this.toke, `La simbolo << ${this.id}>> no es una variable, atributo o parametro.`, ErrorType.SEMANTIC); 
-                handlerComprobation.listError.push(errorGramm);
-            } else {
-                //Verificamos que no se una constante
-                if (resName.isConst) {
-                    //error porque es una constante que no puede ser cambiada
-                    const errorGramm = new ErrorGramm(this.positionToken, this.toke, `La variable es una constante: << ${this.id}>>, no es asignable.`, ErrorType.SEMANTIC); 
-                    handlerComprobation.listError.push(errorGramm);
-                    // return this.type;
-                }
-            }
-        }
+        //     if (!this.isTypeCorrect(resName.symbolType)) {
+        //         //error de tipo de simbolo, no es un simbolo de tipo variable asignable
+        //         const errorGramm = new ErrorGramm(this.positionToken, this.token, `La simbolo << ${this.id}>> no es una variable, atributo o parametro.`, ErrorType.SEMANTIC); 
+        //         handlerComprobation.listError.push(errorGramm);
+        //     } else {
+        //         //Verificamos que no se una constante
+        //         if (resName.isConst) {
+        //             //error porque es una constante que no puede ser cambiada
+        //             const errorGramm = new ErrorGramm(this.positionToken, this.token, `La variable es una constante: << ${this.id}>>, no es asignable.`, ErrorType.SEMANTIC); 
+        //             handlerComprobation.listError.push(errorGramm);
+        //             // return this.type;
+        //         }
+        //     }
+        // }
 
-        const resAsig = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-        if (resAsig) {
-            if ( this.type == resAsig) {
-                //En caso de que sea una asignacion por medio de una variable
-                if (this.asignation instanceof Identifier) {
-                    const identifier: Identifier = this.asignation as Identifier;
-                    const symbolIdentifier = handlerComprobation.symbolTable.searchSymbol(identifier.id);
-                    if (!symbolIdentifier.isArray) {
-                        //error de tipo de simbolo, no es un arreglo
-                        const errorGramm = new ErrorGramm(this.positionToken, this.toke, `La simbolo << ${identifier.id}>> no es una variable de tipo arreglo.`, ErrorType.SEMANTIC); 
-                        handlerComprobation.listError.push(errorGramm);
-                    }
-                }
+        // const resAsig = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        // if (resAsig) {
+        //     if ( this.type == resAsig) {
+        //         //En caso de que sea una asignacion por medio de una variable
+        //         if (this.asignation instanceof Identifier) {
+        //             const identifier: Identifier = this.asignation as Identifier;
+        //             const symbolIdentifier = handlerComprobation.symbolTable.searchSymbol(identifier.id);
+        //             if (!symbolIdentifier.isArray) {
+        //                 //error de tipo de simbolo, no es un arreglo
+        //                 const errorGramm = new ErrorGramm(this.positionToken, this.token, `La simbolo << ${identifier.id}>> no es una variable de tipo arreglo.`, ErrorType.SEMANTIC); 
+        //                 handlerComprobation.listError.push(errorGramm);
+        //             }
+        //         }
 
-                return this.type;
-            } else {
-                //Verificar si la asignation es posible, por ejemplo que se de tipo int y que la asignation sea un char lo cual se puede
-                const resVeri = this._typeVerifier.verifierTypeAsignationNode(this.type, resAsig);
-                if (!resVeri) {
-                    //error
-                    const errorGramm = new ErrorGramm(this.positionToken, this.toke, `No es posible realizar la asignacion << ${this.toke} ${this.asignation.toke} >> El tipo de dato de la variable ${this.id} no es compatible con el tipo de dato de la asignation.`, ErrorType.SEMANTIC); 
-                    handlerComprobation.listError.push(errorGramm);
-                }
-            }
-        }else {
-            //error
-            const errorGramm = new ErrorGramm(this.positionToken, this.toke, `No es posible realizar la asignacion << ${this.toke} ${this.asignation.toke} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
-            handlerComprobation.listError.push(errorGramm);
-        }
+        //         return this.type;
+        //     } else {
+        //         //Verificar si la asignation es posible, por ejemplo que se de tipo int y que la asignation sea un char lo cual se puede
+        //         const resVeri = this._typeVerifier.verifierTypeAsignationNode(this.type, resAsig);
+        //         if (!resVeri) {
+        //             //error
+        //             const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.toke} >> El tipo de dato de la variable ${this.id} no es compatible con el tipo de dato de la asignation.`, ErrorType.SEMANTIC); 
+        //             handlerComprobation.listError.push(errorGramm);
+        //         }
+        //     }
+        // }else {
+        //     //error
+        //     const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.toke} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
+        //     handlerComprobation.listError.push(errorGramm);
+        // }
         return this.type;
 
     }

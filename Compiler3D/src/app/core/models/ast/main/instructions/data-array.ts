@@ -9,8 +9,8 @@ import { DynamicDataType } from "../utils/DynamicDataType";
 export class DataArray extends Node {
     private _contentList: Array<Node>;
 
-    constructor(positionToken: PositionToken, contentList: Array<Node>){
-        super(positionToken, null, "");
+    constructor(positionToken: PositionToken, token: string, contentList: Array<Node>){
+        super(positionToken, null, token);
         this._contentList = contentList;
     }
 
@@ -29,7 +29,7 @@ export class DataArray extends Node {
                 const res = element.searchTypeArray(handlerComprobation);
                 
                 if (!res) {
-                    const errorGramm = new ErrorGramm(this.positionToken, this.toke, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.toke} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
+                    const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.token} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
                     handlerComprobation.listError.push(errorGramm);
                     return null;
                 }
@@ -40,7 +40,7 @@ export class DataArray extends Node {
                 }else {
                     if (typeArray != res) {
                         //ERROR de tipos
-                        const errorGramm = new ErrorGramm(this.positionToken, this.toke, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.toke} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
+                        const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.token} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
                         handlerComprobation.listError.push(errorGramm);
                         return null;
                     }
@@ -51,7 +51,7 @@ export class DataArray extends Node {
                 const res = element.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
 
                 if (!res) {
-                    const errorGramm = new ErrorGramm(this.positionToken, this.toke, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.toke} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
+                    const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.token} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
                     handlerComprobation.listError.push(errorGramm);
                     return null;
                 }
@@ -62,7 +62,7 @@ export class DataArray extends Node {
                 }else {
                     if (typeArray != res) {
                         //ERROR de tipos
-                        const errorGramm = new ErrorGramm(this.positionToken, this.toke, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.toke} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
+                        const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.token} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
                         handlerComprobation.listError.push(errorGramm);
                         return null;
                     }
@@ -85,7 +85,7 @@ export class DataArray extends Node {
                     } else {
                         if (dimCount != dataArray.contentList.length) {
                             //Error de unicidad o dimensiones
-                            const errorGramm = new ErrorGramm(this.positionToken, this.toke, `El numero de valores de los arreglos no son congruentes.`, ErrorType.SEMANTIC); 
+                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de valores de los arreglos no son congruentes.`, ErrorType.SEMANTIC); 
                             handlerComprobation.listError.push(errorGramm);
                             return 0;
                         }
@@ -115,7 +115,7 @@ export class DataArray extends Node {
             return resType; //retornamos el tipo de dato de los valores del arreglo
         }
         //ERROR de tipos
-        const errorGramm = new ErrorGramm(this.positionToken, this.toke, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato. El tipo de dato es inconsistente.`, ErrorType.SEMANTIC); 
+        const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato. El tipo de dato es inconsistente.`, ErrorType.SEMANTIC); 
         handlerComprobation.listError.push(errorGramm);
         return null;
 
