@@ -8,11 +8,10 @@ export class ConditionalSwitch extends Node {
     private _listCases: Array<Node>;
     private _defaultCase: Node;
 
-	constructor(positionToken: PositionToken, toke: string, value: Node, listCases: Array<Node>, defaultCase: Node) {
+	constructor(positionToken: PositionToken, toke: string, value: Node, listCases: Array<Node>) {
 		super(positionToken, null, toke);
         this._value = value;
 		this._listCases = listCases;
-		this._defaultCase = defaultCase;
 	}
 
     /**

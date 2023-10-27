@@ -1,23 +1,20 @@
-export const enterText1 = 
-`
-void main() {
-    @Getter 
-    Clase1 [] ar = new Clase1[4];
-    /*int arr [][] = new int[2][3], ads [] = new int[3];
-        */
-    int [][] arr = new int[2][3], [] ads  = new int[3];
-    int [][] arre = new int[2][3];
-    arre = new int[5][5];
-    Clase1 clas = new Clase1(3,4+5/8+3, "daf", 'e');
-    arr[0][0]= 4;
-    arr[0][2]= 3;
-    arre[0][0] = 4;
-    var d = 4;
-    int a = 3, b = 4, c = 5;
-  }
+export const enterText = 
+`class Clase1 {
+
+	void main(){
+		int [] a = new int[3];
+		int res = suma(1, 3, new Clase(a), new int[3]);
+		Clase1 clase = new Clase1(new int[4], new int[4], new Clase[3]);
+	}
+
+	public int suma(int x, int y, Clase1 clase, int [] ind) {
+		return x + y;
+	}
+}
+
 `
 
-export const enterText = 
+export const enterText1 = 
 `public class Clase1 extends ClasePadre {
     private static int val1;
     private static final int val2;

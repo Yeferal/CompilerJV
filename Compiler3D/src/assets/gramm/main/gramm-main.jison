@@ -228,8 +228,8 @@ Decimal         {Numero} [.] {Numero}
 /* EXPRESIONES REGULARES */
 <INITIAL>\"[^\"]*\"			                                {/* paint(yytext); */ yytext = yytext.substr(0,yyleng-0); return 'string_primitive'; }
 <INITIAL>\'[^\']?\'			                                {/* paint(yytext); */yytext = yytext.substr(0,yyleng-0); return 'char_primitive'; }
-<INITIAL>{Numero}  	                                        {/* paint('entero: '+yytext); */ return 'integer_primitive';}
 <INITIAL>{Decimal}                                          {/*paint('decimal: '+yytext); */ return 'decimal_primitive';}
+<INITIAL>{Numero}  	                                        {/* paint('entero: '+yytext); */ return 'integer_primitive';}
 <INITIAL>{id}                                               { return 'id';}
 
 /**/
@@ -449,6 +449,15 @@ STRUCT_CLASS
     { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $5, $6, true, false, $8); }
     |getter setter public final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
     { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $6, $7, true, true, $9); }
+    |getter setter class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $4, $5, true, false, $7); }
+    |getter setter final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $5, $6, true, true, $8); }
+    
+    |setter getter public class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $5, $6, true, false, $8); }
+    |setter getter public final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $6, $7, true, true, $9); }
     |setter getter class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
     { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, true, $4, $5, true, false, $7); }
     |setter getter final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
@@ -458,6 +467,15 @@ STRUCT_CLASS
     { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, false, $4, $5, true, false, $7); }
     |getter public final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
     { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, false, $5, $6, true, true, $8); }
+    |getter class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, false, $3, $4, true, false, $6); }
+    |getter final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, true, false, $4, $5, true, true, $7); }
+    
+    |setter public class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, true, $4, $5, true, false, $7); }
+    |setter public final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
+    { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, true, $5, $6, true, true, $8); }
     |setter class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
     { $$ = new ClassInst(new PositionToken(this._$.first_line, this._$.first_column), $1, false, true, $3, $4, true, false, $6); }
     |setter final class id STRUCT_EXTENDS keys_l CODE_CLASS keys_r 
@@ -859,7 +877,7 @@ STRUCT_DECLARATION_VAR
     |final DATATYPE_PRIMITIVE id STATE_ASIGNATION_VAR
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        $1, $2, DeclarationType.VAR, false, false, null, true, false,
+        $2, $2, DeclarationType.VAR, false, false, null, true, false,
         [new DeclarationVarible(new PositionToken(this._$.first_line, this._$.first_column), null, $3, $3, $4)]);
     }
     |DATATYPE_PRIMITIVE id STATE_ASIGNATION_VAR
@@ -947,7 +965,7 @@ STRUCT_ASIGNATION_VAR
     }
 
     //PARA LOS TRIBUTOS
-    |this id equal_mark ASIGNATION_VAR semicolon {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3, true, false); }
+    |this id equal_mark ASIGNATION_VAR semicolon {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, true, false); }
     |this id plus_plus semicolon
     {
         var arithPlus = new ArithmeticOperation(new PositionToken(
@@ -968,7 +986,7 @@ STRUCT_ASIGNATION_VAR
     }
 
     //Cuando es un objeto
-    |this id period id equal_mark ASIGNATION_VAR semicolon {$$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3, $5, true, false);}
+    |this id period id equal_mark ASIGNATION_VAR semicolon {$$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, $6, true, false);}
     |this id equal_mark new id parentheses_l parentheses_r semicolon
     {
         $$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2,
@@ -983,19 +1001,19 @@ STRUCT_ASIGNATION_VAR
     }
 
     //CUANDO ES UN ARREGLO
-    |this id equal_mark VALUE_ARRAY_STATE semicolon {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3, true, true); }
+    |this id equal_mark VALUE_ARRAY_STATE semicolon {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, true, true); }
     |this id equal_mark new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
     {
         $$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2,
-            new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $4, $2, $5),
+            new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $5, $4, $6),
             true, true);
     }
     |this id equal_mark new id STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
     {
         $$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2,
             new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column),
-            new DynamicDataType(1,$4, 1),
-            $2, $5),
+            new DynamicDataType(1,$5, 1),
+            $5, $6),
             false, true);
     }
 
@@ -1010,13 +1028,13 @@ STRUCT_ASIGNATION_VAR
 
 STRUCT_VAR
     :var id equal_mark ASIGNATION_VAR semicolon
-    {$$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3, $5, false);}
+    {$$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, false);}
     |final var id equal_mark ASIGNATION_VAR semicolon
     {$$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3, $5, true);}
 
     |var id equal_mark new id parentheses_l parentheses_r semicolon
     {
-        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3,
+        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2,
         new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, []),
         false);
     }
@@ -1028,8 +1046,8 @@ STRUCT_VAR
     }
     |var id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
     {
-        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3,
-        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, $8),
+        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2,
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $5, $5, $7),
         false);
     }
     |final var id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
@@ -1038,6 +1056,40 @@ STRUCT_VAR
         new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, $8),
         true);
     }
+
+    // VAR = ARREGLOS
+    |var id equal_mark new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
+    {
+        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2,
+        new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $5, $5, $6),
+        false);
+    }
+    |final var id equal_mark new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
+    {
+        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3,
+        new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, $7),
+        true);
+    }
+
+    |var id equal_mark new id STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
+    {
+        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2,
+        new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,$5, 1), $5, $6),
+        false);
+    }
+    |final var id equal_mark new id STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
+    {
+        $$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $3, $3,
+        new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,$6, 1), $6, $7),
+        true);
+    }
+
+
+
+
+
+
+
 
     |var error new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon {
         addError(this._$.first_line, this._$.first_column, $2, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -1065,19 +1117,19 @@ STRUCT_DECLARATION_VAR_ARRAY
     :STRUCT_DECLARATION_VAR_ARRAY comma STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_VAR_ARRAY
     {
         $$ = $1;
-        $$.listDeclaration.push(new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5, $3, true));
+        $$.listDeclaration.push(new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5, $3, false));
     }
     |final DATATYPE_PRIMITIVE STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_VAR_ARRAY
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        $1, $2, DeclarationType.ATRIBUT, false, false, null, true, false,
-        [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5, $3, true)]);
+        $2, $2, DeclarationType.VAR, false, false, null, true, false,
+        [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5, $3, false)]);
     }
     |DATATYPE_PRIMITIVE STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_VAR_ARRAY
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        $1, $2, DeclarationType.ATRIBUT, false, false, null, false, false,
-        [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $3, $3, $4, $2, true)]);
+        $1, $1, DeclarationType.VAR, false, false, null, false, false,
+        [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $3, $3, $4, $2, false)]);
     }
 
     |error STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_VAR_ARRAY {
@@ -1121,8 +1173,8 @@ VALUE_ARRAY_STATE
 ;
 
 VALUE_ARRAY_MULTI_STATE
-    :VALUE_ARRAY_MULTI_STATE comma keys_l VALUE_ARRAY_MULTI_STATE keys_r { $$ = $1; $$.push(new DataArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $4)); }
-    |VALUE_ARRAY_MULTI_STATE comma keys_l VALUE_UNIT_ARRAY_STATE keys_r { $$ = $1; $$.push(new DataArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $4)); }
+    :VALUE_ARRAY_MULTI_STATE comma keys_l VALUE_ARRAY_MULTI_STATE keys_r { $$ = $1; $$.push(new DataArray(new PositionToken(this._$.first_line, this._$.first_column), $3, $4)); }
+    |VALUE_ARRAY_MULTI_STATE comma keys_l VALUE_UNIT_ARRAY_STATE keys_r { $$ = $1; $$.push(new DataArray(new PositionToken(this._$.first_line, this._$.first_column), $3, $4)); }
     |keys_l VALUE_ARRAY_MULTI_STATE keys_r { $$ = [new DataArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $2)];}
     |keys_l VALUE_UNIT_ARRAY_STATE keys_r { $$ = [new DataArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $2)];}
 ;
@@ -1135,7 +1187,7 @@ VALUE_UNIT_ARRAY_STATE
         $$.push(new InstanceArray(
             new PositionToken(this._$.first_line, this._$.first_column),
             $4,
-            $1, $5));
+            $3, $5));
     }
     |VALUE_UNIT_ARRAY_STATE comma new id STRUCT_VALUE_DIMS_VAR_ARRAY
     {
@@ -1161,26 +1213,22 @@ STRUCT_ASIGNATION_VAR_ARRAY
     { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2, $4, false); }
     |id STRUCT_VALUE_DIMS_VAR_ARRAY equal_mark new id parentheses_l parentheses_r semicolon
     { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2,
-        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $5, $5, []),
-        false);
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $5, $5, []), false);
     }
     |id STRUCT_VALUE_DIMS_VAR_ARRAY equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
     { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2,
-        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $5, $5, $7),
-        false);
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $5, $5, $7), false);
     }
     //CUANDO SON ATRIBUTOS
     |this id STRUCT_VALUE_DIMS_VAR_ARRAY equal_mark ASIGNATION_VAR semicolon
-    { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2, $4, true); }
+    { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $3, $5, true); }
     |this id STRUCT_VALUE_DIMS_VAR_ARRAY equal_mark new id parentheses_l parentheses_r semicolon
-    { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2,
-        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $5, $5, []),
-        true);
+    { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $3,
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, []), true);
     }
     |this id STRUCT_VALUE_DIMS_VAR_ARRAY equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
-    { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2,
-        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $5, $5, $7),
-        true);
+    { $$ = new AsignationArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $3,
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, $8), true);
     }
 
     |this id error equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon {
@@ -1332,13 +1380,13 @@ STRUCT_DECLARATION_OBJECT_ATRIB
     |static final id id STATE_ASIGNATION_OBJECT
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        new DynamicDataType(1, $3, 1), $2, DeclarationType.ATRIBUT, false, false, null, true, true,
+        new DynamicDataType(1, $3, 1), $3, DeclarationType.ATRIBUT, false, false, null, true, true,
         [new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5)]);
     }
     |final static id id STATE_ASIGNATION_OBJECT
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        new DynamicDataType(1, $3, 1), $2, DeclarationType.ATRIBUT, false, false, null, true, true,
+        new DynamicDataType(1, $3, 1), $3, DeclarationType.ATRIBUT, false, false, null, true, true,
         [new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5)]);
     }
     |final id id STATE_ASIGNATION_OBJECT
@@ -1358,7 +1406,7 @@ STRUCT_DECLARATION_OBJECT_ATRIB
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
         new DynamicDataType(1, $1, 1),
-        $2, DeclarationType.ATRIBUT, false, false, null, false, false,
+        $1, DeclarationType.ATRIBUT, false, false, null, false, false,
         [new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), null, $2, $2, $3)]);
     }
 
@@ -1382,7 +1430,7 @@ STRUCT_DECLARATION_OBJECT_VAR
     |id id STATE_ASIGNATION_OBJECT
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        new DynamicDataType(1, $1, 1), $2, DeclarationType.VAR, false, false, null, false, false,
+        new DynamicDataType(1, $1, 1), $1, DeclarationType.VAR, false, false, null, false, false,
         [new DeclarationVarible(new PositionToken(this._$.first_line, this._$.first_column), null, $2, $2, $3)]);
     }
 
@@ -1413,7 +1461,23 @@ VALUE_ASIGNATION_OBJECT
 
 STATE_PARAM_OBJECT
     :STATE_PARAM_OBJECT comma STATE_VALUE {$$ = $1; $$.push($3);}
+    |STATE_PARAM_OBJECT comma new id parentheses_l STATE_PARAM_OBJECT parentheses_r
+    {$$ = $1; $$.push(new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $4, $4, $6));}
+    |STATE_PARAM_OBJECT comma new id parentheses_l parentheses_r
+    {$$ = $1; $$.push(new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $4, $4, []));}
+    |STATE_PARAM_OBJECT comma new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $4, $3, $5); }
+    |STATE_PARAM_OBJECT comma new id STRUCT_VALUE_DIMS_VAR_ARRAY
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,$4, 1), $3, $5); }
+
     |STATE_VALUE {$$ = [$1]}
+    |new id parentheses_l STATE_PARAM_OBJECT parentheses_r {$$ = [new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4)];}
+    |new id parentheses_l parentheses_r {$$ = [new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, [])];}
+    |new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $2, $1, $3); }
+    |new id STRUCT_VALUE_DIMS_VAR_ARRAY
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,$2, 1), $1, $3); }
+
 
     |STATE_PARAM_OBJECT error STATE_VALUE {
         addError(this._$.first_line, this._$.first_column, $2, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -1558,13 +1622,13 @@ STRUCT_DECLARATION_OBJECT_ATRIB_ARRAY
     |final static id STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_OBJECT_VAR_ARRAY
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        new DynamicDataType(1, $3, 1), $2, DeclarationType.ATRIBUT, false, false, null, true, true,
+        new DynamicDataType(1, $3, 1), $3, DeclarationType.ATRIBUT, false, false, null, true, true,
         [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $5, $5, $6, $4, true)]);
     }
     |static final id STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_OBJECT_VAR_ARRAY
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        new DynamicDataType(1, $3, 1), $2, DeclarationType.ATRIBUT, false, false, null, true, true,
+        new DynamicDataType(1, $3, 1), $3, DeclarationType.ATRIBUT, false, false, null, true, true,
         [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $5, $5, $6, $4, true)]);
     }
     |final id STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_OBJECT_VAR_ARRAY
@@ -1582,7 +1646,7 @@ STRUCT_DECLARATION_OBJECT_ATRIB_ARRAY
     |id STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_OBJECT_VAR_ARRAY
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        new DynamicDataType(1, $1, 1), $2, DeclarationType.ATRIBUT, false, false, null, false, false,
+        new DynamicDataType(1, $1, 1), $1, DeclarationType.ATRIBUT, false, false, null, false, false,
         [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $3, $3, $4, $2, true)]);
     }
 
@@ -1598,19 +1662,19 @@ STRUCT_DECLARATION_OBJECT_VAR_ARRAY
     :STRUCT_DECLARATION_OBJECT_VAR_ARRAY comma STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_OBJECT_VAR_ARRAY
     {
         $$ = $1;
-        $$.listDeclaration.push(new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5, $3, true));
+        $$.listDeclaration.push(new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5, $3, false));
     }
     |final id STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_OBJECT_VAR_ARRAY
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        new DynamicDataType(1, $1, 1), $2, DeclarationType.ATRIBUT, false, false, null, true, false,
-        [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5, $3, true)]);
+        new DynamicDataType(1, $2, 1), $2, DeclarationType.VAR, false, false, null, true, false,
+        [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $4, $4, $5, $3, false)]);
     }
     |id STRUCT_EMPTY_DIMS_VAR_ARRAY id STATE_ASIGNATION_OBJECT_VAR_ARRAY
     { $$ = new ListDeclaration(
         new PositionToken(this._$.first_line, this._$.first_column),
-        new DynamicDataType(1, $1, 1), $2, DeclarationType.ATRIBUT, false, false, null, false, false,
-        [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $3, $3, $4, $2, true)]);
+        new DynamicDataType(1, $1, 1), $1, DeclarationType.VAR, false, false, null, false, false,
+        [new DeclarationArray(new PositionToken(this._$.first_line, this._$.first_column), null, $3, $3, $4, $2, false)]);
     }
 
 
@@ -1635,7 +1699,7 @@ ASIGNATION_OBJECT_VAR_ARRAY
     :STATE_VALUE { $$ = $1; }
     |VALUE_ARRAY_STATE { $$ = $1; }
     |new id STRUCT_VALUE_DIMS_VAR_ARRAY
-    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1, $2, 1), $1, $3); }
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1, $2, 1), $2, $3); }
 
     |error STRUCT_VALUE_DIMS_VAR_ARRAY {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -1709,6 +1773,7 @@ STATE_WHILE
 STRUCT_WHILE
     :while parentheses_l STATE_VALUE parentheses_r keys_l CODE_FUNC_METOD keys_r
     {$$ = new ConditionalWhile(new PositionToken(this._$.first_line, this._$.first_column), $1, $3, $6);}
+
     |while error keys_l CODE_FUNC_METOD keys_r {
         addError(this._$.first_line, this._$.first_column, $2, "Error en la Expresion", ErrorType.SYNTACTIC);
     }
@@ -1721,6 +1786,7 @@ STATE_DO_WHILE
 STRUCT_DO_WHILE
     :do keys_l CODE_FUNC_METOD keys_r while parentheses_l STATE_VALUE parentheses_r semicolon
     {$$ = new ConditionalDoWhile(new PositionToken(this._$.first_line, this._$.first_column), $1, $7, $3);}
+
     |do keys_l CODE_FUNC_METOD keys_r while error semicolon {
         addError(this._$.first_line, this._$.first_column, $6, "Error en la Expresion", ErrorType.SYNTACTIC);
     }
@@ -1748,7 +1814,7 @@ ASIG_STATE_FOR
     {$$ = new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $2, $4);}
     |id equal_mark STATE_VALUE {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, false, false);}
     |var id equal_mark STATE_VALUE {$$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, false);}
-    |this id equal_mark STATE_VALUE {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3, true, false); }
+    |this id equal_mark STATE_VALUE {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, true, false); }
 
     |error id equal_mark STATE_VALUE {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -1772,8 +1838,7 @@ SENTENCE_STATE_FOR
     :id equal_mark ASIGNATION_VAR {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, false, false); }
     |id plus_plus 
     {
-        var arithPlus = new ArithmeticOperation(new PositionToken(
-            this._$.first_line, this._$.first_column), $2, ArithType.ADD,
+        var arithPlus = new ArithmeticOperation(new PositionToken(this._$.first_line, this._$.first_column), $2, ArithType.ADD,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
             );
@@ -1781,8 +1846,7 @@ SENTENCE_STATE_FOR
     }
     |id minus_minus
     {
-        var arithMinus = new ArithmeticOperation(new PositionToken(
-            this._$.first_line, this._$.first_column), $2, ArithType.SUBTRAC,
+        var arithMinus = new ArithmeticOperation(new PositionToken(this._$.first_line, this._$.first_column), $2, ArithType.SUBTRAC,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false),
             new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
             );
@@ -1802,7 +1866,7 @@ SENTENCE_STATE_FOR
         var arithPlus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.ADD,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, false),
-            new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
+            new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $3, 1)
             );
         $$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, arithPlus, true, false);
     }
@@ -1811,7 +1875,7 @@ SENTENCE_STATE_FOR
         var arithMinus = new ArithmeticOperation(new PositionToken(
             this._$.first_line, this._$.first_column), $2, ArithType.SUBTRAC,
             new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, false),
-            new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $2, 1)
+            new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1),  $3, 1)
             );
         $$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, arithMinus, true, false);
     }
@@ -1846,7 +1910,7 @@ STATE_SWITCH
 
 STRUCT_SWITCH
     :switch parentheses_l STATE_VALUE parentheses_r keys_l CONTENT_SWITCH keys_r
-    { $$ = new ConditionalSwitch(new PositionToken(this._$.first_line, this._$.first_column), $1, );}
+    { $$ = new ConditionalSwitch(new PositionToken(this._$.first_line, this._$.first_column), $1, $3, $6, null);}
 
     |switch error keys_l CONTENT_SWITCH keys_r {
         addError(this._$.first_line, this._$.first_column, $2, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -1970,19 +2034,19 @@ STRUCT_CALL_FUNCTION
     |id parentheses_l STATE_PARAM_CALL_FUNCTION parentheses_r
     { $$ = new CallFunction(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, false);}
     |this id parentheses_l parentheses_r
-    { $$ = new CallFunction(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, [], true);}
+    { $$ = new CallFunction(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, [], true);}
     |this id parentheses_l STATE_PARAM_CALL_FUNCTION parentheses_r
-    { $$ = new CallFunction(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, true);}
+    { $$ = new CallFunction(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $4, true);}
 
     //Para funciones de objetos
     |id period id parentheses_l parentheses_r
-    { $$ = new CallFunctionObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $3, [], false);}
+    { $$ = new CallFunctionObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, [], false);}
     |id period id parentheses_l STATE_PARAM_CALL_FUNCTION parentheses_r
-    { $$ = new CallFunctionObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $3, $5, false);}
+    { $$ = new CallFunctionObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, $5, false);}
     |this id period id parentheses_l parentheses_r
-    { $$ = new CallFunctionObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $3, [], true);}
+    { $$ = new CallFunctionObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $4, [], true);}
     |this id period id parentheses_l STATE_PARAM_CALL_FUNCTION parentheses_r
-    { $$ = new CallFunctionObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $3, $5, true);}
+    { $$ = new CallFunctionObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $4, $6, true);}
 
     |error period id parentheses_l STATE_PARAM_CALL_FUNCTION parentheses_r {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la Expresion", ErrorType.SYNTACTIC);
@@ -1992,8 +2056,27 @@ STRUCT_CALL_FUNCTION
 
 STATE_PARAM_CALL_FUNCTION
     :STATE_PARAM_CALL_FUNCTION comma STATE_VALUE  {$$ = $1; $$.push($3); }
+    |STATE_PARAM_CALL_FUNCTION comma new id parentheses_l STATE_PARAM_CALL_FUNCTION parentheses_r
+    {$$ = $1; $$.push(new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $4, $4, $6));}
+    |STATE_PARAM_CALL_FUNCTION comma new id parentheses_l parentheses_r
+    {$$ = $1; $$.push(new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $4, $4, []));}
+    
+    |STATE_PARAM_CALL_FUNCTION comma new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $4, $3, $5); }
+    |STATE_PARAM_CALL_FUNCTION comma new id STRUCT_VALUE_DIMS_VAR_ARRAY
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,$4, 1), $3, $5); }
+
     |STATE_VALUE {$$ = [$1];}
+    |new id parentheses_l STATE_PARAM_CALL_FUNCTION parentheses_r {$$ = [new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4)];}
+    |new id parentheses_l parentheses_r {$$ = [new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, [])];}
+    |VALUE_ARRAY_STATE
+    |new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $2, $1, $3); }
+    |new id STRUCT_VALUE_DIMS_VAR_ARRAY
+    { $$ = new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,$2, 1), $1, $3); }
+
 ;
+
 
 STATE_FUNCTION
     :STRUCT_FUNCTION 
@@ -2253,6 +2336,7 @@ STATE_RETURN
 
 STRUCT_CALL_ARRAY
     :id STRUCT_VALUE_DIMS_VAR_ARRAY {$$ = new CallArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2);}
+    |this id STRUCT_VALUE_DIMS_VAR_ARRAY {$$ = new CallArray(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3);}
 ;
 
 STRUCT_CALL_OBJECT_VALUE
