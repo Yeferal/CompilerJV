@@ -94,7 +94,7 @@ export class CallFunctionObject extends Node {
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //buscar la funciones para comprobar si existe
-        const symbolFunc = handlerComprobation.symbolTable.searchSymbol(this.id);
+        const symbolFunc = handlerComprobation.searchSymbol(this.id);
         this.type = symbolFunc.type;
 
         //Verificar que sea una funcion o procedimiento

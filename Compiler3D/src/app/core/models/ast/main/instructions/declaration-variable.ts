@@ -111,13 +111,13 @@ export class DeclarationVarible extends Node{
 
         newSymbol.ambit = handlerComprobation.getAmbitS();
 
-        handlerComprobation.symbolTable.addSymbol(newSymbol);
+        handlerComprobation.addSymbol(newSymbol);
         handlerComprobation.sizeFuncProc++;
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //Verifica que no exista otra simbolo con el mismo nombre
-        const resName = handlerComprobation.symbolTable.searchSymbol(this.id);
+        const resName = handlerComprobation.searchSymbol(this.id);
 
         //Falta agregar si el simbolo es un parametro entonces que use el this como referencia
         if (resName) {

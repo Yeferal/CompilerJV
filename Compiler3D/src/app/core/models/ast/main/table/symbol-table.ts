@@ -3,7 +3,11 @@ import { Symbol } from './symbol';
 import { forEach } from 'typescript-collections/dist/lib/arrays';
 
 export class SymbolTable {
-    private stackTable: Stack<Array<Symbol>> = new Stack<Array<Symbol>>();
+    public stackTable: Stack<Array<Symbol>> = new Stack<Array<Symbol>>();
+
+    constructor(){
+        this.stackTable.push([]);
+    }
 
     public addNewTable(){
         let newTable = new Array<Symbol>;
@@ -14,11 +18,10 @@ export class SymbolTable {
     }
 
     public searchSymbol(name: string): Symbol{
-        if (!this.stackTable.isEmpty) {
+        if (!this.stackTable.isEmpty()) {
             const tableTemp = this.stackTable.peek();
             for (let i = 0; i < tableTemp.length; i++) {
                 const symbol = tableTemp[i];
-                console.log(symbol.name);
                 if (name === symbol.name) {
                     return symbol;
                 }

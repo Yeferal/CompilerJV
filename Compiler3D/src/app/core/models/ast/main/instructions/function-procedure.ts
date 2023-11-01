@@ -184,12 +184,12 @@ export class FunctionProcedure extends Node {
 
         newSymbol.ambit = handlerComprobation.getAmbitS();
 
-        handlerComprobation.symbolTable.addSymbol(newSymbol);
+        handlerComprobation.addSymbol(newSymbol);
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //Buscar que no exista otro simbolo con ese nombre
-        const symbolFunc = handlerComprobation.symbolTable.searchSymbol(this.id);
+        const symbolFunc = handlerComprobation.searchSymbol(this.id);
         if (symbolFunc) {
             //Error ya existe alguna simbolo con ese nombre
             const errorGramm = new ErrorGramm(this.positionToken, this.token, `Ya existe una simbolo con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 

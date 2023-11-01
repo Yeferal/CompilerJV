@@ -1,4 +1,4 @@
 export enum EncapsulationType {
-    PUBLIC,
-    PRIVATE
+    PUBLIC = "PUBLIC",
+    PRIVATE = "PRIVATE"
 }

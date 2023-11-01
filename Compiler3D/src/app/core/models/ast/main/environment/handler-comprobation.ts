@@ -2,58 +2,44 @@ import { Stack } from 'typescript-collections';
 import { SymbolTable } from '../table/symbol-table';
 import { ErrorGramm } from '../../error/error-gramm';
 import { TypeTable } from '../table/TypeTable';
+import { Symbol } from '../table/symbol';
+import { Node } from '../node';
+import { ClassInst } from '../instructions/class-inst';
 
 export class HandlerComprobation {
-    private _symbolTable: SymbolTable = new SymbolTable();
-    private _typeTable: TypeTable = new TypeTable();
-    private _ambits: Stack<string> = new Stack<string>;
-    private _pointers: Stack<number> = new Stack<number>;
-    private _pointerNow: number;
-    private _listError: Array<ErrorGramm> = new Array<ErrorGramm>;
-    private _flagId = 0;
-    sizeFuncProc: number;
+    public symbolTable: SymbolTable = new SymbolTable();
+    public symbolAmbit: SymbolTable = new SymbolTable();
+    public typeTable: TypeTable = new TypeTable();
+    public ambits: Stack<string> = new Stack<string>;
+    public pointers: Stack<number> = new Stack<number>;
+    public pointerNow: number;
+    public listError: Array<ErrorGramm> = new Array<ErrorGramm>;
+    public flagId = 0;
+    public sizeFuncProc: number;
+    public listGetters: Array<Node> = [];
+    public listSetters: Array<Node> = [];
+    public listStatic: Array<Node> = [];
+    public actualClass: ClassInst;
+    public listNode: Array<Node>;
 
     constructor(){
-        this._pointers.push(0);
-        this._pointerNow = this._pointers.peek();
+        this.pointers.push(0);
+        this.pointerNow = this.pointers.peek()
+        this.ambits.push(""); //GLOBAL
     }
 
-    public get symbolTable(): SymbolTable {
-        return this._symbolTable;
-    }
-
-    public set symbolTable(value: SymbolTable) {
-        this._symbolTable = value;
-    }
-
-	public get typeTable(): TypeTable  {
-		return this._typeTable;
-	}
-
-	public set typeTable(value: TypeTable ) {
-		this._typeTable = value;
-	}
-
-    public get listError(): Array<ErrorGramm> {
-        return this._listError;
-    }
-
-    public set listError(value: Array<ErrorGramm>) {
-        this._listError = value;
-    }
-    
     public getIdDynamic(){
-        const idNum = this._flagId;
-        this._flagId++;
+        const idNum = this.flagId;
+        this.flagId++;
         return idNum;
     }
 
     public addAmbitS(ambit: string){
-        this._ambits.push(ambit);
+        this.ambits.push(ambit);
     }
 
     public getAmbitS(): string{
-        return this._ambits.peek();
+        return this.ambits.peek();
     }
 
     public getPackageRoot(){
@@ -61,19 +47,38 @@ export class HandlerComprobation {
     }
 
     public getAndAddPointer(): number {
-        const flagPoint = this._pointers.pop();
-        this._pointers.push(flagPoint + 1);
-        this._pointerNow = flagPoint + 1;
+        const flagPoint = this.pointers.pop();
+        this.pointers.push(flagPoint + 1);
+        this.pointerNow = flagPoint + 1;
         return flagPoint;
     }
 
     public addAmbit(){
-        this.symbolTable.addNewTable();
+        this.symbolAmbit.addNewTable();
     }
 
     public popAmbit(){
-        this.symbolTable.popTableAmbit();
+        this.symbolAmbit.popTableAmbit();
+    }
+
+    public addSymbol(symbol: Symbol){
+        this.symbolTable.addSymbol(symbol);
+        this.symbolAmbit.addSymbol(symbol);
+    }
+
+    public searchSymbol(name: string){
+        return this.symbolAmbit.searchSymbol(name);
     }
     
-    
+    public paintError(){
+        for (let i = 0; i < this.listError.length; i++) {
+            console.log(this.listError[i].toString());
+            
+            
+        }
+    }
+
+    public isExistType(name: string): boolean {
+        return this.typeTable.isExistType(name);
+    }
 }

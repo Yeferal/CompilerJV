@@ -20,121 +20,64 @@ export class DeclarationAtribute extends Node{
     private _id: string;
     private _asignation: Node;
 
-
 	constructor(positionToken: PositionToken, type: DynamicDataType, token: string, id: string, asignation: Node) {
 		super(positionToken, type, token);
 		this._id = id;
 		this._asignation = asignation;
 	}
 
-    /**
-     * Getter isGetter
-     * @return {boolean}
-     */
 	public get isGetter(): boolean {
 		return this._isGetter;
 	}
 
-    /**
-     * Getter isSetter
-     * @return {boolean}
-     */
 	public get isSetter(): boolean {
 		return this._isSetter;
 	}
 
-    /**
-     * Getter encapsulationType
-     * @return {EncapsulationType}
-     */
 	public get encapsulationType(): EncapsulationType {
 		return this._encapsulationType;
 	}
 
-    /**
-     * Getter isFinal
-     * @return {boolean}
-     */
 	public get isFinal(): boolean {
 		return this._isFinal;
 	}
 
-    /**
-     * Getter isStatic
-     * @return {boolean}
-     */
 	public get isStatic(): boolean {
 		return this._isStatic;
 	}
 
-    /**
-     * Getter id
-     * @return {string}
-     */
 	public get id(): string {
 		return this._id;
 	}
 
-    /**
-     * Getter asignation
-     * @return {Node}
-     */
 	public get asignation(): Node {
 		return this._asignation;
 	}
 
-    /**
-     * Setter isGetter
-     * @param {boolean} value
-     */
 	public set isGetter(value: boolean) {
 		this._isGetter = value;
 	}
 
-    /**
-     * Setter isSetter
-     * @param {boolean} value
-     */
 	public set isSetter(value: boolean) {
 		this._isSetter = value;
 	}
 
-    /**
-     * Setter encapsulationType
-     * @param {EncapsulationType} value
-     */
 	public set encapsulationType(value: EncapsulationType) {
 		this._encapsulationType = value;
 	}
 
-    /**
-     * Setter isFinal
-     * @param {boolean} value
-     */
 	public set isFinal(value: boolean) {
 		this._isFinal = value;
 	}
 
-    /**
-     * Setter isStatic
-     * @param {boolean} value
-     */
 	public set isStatic(value: boolean) {
 		this._isStatic = value;
 	}
 
-    /**
-     * Setter id
-     * @param {string} value
-     */
 	public set id(value: string) {
 		this._id = value;
 	}
 
-    /**
-     * Setter asignation
-     * @param {Node} value
-     */
 	public set asignation(value: Node) {
 		this._asignation = value;
 	}
@@ -159,36 +102,84 @@ export class DeclarationAtribute extends Node{
             handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
             this.isFinal                            //isFinal
         );
-
+        newSymbol.isStatic = this.isStatic;
         newSymbol.ambit = handlerComprobation.getAmbitS();
 
-        handlerComprobation.symbolTable.addSymbol(newSymbol);
+        handlerComprobation.addSymbol(newSymbol);
         handlerComprobation.sizeFuncProc++;
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        if (this.type == null) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El token o id << ${this.id}>>, no tine tipo de dato.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
         //Verifica que no exista otra simbolo con el mismo nombre
-        const resName = handlerComprobation.symbolTable.searchSymbol(this.id);
-
-        //Falta agregar si el simbolo es un parametro entonces que use el this como referencia
-        if (resName) {
+        const resName = handlerComprobation.searchSymbol(this.id);
+        
+        if (resName != null) {
             //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
             const errorGramm = new ErrorGramm(this.positionToken, this.token, `Ya existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        //Comprobamos los getter y setters, static, final, encapsulamiento
+        if (this.isStatic || this.isFinal) {
+            if (this.isGetter || this.isSetter) {
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los decaradores getter y setter no pueden se usados en declaraciones static o final<< ${this.id}>>.`, ErrorType.SEMANTIC); 
+                handlerComprobation.listError.push(errorGramm);
+                return ;
+            }
+        }
+
+        if (this.isFinal && this.asignation == null) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `Una declaracion final debe de tener un valor de asignacion << ${this.id}>>.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        if (this.encapsulationType != EncapsulationType.PRIVATE) {
+            if (this.isGetter || this.isSetter) {
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los decaradores getter y setter solo pueden ser usados con encapsulamiento private << ${this.id}>>.`, ErrorType.SEMANTIC); 
+                handlerComprobation.listError.push(errorGramm);
+                return ;
+            }
+        }
+
+        if (!handlerComprobation.isExistType(this.type.name)) {  
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato << ${this.type.name}>> no existe.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        if (this.isGetter) {
+            handlerComprobation.listGetters.push(this);
+        }
+        if (this.isSetter) {
+            handlerComprobation.listSetters.push(this);
         }
 
         //Verificar el tipo de asignacion
-        if (this.asignation) {
-            const resAsig = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-            if (resAsig) {
-                if ( this.type == resAsig) {
+        if (this.asignation != null) {
+            const resAsig: DynamicDataType = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            
+            if (!handlerComprobation.isExistType(resAsig.name)) {  
+                const errorGramm = new ErrorGramm(this.asignation.positionToken, this.asignation.token, `El tipo de dato << ${resAsig.name}>> no existe.`, ErrorType.SEMANTIC); 
+                handlerComprobation.listError.push(errorGramm);
+                return ;
+            }
+
+            if (resAsig != null) {
+                if ( this.type.name == resAsig.name) {
                     //Agreagar a la tabla de simbolos
                     this.addSymbol(handlerComprobation);
                     return this.type;
                 } else {
                     //Verificar si la asignacion es posible, por ejemplo que se de tipo int y que la asignacion sea un char lo cual se puede
                     const resVeri = this._typeVerifier.verifierTypeAsignationNode(this.type, resAsig);
-                    if (resVeri) {
+                    if (resVeri != null) {
                         //Agreagar a la tabla de simbolos
                         this.addSymbol(handlerComprobation);
                         return this.type;

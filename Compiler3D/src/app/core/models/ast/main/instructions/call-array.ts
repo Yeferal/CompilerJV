@@ -51,7 +51,7 @@ export class CallArray extends Node {
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //Busca el simbolo si existe
-        const symbolArray = handlerComprobation.symbolTable.searchSymbol(this.id);
+        const symbolArray = handlerComprobation.searchSymbol(this.id);
         this.type = symbolArray.type;
         if (!symbolArray.isArray) {
             //Error no es un arreglo

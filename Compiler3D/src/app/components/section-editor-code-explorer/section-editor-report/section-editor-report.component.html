@@ -1,1 +1,106 @@
-<p>section-editor-report works!</p>
+
+<div class="container py-4">
+    <h1>Errores</h1>
+    <table class="col-12 bg-primary" id="customers">
+        <thead>
+            <tr>
+                <td>FILA</td>
+                <td>COLUMNA</td>
+                <td>TOKEN</td>
+                <td>TIPO</td>
+                <td>DESCRIPTION</td>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let item of listError">
+                <tr>
+                    <td>{{item.positionToken.row}}</td>
+                    <td>{{item.positionToken.column}}</td>
+                    <td>{{item.token}}</td>
+                    <td>{{item.errorType}}</td>
+                    <td>{{item.description}}</td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+</div>
+
+<div class="container py-4">
+    <div class="col-12 p-0">
+        <h1>Tabla de Tipos</h1>
+        <table class="col-12 bg-primary" id="customers">
+            <thead class="">
+                <tr>
+                    <td>ID</td>
+                    <td>Name</td>
+                    <td>Size</td>
+                    <!-- <td></td> -->
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let item of listTypes">
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.size}}</td>
+                        
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="col-12 p-0">
+        <h1>Tabla de Simbolos</h1>
+        <table class="col-12 bg-primary" id="customers">
+            <thead class="">
+                <tr>
+                    <td>ID</td>
+                    <td>Nombre</td>
+                    <td>NombreCode</td>
+                    <td>Categoria</td>
+                    <td>Tipo</td>
+
+                    <td>#Param</td>
+                    <td>listParams</td>
+                    <td>isArray</td>
+                    <td>listDims</td>
+
+                    <td>Dir</td>
+                    <td>Ambito</td>
+                    <td>Tamanio</td>
+                    <td>final</td>
+                    <td>static</td>
+                    <td>Encapsulamiento</td>
+                    <!-- <td></td> -->
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let item of arraySymbol">
+                    <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.nameCode}}</td>
+                        <td>{{item.symbolType}}</td>
+                        <td>{{item.type?.name}}</td>
+
+                        <td>{{item.numParams? item.numParams : ""}}</td>
+                        <td>{{item.listParams? item.listParams?.toString() : ""}}</td>
+                        <td>{{item.isArray? item.isArray : ""}}</td>
+                        <td>{{item.listDims? item.listDims?.toString() : ""}}</td>
+
+                        <td>{{item.direction}}</td>
+                        <td>{{item.ambit}}</td>
+                        <td>{{item.size}}</td>
+                        <td>{{item.isConst}}</td>
+                        <td>{{item.isStatic}}</td>
+                        <td>{{item.encapsulation}}</td>
+                        
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>

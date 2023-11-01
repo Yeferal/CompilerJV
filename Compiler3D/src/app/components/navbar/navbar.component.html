@@ -12,7 +12,7 @@
                 <li><a (click)="modalNewFile.openModal()">Nuevo Archivo</a></li>
                 <li><a (click)="modalOpenProject.openModal()">Abrir Proyecto</a></li>
                 <!-- <li><a (click)="modalOpenFile.openModal()">Abrir Archivo</a></li> -->
-                <li><a>Guardar</a></li>
+                <li><a (click)="save()">Guardar</a></li>
                 <li><a (click)="modalSaveAs.openModal()">Guardar Como</a></li>
                 <li><a (click)="closeProejct()">Cerrar Proyecto</a></li>
             </ul>
@@ -24,9 +24,9 @@
         >
             <a>Generar Codigo</a>
             <ul *ngIf="menuItems[1].showSubMenu && menuItems[1].clicked" class="sub-menu">
-                <li><a>Codigo de Tres Direcciones</a></li>
+                <li><a (click)="generateCode3D()">Codigo de Tres Direcciones</a></li>
                 <!-- <li><a>Codigo Optimizado</a></li> -->
-                <li><a>Codigo Assembler</a></li>
+                <li><a (click)="generateCodeAssembler()">Codigo Assembler</a></li>
             </ul>
         </li>
         <li class="has-children" 
@@ -36,9 +36,9 @@
         >
             <a>Descargar</a>
             <ul *ngIf="menuItems[2].showSubMenu && menuItems[2].clicked" class="sub-menu">
-                <li><a>Codigo de Tres Direcciones</a></li>
+                <li><a (click)="downloadCode3D()">Codigo de Tres Direcciones</a></li>
                 <!-- <li><a>Codigo Optimizado</a></li> -->
-                <li><a>Codigo Assembler</a></li>
+                <li><a (click)="downloadCodeAssembler()">Codigo Assembler</a></li>
             </ul>
         </li>
         <li class="has-children" 

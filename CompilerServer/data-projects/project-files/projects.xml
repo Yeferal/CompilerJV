@@ -1,7 +1,13 @@
 <libreria>
 	<proyecto nombre="pro">
+		<archivo path="main">main.java</archivo>
+		<carpeta nombre="clases">
+			<archivo path="Operador">Operador.java</archivo>
+			<archivo path="MathEspecial">MathEspecial.java</archivo>
+		</carpeta>
 	</proyecto>
 	<proyecto nombre="pueba">
+		<archivo path="main">main.java</archivo>
 	</proyecto>
 	<proyecto nombre="raiz">
 		<carpeta nombre="cap1">

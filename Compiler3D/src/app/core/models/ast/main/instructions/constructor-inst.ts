@@ -106,7 +106,7 @@ export class ConstructorInst extends Node {
 
         // newSymbol.ambit = handlerComprobation.getAmbitS();
 
-        // handlerComprobation.symbolTable.addSymbol(newSymbol);
+        // handlerComprobation.addSymbol(newSymbol);
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {

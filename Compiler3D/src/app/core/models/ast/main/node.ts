@@ -10,6 +10,7 @@ export abstract class Node {
     private _positionToken: PositionToken;
     private _type: DynamicDataType;
     private _token: string;
+    public isRunning: boolean = false;
     public _typeVerifier: TypeVerifier = new TypeVerifier();
 
     /**

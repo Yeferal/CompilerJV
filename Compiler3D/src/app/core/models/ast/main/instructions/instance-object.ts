@@ -1,3 +1,5 @@
+import { ErrorType } from "../../error/ErrorType";
+import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
@@ -6,7 +8,7 @@ import { Node } from "../node";
 export class InstanceObject extends Node {
     private _id: string;
     private _params: Array<Node>;
-
+    
 
 	constructor(positionToken: PositionToken, token: string, id: string, params: Array<Node>) {
 		super(positionToken, null, token);
@@ -46,9 +48,36 @@ export class InstanceObject extends Node {
 		this._params = value;
 	}
 
+    generateListParamsType(): Array<string>{
+        let list: Array<string> = [];
+
+        return list;
+    }
+
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        throw new Error("Method not implemented.");
+        
+        const resType = handlerComprobation.typeTable.getDataType(this.id);
+        if (resType == null) {
+            //Error no existe un tipo de dato
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato << ${this.type.name}>> no existe.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }else {
+            this.type = resType;
+        }
+
+        const symbolSearch = handlerComprobation.searchSymbol(this.id+"_"+this.id);
+        if (symbolSearch != null) {
+            console.log("Si lo encontro");
+
+        } else {
+            console.log("No lo encontro");
+            //El constructor aun no existe tenesmos que buscarlo, pero solo para sus parametros
+            
+        }
+
+        return this.type;
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {

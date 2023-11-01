@@ -12,7 +12,7 @@ router.post('/project', controller.postProject);
 router.post('/folder', controller.postFolder);
 router.post('/file', controller.postFile);
 
-router.put('/file-content/:nameFile', controller.putFileContent);
+router.put('/file-content/', controller.putFileContent);
 router.put('/file-contentAs/:nameFile', controller.putFileContentAs);
 
 

@@ -1,6 +1,15 @@
-<section class="section-tabs-editorcode" (wheel)="onMouseWheel($event)">
+<section class="section-tabs-editorcode" (wheel)="onMouseWheel($event)" *ngIf="listTabs && listTabs.length>0">
     <div class="tabs-container" #tabs>
-        <div class="tab">
+        <ng-container *ngFor="let item of listTabs; let i = index" >
+            <div class="tab tab-selected" [class.tab-selected]="item.selected" (click)="setSelecteNode(i)">
+                <a class="tab-file" >
+                    <span class="name-file">{{item.name}}</span>
+                    <span class="badge-save" *ngIf="item.update">*</span>
+                    <button class="btn btn-sm btn-close-tab">X</button>
+                </a>
+            </div>
+        </ng-container>
+        <!-- <div class="tab">
             <a class="tab-file">
                 <span class="name-file">fileasdf 1</span>
                 <span class="badge-save">*</span>
@@ -10,37 +19,8 @@
         <div class="tab tab-selected">
             <a class="tab-file">
                 <span class="name-file">fileasdf 2</span>
-                <!-- <span class="badge-save">*</span> -->
                 <button class="btn btn-sm btn-close-tab">X</button>
             </a>
-        </div>
-        <div class="tab">
-            <a class="tab-file">
-                <span class="name-file">fileddf 1</span>
-                <!-- <span class="badge-save">*</span> -->
-                <button class="btn btn-sm btn-close-tab">X</button>
-            </a>
-        </div>
-        <div class="tab">
-            <a class="tab-file">
-                <span class="name-file">filefdfd 2</span>
-                <span class="badge-save">*</span>
-                <button class="btn btn-sm btn-close-tab">X</button>
-            </a>
-        </div>
-        <div class="tab">
-            <a class="tab-file">
-                <span class="name-file">fileasas 1</span>
-                <span class="badge-save">*</span>
-                <button class="btn btn-sm btn-close-tab">X</button>
-            </a>
-        </div>
-        <div class="tab">
-            <a class="tab-file">
-                <span class="name-file">filef asd asdfa 2</span>
-                <span class="badge-save">*</span>
-                <button class="btn btn-sm btn-close-tab">X</button>
-            </a>
-        </div>
+        </div> -->
     </div>
 </section>

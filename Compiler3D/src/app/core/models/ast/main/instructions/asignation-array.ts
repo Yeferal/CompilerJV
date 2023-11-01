@@ -111,7 +111,7 @@ export class AsignationArray extends Node {
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        // const resName = handlerComprobation.symbolTable.searchSymbol(this.id);
+        // const resName = handlerComprobation.searchSymbol(this.id);
         // if (!resName) {
         //     //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
         //     const errorGramm = new ErrorGramm(this.positionToken, this.token, `No existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
@@ -146,7 +146,7 @@ export class AsignationArray extends Node {
         //         //En caso de que sea una asignacion por medio de una variable
         //         if (this.asignation instanceof Identifier) {
         //             const identifier: Identifier = this.asignation as Identifier;
-        //             const symbolIdentifier = handlerComprobation.symbolTable.searchSymbol(identifier.id);
+        //             const symbolIdentifier = handlerComprobation.searchSymbol(identifier.id);
         //             if (!symbolIdentifier.isArray) {
         //                 //error de tipo de simbolo, no es un arreglo
         //                 const errorGramm = new ErrorGramm(this.positionToken, this.token, `La simbolo << ${identifier.id}>> no es una variable de tipo arreglo.`, ErrorType.SEMANTIC); 

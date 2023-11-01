@@ -1,6 +1,7 @@
 %{
     var resultado;
-    var listErrors = new Array();
+    var listErrors = [];
+
 
     const { PositionToken } = require('src/app/core/models/ast/error/position-token.ts');
     const { ErrorGramm } = require("src/app/core/models/ast/error/error-gramm.ts");
@@ -83,11 +84,12 @@
     }
 
     function addError(row, column, token, description, errorType){
-        console.log("Entro en los errores");
+        // console.log("Entro en los errores");
         const newError = new ErrorGramm(new PositionToken(row, column), token, description, errorType);
         listErrors.push(newError);
-        console.log(newError.toString());
+        // console.log(newError.toString());
     }
+
 %}
 
 %lex
@@ -162,7 +164,7 @@ Decimal         {Numero} [.] {Numero}
 <INITIAL>"int"                                              { return "int"; }
 <INITIAL>"char"                                             { return "char"; }
 <INITIAL>"boolean"                                          { return "boolean"; }
-<INITIAL>("S"|"s")"tring"                                   { return "string"; }
+<INITIAL>"String"                                   { return "string"; }
 
 /* INPUTS */
 <INITIAL>"readfloat"                                            { return "readfloat"; }
@@ -188,6 +190,8 @@ Decimal         {Numero} [.] {Numero}
 <INITIAL>"Math.exp"                                         { return 'math_exp';}
 
 /* RESERVADAS */
+<INITIAL>"package"                                           { return 'package';}
+<INITIAL>"import"                                           { return 'package';}
 <INITIAL>"public"                                           { return 'public';}
 <INITIAL>"private"                                          { return 'private';}
 <INITIAL>"class"                                            { return 'class';}
@@ -259,7 +263,7 @@ Decimal         {Numero} [.] {Numero}
 
 
 ini
-    :CODE EOF { /*console.log($1);*/ /*resultado = $1;*/ /*return $1;*/ return new TreeAST($1, getListErrors());}
+    :CODE EOF { /*console.log($1);*/ resultado = $1; /*return $1;*/ return new TreeAST($1, getListErrors());}
     // |error EOF
 ;
 
@@ -268,6 +272,8 @@ CODE
     :CODE STRUCT_MAIN { $$ = $1; $$.push($2); }
     |CODE STRUCT_CLASS { $$ = $1; $$.push($2); }
     |CODE STATE_COMMENT { $$ = $1; }
+    |CODE STATE_PACKAGE { $$ = $1; }
+    |CODE STATE_IMPORT { $$ = $1; }
     | { $$ = []; }
 ;
 
@@ -322,9 +328,9 @@ DATA_VALUE
     |char_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"CHAR", 1), $1, $1);}
     |true { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"BOOLEAN", 1), $1, true);}
     |false { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"BOOLEAN", 1), $1, false);}
-    |string_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"FLOAT", 1), $1, $1);}
+    |string_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"STRING", 1), $1, $1);}
     |id { $$ = new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false);}
-    |this id { $$ = new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false);}
+    |this id { $$ = new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, true);}
     |null { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"NULL", 0), $1, null);}
     |STRUCT_CALL_FUNCTION { $$ = $1;}
     |STRUCT_CALL_ARRAY { $$ = $1;}
@@ -429,6 +435,26 @@ BLOCK_CONTENT_MAIN
     | { $$ = []; }
 ;
 
+STATE_PACKAGE
+    :package STRUCT_PACKAGE semicolon
+;
+
+STRUCT_PACKAGE
+    :STRUCT_PACKAGE comma id
+    |id
+;
+
+STATE_IMPORT
+    :import STRUCT_IMPORT semicolon
+    |import STRUCT_IMPORT comma mult semicolon
+;
+
+STRUCT_IMPORT
+    :STRUCT_IMPORT comma id
+    |id
+;
+
+
 /*
 ======================================================================================================================================
 |BLOQUE DE CODIGO DE CLASES
@@ -518,6 +544,10 @@ CODE_CLASS
 STATE_DECLARATION_ATRIB
     :STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $1.positionToken,
+        // $1.type, $1.token, $1.declarationType, false, false, EncapsulationType.PUBLIC, $1.isFinal, $1.isStatic,
+        // [...$1.listDeclaration]);
         $$ = $1;
         $$.isGetter = false;
         $$.isSetter = false;
@@ -525,6 +555,10 @@ STATE_DECLARATION_ATRIB
     }
     |getter STRUCT_DECLARATION_ATRIB semicolon
     {
+        $$ = new ListDeclaration(
+        $2.positionToken,
+        $2.type, $2.token, $2.declarationType, true, false, EncapsulationType.PUBLIC, $2.isFinal, $2.isStatic,
+        [...$2.listDeclaration]);
         $$ = $2;
         $$.isGetter = true;
         $$.isSetter = false;
@@ -532,6 +566,10 @@ STATE_DECLARATION_ATRIB
     }
     |setter STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $2.positionToken,
+        // $2.type, $2.token, $2.declarationType, false, true, EncapsulationType.PUBLIC, $2.isFinal, $2.isStatic,
+        // [...$2.listDeclaration]);
         $$ = $2;
         $$.isGetter = false;
         $$.isSetter = true;
@@ -539,6 +577,10 @@ STATE_DECLARATION_ATRIB
     }
     |getter setter STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $3.positionToken,
+        // $3.type, $3.token, $3.declarationType, true, true, EncapsulationType.PUBLIC, $3.isFinal, $3.isStatic,
+        // [...$3.listDeclaration]);
         $$ = $3;
         $$.isGetter = true;
         $$.isSetter = true;
@@ -546,6 +588,10 @@ STATE_DECLARATION_ATRIB
     }
     |setter getter STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $3.positionToken,
+        // $3.type, $3.token, $3.declarationType, true, true, EncapsulationType.PUBLIC, $3.isFinal, $3.isStatic,
+        // [...$3.listDeclaration]);
         $$ = $3;
         $$.isGetter = true;
         $$.isSetter = true;
@@ -554,6 +600,10 @@ STATE_DECLARATION_ATRIB
 
     |private STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $2.positionToken,
+        // $2.type, $2.token, $2.declarationType, false, false, EncapsulationType.PRIVATE, $2.isFinal, $2.isStatic,
+        // [...$2.listDeclaration]);
         $$ = $2;
         $$.isGetter = false;
         $$.isSetter = false;
@@ -561,6 +611,10 @@ STATE_DECLARATION_ATRIB
     }
     |getter private STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $3.positionToken,
+        // $3.type, $3.token, $3.declarationType, true, false, EncapsulationType.PRIVATE, $3.isFinal, $3.isStatic,
+        // [...$3.listDeclaration]);
         $$ = $3;
         $$.isGetter = true;
         $$.isSetter = false;
@@ -568,6 +622,10 @@ STATE_DECLARATION_ATRIB
     }
     |setter private STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $3.positionToken,
+        // $3.type, $3.token, $3.declarationType, false, true, EncapsulationType.PRIVATE, $3.isFinal, $3.isStatic,
+        // [...$3.listDeclaration]);
         $$ = $3;
         $$.isGetter = false;
         $$.isSetter = true;
@@ -575,6 +633,39 @@ STATE_DECLARATION_ATRIB
     }
     |getter setter private STRUCT_DECLARATION_ATRIB semicolon
     {
+        
+        // var newLD = new ListDeclaration(
+        // $4.positionToken,
+        // $4.type, $4.token, $4.declarationType, true, true, EncapsulationType.PRIVATE, $4.isFinal, $4.isStatic,
+        // [...$4.listDeclaration]);
+        // console.log(newLD);
+        // $4.isGetter = true;
+        // $4.isSetter = true;
+        // $4.encapsulationType = EncapsulationType.PRIVATE;
+        // $$ = $4;
+
+        // Crea una nueva instancia de ListDeclaration
+        // $$ = new ListDeclaration();
+
+        // Copiar las propiedades específicas de $4 a $$
+        // $$.positionToken = $4.positionToken;
+        // $$.type = $4.type;
+        // $$.token = $4.token;
+        // $$.declarationType = $4.declarationType;
+        // $$.isGetter = true;
+        // $$.isSetter = true;
+        // $$.encapsulationType = EncapsulationType.PRIVATE;
+        // $$.isFinal = $4.isFinal;
+        // $$.isStatic = $4.isStatic;
+        // $$.listDeclaration = $4.listDeclaration;
+
+        // Copia las propiedades de $4 a $$
+        // for (const prop in $4) {
+        //     if ($4.hasOwnProperty(prop)) {
+        //     $$[prop] = $4[prop];
+        //     }
+        // }
+        // console.log($$);
         $$ = $4;
         $$.isGetter = true;
         $$.isSetter = true;
@@ -582,6 +673,10 @@ STATE_DECLARATION_ATRIB
     }
     |setter getter private STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $4.positionToken,
+        // $4.type, $4.token, $4.declarationType, true, true, EncapsulationType.PRIVATE, $4.isFinal, $4.isStatic,
+        // [...$4.listDeclaration]);
         $$ = $4;
         $$.isGetter = true;
         $$.isSetter = true;
@@ -590,6 +685,10 @@ STATE_DECLARATION_ATRIB
 
     |public STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $2.positionToken,
+        // $2.type, $2.token, $2.declarationType, false, false, EncapsulationType.PUBLIC, $2.isFinal, $2.isStatic,
+        // [...$2.listDeclaration]);
         $$ = $2;
         $$.isGetter = false;
         $$.isSetter = false;
@@ -597,6 +696,10 @@ STATE_DECLARATION_ATRIB
     }
     |getter public STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $3.positionToken,
+        // $3.type, $3.token, $3.declarationType, true, false, EncapsulationType.PUBLIC, $3.isFinal, $3.isStatic,
+        // [...$3.listDeclaration]);
         $$ = $3;
         $$.isGetter = true;
         $$.isSetter = false;
@@ -604,6 +707,10 @@ STATE_DECLARATION_ATRIB
     }
     |setter public STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $3.positionToken,
+        // $3.type, $3.token, $3.declarationType, false, true, EncapsulationType.PUBLIC, $3.isFinal, $3.isStatic,
+        // [...$3.listDeclaration]);
         $$ = $3;
         $$.isGetter = false;
         $$.isSetter = true;
@@ -611,6 +718,10 @@ STATE_DECLARATION_ATRIB
     }
     |getter setter public STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $4.positionToken,
+        // $4.type, $4.token, $4.declarationType, true, true, EncapsulationType.PUBLIC, $4.isFinal, $4.isStatic,
+        // [...$4.listDeclaration]);
         $$ = $4;
         $$.isGetter = true;
         $$.isSetter = true;
@@ -618,6 +729,10 @@ STATE_DECLARATION_ATRIB
     }
     |setter getter public STRUCT_DECLARATION_ATRIB semicolon
     {
+        // $$ = new ListDeclaration(
+        // $4.positionToken,
+        // $4.type, $4.token, $4.declarationType, true, true, EncapsulationType.PUBLIC, $4.isFinal, $4.isStatic,
+        // [...$4.listDeclaration]);
         $$ = $4;
         $$.isGetter = true;
         $$.isSetter = true;

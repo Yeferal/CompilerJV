@@ -59,7 +59,7 @@ export class RationalOperation extends Node{
         let resRight = this.nodeRight.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         if (resLeft && resRight) {
             //Comprobacion de tipos
-            const resType: DynamicDataType = this._typeVerifier.verifierTypeRationalNode(resLeft, resRight);
+            const resType: DynamicDataType = this._typeVerifier.verifierTypeRationalNode(resLeft, resRight, this.rationalType);
             if (resLeft) {
                 return resType;
             } else {

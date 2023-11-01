@@ -24,6 +24,30 @@ export class TreeDirectoryComponent {
           this.projectsNow = root;
         }
       });
+
+      this.filesService.dataGen3D$.subscribe({
+        next: res => {
+          this.generateCode3D();
+        }
+      });
+
+      this.filesService.dataGenAssem$.subscribe({
+        next: res => {
+          this.generateCodeAssem();
+        }
+      });
+
+      this.filesService.dataDow3D$.subscribe({
+        next: res => {
+          this.downloadCode3D();
+        }
+      });
+
+      this.filesService.dataDowAssem$.subscribe({
+        next: res => {
+          this.downloadCodeAssem();
+        }
+      });
     }
 
   ngOnInit() {
@@ -62,5 +86,72 @@ export class TreeDirectoryComponent {
       });
     }
   }
+
+  generateCode3D(){
+    if (this.projectsNow == null) {
+      return ;
+    }
+    let listFile: Array<NodeDir> = [];
+    this.colletPath(this.projectsNow, listFile);
+    for (let i = 0; i < listFile.length; i++) {
+      this.filesService.getFileContent(listFile[i].path).subscribe({
+        next: res => {
+          listFile[i].text = res.data;
+        }
+      });
+    }
+    console.log(listFile);
+    
+  }
+
+  generateCodeAssem(){
+    if (this.projectsNow == null) {
+      return ;
+    }
+    // let listPath: Array<NodeDir> = [];
+    // this.colletPath(this.projectsNow, listPath);
+    // console.log(listPath);
+    
+  }
+
+  downloadCode3D(){
+    if (this.projectsNow == null) {
+      return ;
+    }
+    // let listPath: Array<NodeDir> = [];
+    // this.colletPath(this.projectsNow, listPath);
+    // console.log(listPath);
+    
+  }
+
+  downloadCodeAssem(){
+    if (this.projectsNow == null) {
+      return ;
+    }
+    // let listPath: Array<NodeDir> = [];
+    // this.colletPath(this.projectsNow, listPath);
+    // console.log(listPath);
+    
+  }
+  
+
+  colletPath(node: NodeDir, list: Array<NodeDir>){
+    if (node != null) {
+      if (node.typeNode == "root") {
+        for (let i = 0; i < node.nodeChilds.length; i++) {
+          this.colletPath(node.nodeChilds[i], list);
+        }
+      } else if (node.typeNode == "directory") {
+        for (let i = 0; i < node.nodeChilds.length; i++) {
+          this.colletPath(node.nodeChilds[i], list);
+        }
+      } else {
+        if (node.typeNode == "file") {
+          list.push(node);
+        }
+      }
+    }
+  }
+
 
 }

@@ -109,13 +109,13 @@ export class DeclarationParam extends Node {
 
         newSymbol.ambit = handlerComprobation.getAmbitS();
 
-        handlerComprobation.symbolTable.addSymbol(newSymbol);
+        handlerComprobation.addSymbol(newSymbol);
         handlerComprobation.sizeFuncProc++;
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //Verifica que no exista otra simbolo con el mismo nombre
-        const resName = handlerComprobation.symbolTable.searchSymbol(this.id);
+        const resName = handlerComprobation.searchSymbol(this.id);
         if (resName) {
             //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
             const errorGramm = new ErrorGramm(this.positionToken, this.token, `Ya existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 

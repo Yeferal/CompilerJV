@@ -1,14 +1,36 @@
 export const enterText = 
-`class Clase1 {
+`@Getter @Setter
+public class ClaseFunc {
+	private int id;
+    int r = (2*5)+2;
+    int [][][] arrData = {{{1, 3, 2}, {1, 3, 1}},{{1, 3, 11}, {1, 3, 10}}};
+    int [][] arrInstance = new int[2][2];
+    private int [][][] arrId = arrData;
+    ClaseFunc [] arrClase = new ClaseFunc[4];
+	
+	private String name;
+	String typo = "clase";
+    ClaseFunc clase = null;
+    ClaseFunc clase2 = new ClaseFunc();
 
-	void main(){
-		int [] a = new int[3];
-		int res = suma(1, 3, new Clase(a), new int[3]);
-		Clase1 clase = new Clase1(new int[4], new int[4], new Clase[3]);
+	void main() {
+		int a = 3;
+		int b = 2;
+		int c = (2*5)+a*b/a*2;
+		int res = Math.abs(c);
 	}
 
-	public int suma(int x, int y, Clase1 clase, int [] ind) {
-		return x + y;
+	public ClaseFunc(int id, String name){
+		this.id = id;
+		this.name = name;
+	}
+
+	public void pintar(){
+		System.out.println("Nombre: "+ name);
+	}
+
+	public int getId(){
+		return this.id;
 	}
 }
 

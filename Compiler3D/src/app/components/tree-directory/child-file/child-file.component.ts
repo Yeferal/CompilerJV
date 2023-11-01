@@ -16,16 +16,20 @@ export class ChildFileComponent {
   constructor(private shareDirService: ShareDirService){}
 
   setSelected(){
-    this.shareDirService.sendNodeData(this.data);
+    this.shareDirService.sendNodeFileData(this.data);
   }
 
   openFile(){
-    // console.log(this.data);
+    if (this.data.typeNode == "directory" || this.data.typeNode == "folder") {
+      return;
+    }
     if (this.data.active) {
       this.data.selected = true;
+      
     } else {
       this.data.active = true;
       this.data.selected = true;
     }
+    this.setSelected();
   }
 }

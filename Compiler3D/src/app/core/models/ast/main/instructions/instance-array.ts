@@ -1,3 +1,5 @@
+import { ErrorType } from "../../error/ErrorType";
+import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
@@ -46,7 +48,27 @@ export class InstanceArray extends Node {
 	}
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        throw new Error("Method not implemented.");
+        if (this.type == null) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `Tipo de dato no valido para la instancia del arreglo << ${this.token}>>.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        if (!handlerComprobation.typeTable.isExistType(this.type.name)) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `No existe el tipo de dato para la instancia del arreglo << ${this.token}>>.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+        
+        for (let i = 0; i < this.dims.length; i++) {
+            const resType: DynamicDataType = this.dims[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            if (resType.name !== "INTEGER") {
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de las dimenesione no son Enteros << ${this.token}>>.`, ErrorType.SEMANTIC); 
+                handlerComprobation.listError.push(errorGramm);
+                return ;
+            }
+        }
+        return this.type;
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {

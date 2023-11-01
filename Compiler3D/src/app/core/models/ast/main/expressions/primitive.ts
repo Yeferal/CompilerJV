@@ -28,9 +28,8 @@ export class Primitive extends Node{
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        
         return this.type;
-    }
+    }   
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {
         return this.type;
@@ -45,7 +44,7 @@ export class Primitive extends Node{
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        return this.value;
     }
 
 }

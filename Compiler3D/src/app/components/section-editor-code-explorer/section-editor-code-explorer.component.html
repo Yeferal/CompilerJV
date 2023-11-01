@@ -1,14 +1,14 @@
 <div class="section-editor-code-explorer">
-    <app-section-tabs-files></app-section-tabs-files>
+    <app-section-tabs-files *ngIf="listSection[0].state"></app-section-tabs-files>
     <app-section-editor-code-file *ngIf="listSection[0].state"></app-section-editor-code-file>
 
     <app-section-editor-code3d *ngIf="listSection[1].state"></app-section-editor-code3d>
 
-    <app-section-editor-code-optimized *ngIf="listSection[2].state"></app-section-editor-code-optimized>
+    <!-- <app-section-editor-code-optimized *ngIf="listSection[2].state"></app-section-editor-code-optimized> -->
 
     <app-section-editor-code-assembler *ngIf="listSection[3].state"></app-section-editor-code-assembler>
 
     <app-section-editor-report *ngIf="listSection[4].state"></app-section-editor-report>
     
-    <app-section-editor-footer-file></app-section-editor-footer-file>
+    <app-section-editor-footer-file *ngIf="listSection[0].state"></app-section-editor-footer-file>
 </div>

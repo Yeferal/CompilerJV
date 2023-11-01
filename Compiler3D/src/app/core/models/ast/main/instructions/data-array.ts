@@ -28,7 +28,7 @@ export class DataArray extends Node {
                 const element: DataArray = this.contentList[i] as DataArray;
                 const res = element.searchTypeArray(handlerComprobation);
                 
-                if (!res) {
+                if (res == null) {
                     const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.token} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
                     handlerComprobation.listError.push(errorGramm);
                     return null;
@@ -38,7 +38,7 @@ export class DataArray extends Node {
                     this.type = res;
                     typeArray = res;
                 }else {
-                    if (typeArray != res) {
+                    if (typeArray.name != res.name) {
                         //ERROR de tipos
                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.token} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
                         handlerComprobation.listError.push(errorGramm);
@@ -50,7 +50,7 @@ export class DataArray extends Node {
                 const element: Node = this.contentList[i] as Node;
                 const res = element.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
 
-                if (!res) {
+                if (res == null) {
                     const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.token} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
                     handlerComprobation.listError.push(errorGramm);
                     return null;
@@ -60,7 +60,7 @@ export class DataArray extends Node {
                     this.type = res;
                     typeArray = res;
                 }else {
-                    if (typeArray != res) {
+                    if (typeArray.name != res.name) {
                         //ERROR de tipos
                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `Los valores de los datos del arreglo no son correctos, no pertenecen al mismo tipo de dato << ${element.token} >> El tipo de dato no es compatible.`, ErrorType.SEMANTIC); 
                         handlerComprobation.listError.push(errorGramm);
@@ -106,7 +106,7 @@ export class DataArray extends Node {
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //Fase 1: Verificar los tipos de dato que sean del mismo cada valor de toda la data
         const resType = this.searchTypeArray(handlerComprobation);
-        if (resType) {
+        if (resType != null) {
             //Fase 2: Verificar que las dimensiones del arreglo sean congruentes.
             this.verifyDimArray(handlerComprobation, this.contentList);
 

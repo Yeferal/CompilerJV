@@ -1,8 +1,16 @@
+import { ErrorType } from "../../error/ErrorType";
+import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
+import { Symbol } from "../table/symbol";
+import { SymbolType } from "../table/symbol-type";
+import { DynamicDataType } from "../utils/DynamicDataType";
 import { EncapsulationType } from "../utils/encapsulation-type";
+import { ConstructorInst } from "./constructor-inst";
+import { FunctionProcedure } from "./function-procedure";
+import { ListDeclaration } from "./list-declaration";
 
 export class ClassInst extends Node {
     private _isGetter: boolean;
@@ -25,122 +33,200 @@ export class ClassInst extends Node {
 		this._instructions = instructions;
 	}
 
-    /**
-     * Getter isGetter
-     * @return {boolean}
-     */
 	public get isGetter(): boolean {
 		return this._isGetter;
 	}
 
-    /**
-     * Getter isSetter
-     * @return {boolean}
-     */
 	public get isSetter(): boolean {
 		return this._isSetter;
 	}
 
-    /**
-     * Getter name
-     * @return {string}
-     */
 	public get name(): string {
 		return this._name;
 	}
 
-    /**
-     * Getter nameExtends
-     * @return {string}
-     */
 	public get nameExtends(): string {
 		return this._nameExtends;
 	}
 
-    /**
-     * Getter isPublic
-     * @return {boolean}
-     */
 	public get isPublic(): boolean {
 		return this._isPublic;
 	}
 
-    /**
-     * Getter isFinal
-     * @return {boolean}
-     */
 	public get isFinal(): boolean {
 		return this._isFinal;
 	}
 
-    /**
-     * Getter instructions
-     * @return {Array<Node>}
-     */
 	public get instructions(): Array<Node> {
 		return this._instructions;
 	}
 
-    /**
-     * Setter isGetter
-     * @param {boolean} value
-     */
 	public set isGetter(value: boolean) {
 		this._isGetter = value;
 	}
 
-    /**
-     * Setter isSetter
-     * @param {boolean} value
-     */
 	public set isSetter(value: boolean) {
 		this._isSetter = value;
 	}
 
-    /**
-     * Setter name
-     * @param {string} value
-     */
 	public set name(value: string) {
 		this._name = value;
 	}
 
-    /**
-     * Setter nameExtends
-     * @param {string} value
-     */
 	public set nameExtends(value: string) {
 		this._nameExtends = value;
 	}
 
-    /**
-     * Setter isPublic
-     * @param {boolean} value
-     */
 	public set isPublic(value: boolean) {
 		this._isPublic = value;
 	}
 
-    /**
-     * Setter isFinal
-     * @param {boolean} value
-     */
 	public set isFinal(value: boolean) {
 		this._isFinal = value;
 	}
 
-    /**
-     * Setter instructions
-     * @param {Array<Node>} value
-     */
 	public set instructions(value: Array<Node>) {
 		this._instructions = value;
 	}
 
 
+    public addSymbol(handlerComprobation: HandlerComprobation, size: number){
+        const newSymbol: Symbol = new Symbol(
+            handlerComprobation.getIdDynamic(),     //id
+            this.name,                                //nameCode
+            this.name,                                //name
+            SymbolType.CLASS,                         //symbolType
+            false,                                  //isFunction
+            null,                          //type, tipo de dato
+            0,                                      //numParams
+            null,                                   //listParams
+            handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
+            size,                                      //Tamanio del symbol
+            false,                                  //isArray
+            null,                                   //listDims
+            false,                       //isReference
+            EncapsulationType.PUBLIC,                     //encapsulation
+            handlerComprobation.getPackageRoot()+this.name,//fullname, desde que paquete hasta el id
+            this.isFinal                            //isFinal
+        );
+
+        newSymbol.ambit = handlerComprobation.getAmbitS();
+        if (this.nameExtends != null) {
+            newSymbol.parent = this.nameExtends
+        }
+
+        handlerComprobation.addSymbol(newSymbol);
+        handlerComprobation.sizeFuncProc++;
+    }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        throw new Error("Method not implemented.");
+        //Buscar que no exista una clase con ese nombre, que exista el extends
+        const classSearch = handlerComprobation.searchSymbol(this.name);
+        
+        if (classSearch != null) {
+            //Error ya existe una clase con ese nombre
+            const errorGramm = new ErrorGramm(this.positionToken, this.name, `Ya existe una clase << ${this.name} >> dentro del ambito.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        if (this.isFinal) {
+            if (this.nameExtends != null) {
+                //Error la clase no puede ser extendida
+                const errorGramm = new ErrorGramm(this.positionToken, this.name, `La clase << ${this.name} >> no puede ser extendida porque contiene la key final.`, ErrorType.SEMANTIC); 
+                handlerComprobation.listError.push(errorGramm);
+                return ;
+            }
+        } else {
+            if (this.nameExtends != null) {
+                const extendSearch = handlerComprobation.searchSymbol(this.nameExtends);
+                if (extendSearch == null) {
+                    //Error no existe una clase con ese nombre
+                    const errorGramm = new ErrorGramm(this.positionToken, this.name, `No existe una Clase << ${this.nameExtends} >> dentro del ambito.`, ErrorType.SEMANTIC); 
+                    handlerComprobation.listError.push(errorGramm);
+                    return ;
+                }
+            }
+        }
+        let countSize = 0;
+        if (this.isGetter || this.isSetter) {
+            for (let i = 0; i < this.instructions.length; i++) {
+                const instruction = this.instructions[i];
+                if (instruction instanceof ListDeclaration) {
+                    const listDeclaration = instruction as ListDeclaration;
+                    countSize += listDeclaration.listDeclaration.length;
+                }
+            }
+        }
+
+        //SI todo esta bien agregar a la tabla de simbolos la clase
+        //Agregar a la tabla de simbolos la clase
+        this.type = new DynamicDataType(1, this.name, countSize);
+        handlerComprobation.typeTable.setSizeType(this.name, countSize);
+        this.addSymbol(handlerComprobation, countSize);
+        handlerComprobation.addAmbitS(this.name);
+        handlerComprobation.addAmbit();
+        
+        // Cuando agrega el getter y setter a las listas de declaraciones
+        if (this.isGetter || this.isSetter) {
+            for (let i = 0; i < this.instructions.length; i++) {
+                const instruction = this.instructions[i];
+                if (instruction instanceof ListDeclaration) {
+                    const listDeclaration = instruction as ListDeclaration;
+                    if (listDeclaration.encapsulationType == EncapsulationType.PRIVATE) {
+                        if (this.isGetter) {
+                            listDeclaration.isGetter = this.isGetter;
+                        }
+
+                        if (this.isGetter) {
+                            listDeclaration.isSetter = this.isSetter;
+                        }
+                    }
+                }
+            }
+        }
+        
+
+        //Reccorre las declaracion
+        for (let i = 0; i < this.instructions.length; i++) {
+            const instruction = this.instructions[i];
+            if (instruction instanceof ListDeclaration) {
+                // console.log("lista de declaracion");
+                const listDeclaration = instruction as ListDeclaration;
+                listDeclaration.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            }
+        }
+        //Obtiene el Constructor
+        for (let i = 0; i < this.instructions.length; i++) {
+            const instruction = this.instructions[i];
+            if (instruction instanceof ConstructorInst) {
+                // console.log("lista de declaracion");
+                const listDeclaration = instruction as ConstructorInst;
+                // listDeclaration.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            }
+        }
+
+        //Obtiene las lista de funciones pero para recolectar los nombres
+        for (let i = 0; i < this.instructions.length; i++) {
+            const instruction = this.instructions[i];
+            if (instruction instanceof FunctionProcedure) {
+                const functionProc = instruction as FunctionProcedure;
+                // console.log(functionProc);
+                
+            }
+        }
+        //recorre el contenido de las funciones
+        // for (let i = 0; i < this.instructions.length; i++) {
+        //     const instruction = this.instructions[i];
+        //     if (instruction instanceof FunctionProcedure) {
+        //         const listDeclaration = instruction as FunctionProcedure;
+        //         listDeclaration.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        //     }
+        // }
+
+        handlerComprobation.popAmbit();
+        this.isRunning = true;
+        return ;
 
     }
 

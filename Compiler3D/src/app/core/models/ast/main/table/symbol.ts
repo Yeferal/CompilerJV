@@ -5,7 +5,6 @@ import { SymbolType } from "./symbol-type";
 
 export class Symbol {
 
-	
     private _id: number;
     private _nameCode: string;
     private _name: string;
@@ -24,8 +23,10 @@ export class Symbol {
     private _encapsulation: EncapsulationType = EncapsulationType.PUBLIC;
     private _fullName: string;
     private _isConst: boolean = false;
+    private _isStatic: boolean = false;
     private _value: any;
     private _parent: any;
+    private _numDims: number; //Para la contidad de dimensiones del arreglo
 
     /**
      * @constructor 
@@ -202,5 +203,45 @@ export class Symbol {
     public set isConst(value: boolean) {
         this._isConst = value;
     }
-    
+
+	public get isStatic(): boolean  {
+		return this._isStatic;
+	}
+
+	public set isStatic(value: boolean ) {
+		this._isStatic = value;
+	}
+
+    /**
+     * Getter parent
+     * @return {any}
+     */
+	public get parent(): any {
+		return this._parent;
+	}
+
+    /**
+     * Setter parent
+     * @param {any} value
+     */
+	public set parent(value: any) {
+		this._parent = value;
+	}
+
+    /**
+     * Getter numDims
+     * @return {number}
+     */
+	public get numDims(): number {
+		return this._numDims;
+	}
+
+    /**
+     * Setter numDims
+     * @param {number} value
+     */
+	public set numDims(value: number) {
+		this._numDims = value;
+	}
+
 }

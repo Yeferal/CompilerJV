@@ -109,7 +109,8 @@ controller.getFileContent = async (req, res) => {
     try {
         const nameFile = req.query.nameFile;
         const path = req.query.path;
-        const text = readFile(pathLibrary+"/"+path+"/"+nameFile);
+        // const text = readFile(pathLibrary+"/"+path+"/"+nameFile);
+        const text = readFile(pathLibrary+"/"+path);
         const response = jsonResponse(
             'success',
             text,
@@ -262,10 +263,11 @@ controller.postFile = async (req, res) => {
 
 controller.putFileContent = async (req, res) => {
     try {
-        const nameFile = req.params.nameFile;
-        const path = req.query.path;
-        const text = req.query.text;
-        await createFile(pathLibrary+"/"+path+"/"+nameFile, text);
+        // const nameFile = req.params.nameFile;
+        const path = req.body.path;
+        const text = req.body.text;
+        // await createFile(pathLibrary+"/"+path+"/"+nameFile, text);
+        await createFile(pathLibrary+"/"+path, text);
         const response = jsonResponse(
             'success',
             true,

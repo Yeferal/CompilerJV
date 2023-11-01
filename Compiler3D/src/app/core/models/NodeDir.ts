@@ -8,4 +8,6 @@ export interface NodeDir {
     pathArray: Array<string>;
     active: boolean;
     selected: boolean;
+    update?: boolean;
+    text?: string;
 }

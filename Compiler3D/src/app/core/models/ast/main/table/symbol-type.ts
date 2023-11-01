@@ -1,12 +1,12 @@
 export enum SymbolType {
-    CLASS,
-    ATRIBUT,
-    CONSTRUCTOR,
-    KEY_WORD, //this
-    VOID,
-    PROCEDURE,
-    FUNCTION,
-    PARAM,
-    MAIN,
-    VAR,
+    CLASS = "CLASS",
+    ATRIBUT = "ATRIBUT",
+    CONSTRUCTOR = "CONSTRUCTOR",
+    KEY_WORD = "KEY_WORD", //this
+    VOID = "VOID",
+    PROCEDURE = "PROCEDURE",
+    FUNCTION = "FUNCTION",
+    PARAM = "PARAM",
+    MAIN = "MAIN",
+    VAR = "VAR",
 }

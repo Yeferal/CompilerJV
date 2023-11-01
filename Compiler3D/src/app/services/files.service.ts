@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GLOBAL } from '../core/Global/global';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,35 @@ export class FilesService {
     // 'Content-Type': 'application/json'
   });
 
+  private dataGen3DSubject = new Subject<boolean>();
+  dataGen3D$ = this.dataGen3DSubject.asObservable();
+
+  private dataGenAssemSubject = new Subject<boolean>();
+  dataGenAssem$ = this.dataGenAssemSubject.asObservable();
+
+  private dataDow3DSubject = new Subject<boolean>();
+  dataDow3D$ = this.dataDow3DSubject.asObservable();
+
+  private dataDowAssemSubject = new Subject<boolean>();
+  dataDowAssem$ = this.dataDowAssemSubject.asObservable();
+
   constructor(private http: HttpClient) { }
+
+  sendGen3D(){
+    this.dataGen3DSubject.next(true);
+  }
+
+  sendGenAssem(){
+    this.dataGenAssemSubject.next(true);
+  }
+
+  sendDow3D(){
+    this.dataDow3DSubject.next(true);
+  }
+
+  sendDowAssem(){
+    this.dataDowAssemSubject.next(true);
+  }
 
   getLibrary(){
     return this.http.get<any>(this.URL_API+"/v1.0/files", {
@@ -38,10 +67,15 @@ export class FilesService {
   }
 
   getFileContent(path: string){
-    return this.http.get<any>(this.URL_API+"/v1.0/files/file-content/"+path, {
+    return this.http.get<any>(this.URL_API+"/v1.0/files/file-content", {
       headers: this.headers,
-      withCredentials: true
+      withCredentials: true,
+      params: {path}
     });
+    // return this.http.get<any>(this.URL_API+"/v1.0/files/file-content/"+path, {
+    //   headers: this.headers,
+    //   withCredentials: true
+    // });
   }
 
   postProject(data: any){
@@ -65,10 +99,10 @@ export class FilesService {
     });
   }
 
-  putContetFile(nameFile: string,data: any){
-    return this.http.post<any>(this.URL_API+`/v1.0/files/file-content/${nameFile}`, data, {
+  putContetFile(data: any){
+    return this.http.put<any>(this.URL_API+`/v1.0/files/file-content`, data, {
       headers: this.headers,
-      withCredentials: true
+      withCredentials: true,
     });
   }
 

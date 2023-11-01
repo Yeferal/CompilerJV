@@ -56,10 +56,10 @@ export class ArithmeticOperation extends Node {
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         let resLeft = this.nodeLeft.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         let resRight = this.nodeRight.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-        if (resLeft && resRight) {
+        if (resLeft != null && resRight != null) {
             //Comprobacion de tipos
-            const resType: DynamicDataType = this._typeVerifier.verifierTypeArithNode(resLeft, resRight);
-            if (resLeft) {
+            const resType: DynamicDataType = this._typeVerifier.verifierTypeArithNode(resLeft, resRight, this.arithType);
+            if (resType != null) {
                 return resType;
             } else {
                 const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la operacion << ${this.nodeLeft.token} ${this.token} ${this.nodeRight.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 

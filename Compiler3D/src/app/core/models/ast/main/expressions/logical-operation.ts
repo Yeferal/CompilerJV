@@ -58,7 +58,7 @@ export class LogicalOperation extends Node{
         let resRight = this.nodeRight.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         if (resLeft && resRight) {
             //Comprobacion de tipos
-            const resType: DynamicDataType = this._typeVerifier.verifierTypeLogicalNode(resLeft, resRight);
+            const resType: DynamicDataType = this._typeVerifier.verifierTypeLogicalNode(resLeft, resRight, this.logicalType);
             if (resLeft) {
                 this.type = resType;
                 return resType;

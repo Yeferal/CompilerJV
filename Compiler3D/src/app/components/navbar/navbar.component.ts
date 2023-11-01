@@ -97,45 +97,36 @@ export class NavbarComponent {
   }
 
   save(){
-
+    this.shareProjectService.sendDataSave();
   }
 
   saveAs(){
-
+    this.shareProjectService.sendDataSaveAs();
   }
 
   closeProejct(){
     this.cookieService.delete("project");
     this.shareProjectService.setRoot(null);
     this.shareProjectService.sendDataRoot(null);
+    this.shareProjectService.setTabs([]);
+    this.shareProjectService.setActualNode(null);
+    this.shareProjectService.sendDataActual(null);
   }
 
   generateCode3D(){
-
-  }
-
-  generateCodeOptimized(){
-
+    this.filesService.sendGen3D();
   }
 
   generateCodeAssembler(){
-
+    this.filesService.sendGenAssem();
   }
   
   downloadCode3D(){
-
-  }
-
-  downloadCodeOptimized(){
-
+    this.filesService.sendDow3D();
   }
 
   downloadCodeAssembler(){
-
-  }
-
-  reportOptimized(){
-    
+    this.filesService.sendDowAssem();
   }
   
 }

@@ -1,9 +1,9 @@
-<div class="section-editor-code-file ">
+<div class="section-editor-code-file " *ngIf="fileSelected">
     <ngx-codemirror 
     #editor 
     [(ngModel)]="code" 
     [options]="editorConfig"
-    
+    (ngModelChange)="onEditorChange()"
     (cursorActivity)="onCursorActivity()"
     class="custom-editor "
     ></ngx-codemirror>
