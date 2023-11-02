@@ -100,7 +100,8 @@ export class ClassInst extends Node {
             null,                          //type, tipo de dato
             0,                                      //numParams
             null,                                   //listParams
-            handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
+            // handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
+            null,
             size,                                      //Tamanio del symbol
             false,                                  //isArray
             null,                                   //listDims
@@ -116,7 +117,7 @@ export class ClassInst extends Node {
         }
 
         handlerComprobation.addSymbol(newSymbol);
-        handlerComprobation.sizeFuncProc++;
+        
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
@@ -186,7 +187,7 @@ export class ClassInst extends Node {
             }
         }
         
-
+        handlerComprobation.sizeFuncProc = 0;
         //Reccorre las declaracion
         for (let i = 0; i < this.instructions.length; i++) {
             const instruction = this.instructions[i];
@@ -196,6 +197,9 @@ export class ClassInst extends Node {
                 listDeclaration.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             }
         }
+
+        handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.resetPointer();
         //Obtiene el Constructor
         for (let i = 0; i < this.instructions.length; i++) {
             const instruction = this.instructions[i];
@@ -206,6 +210,8 @@ export class ClassInst extends Node {
             }
         }
 
+        handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.resetPointer();
         //Obtiene las lista de funciones pero para recolectar los nombres
         for (let i = 0; i < this.instructions.length; i++) {
             const instruction = this.instructions[i];
@@ -215,6 +221,8 @@ export class ClassInst extends Node {
                 
             }
         }
+
+        // handlerComprobation.sizeFuncProc = 0;
         //recorre el contenido de las funciones
         // for (let i = 0; i < this.instructions.length; i++) {
         //     const instruction = this.instructions[i];
@@ -225,6 +233,10 @@ export class ClassInst extends Node {
         // }
 
         handlerComprobation.popAmbit();
+        handlerComprobation.popAmbitS();
+        handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.resetPointer();
+        
         this.isRunning = true;
         return ;
 

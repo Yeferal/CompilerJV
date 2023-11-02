@@ -48,9 +48,13 @@ export class InstanceObject extends Node {
 		this._params = value;
 	}
 
-    generateListParamsType(): Array<string>{
+    generateListParamsType(handlerComprobation: HandlerComprobation): Array<string>{
         let list: Array<string> = [];
-
+        if (this.params!=null && this.params.length>0) {
+            for (let i = 0; i < this.params.length; i++) {
+                const element = this.params[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            }
+        }
         return list;
     }
 

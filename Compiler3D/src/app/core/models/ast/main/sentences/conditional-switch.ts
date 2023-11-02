@@ -1,7 +1,10 @@
+import { ErrorType } from "../../error/ErrorType";
+import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
+import { ConditionalSwitchCase } from "./conditional-switch-case";
 
 export class ConditionalSwitch extends Node {
     private _value: Node;
@@ -64,7 +67,46 @@ export class ConditionalSwitch extends Node {
 
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        throw new Error("Method not implemented.");
+        const resCondition = this.value.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        if (resCondition == null) {
+            //Error el valor de la condicional no es un booleano
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de valor << ${this.value.token}>> no es valido.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        if (this.listCases!=null && this.listCases.length > 0) {
+            for (let i = 0; i < this.listCases.length; i++) {
+                if (this.listCases[i] instanceof ConditionalSwitchCase) {
+                    const caseTemp = this.listCases[i] as ConditionalSwitchCase;
+                    const resConditionCase = caseTemp.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+                    if (resConditionCase== null  || resCondition.name != resConditionCase.name) {
+                        const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de valor << ${this.value.token}>> y la condicion case <<${caseTemp.token}>> no son del mismo tipo.`, ErrorType.SEMANTIC); 
+                        handlerComprobation.listError.push(errorGramm);
+                        return ;
+                    }
+                }
+            }
+        }
+
+        //AGREGAR UN AMBITO
+        handlerComprobation.addAmbit();
+
+        if (this.listCases!=null && this.listCases.length > 0) {
+            for (let i = 0; i < this.listCases.length; i++) {
+                if (this.listCases[i] instanceof ConditionalSwitchCase) {
+                    const caseTemp = this.listCases[i] as ConditionalSwitchCase;
+                    caseTemp.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+                }
+            }
+        }
+
+        if (this.defaultCase != null) {
+            this.defaultCase.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        }
+
+        //SALIR DEL AMBITO
+        handlerComprobation.popAmbit();
 
     }
 

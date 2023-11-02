@@ -29,7 +29,9 @@ export class ReturnNode extends Node {
 
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        throw new Error("Method not implemented.");
+        const resReturn = this.value.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        this.type = resReturn;
+        return resReturn;
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {

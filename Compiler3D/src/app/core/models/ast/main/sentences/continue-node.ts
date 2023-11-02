@@ -10,7 +10,7 @@ export class ContinueNode extends Node {
 	}
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        throw new Error("Method not implemented.");
+        return ;
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {

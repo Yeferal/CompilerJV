@@ -201,7 +201,7 @@ export class DeclarationArray extends Node{
     public addSymbol(handlerComprobation: HandlerComprobation){
         const newSymbol: Symbol = new Symbol(
             handlerComprobation.getIdDynamic(),     //id
-            this.id,                                //nameCode
+            null,                                //nameCode
             this.id,                                //name
             this.isAtrib? SymbolType.ATRIBUT: SymbolType.VAR, //symbolType
             false,                                  //isFunction

@@ -69,7 +69,7 @@ export class Factory {
         //Recorre solo los archivo main
         for (let i = 0; i < this.treeAst.listRoot.length; i++) {
             if (this.treeAst.listRoot[i] instanceof MainNode) {
-                    this.treeAst.listRoot[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+                    // this.treeAst.listRoot[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             }
             
         }

@@ -53,12 +53,24 @@ export class HandlerComprobation {
         return flagPoint;
     }
 
+    public resetPointer(): number {
+        this.pointers.clear();
+        this.pointers.push(0);
+        return this.pointers.peek();
+    }
+
     public addAmbit(){
         this.symbolAmbit.addNewTable();
     }
 
     public popAmbit(){
         this.symbolAmbit.popTableAmbit();
+    }
+
+    public popAmbitS(){
+        if (!this.ambits.isEmpty()) {
+            this.ambits.pop();
+        }
     }
 
     public addSymbol(symbol: Symbol){

@@ -87,7 +87,7 @@
         // console.log("Entro en los errores");
         const newError = new ErrorGramm(new PositionToken(row, column), token, description, errorType);
         listErrors.push(newError);
-        // console.log(newError.toString());
+        console.log(newError.toString());
     }
 
 %}

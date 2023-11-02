@@ -86,7 +86,7 @@ export class DeclarationAtribute extends Node{
     public addSymbol(handlerComprobation: HandlerComprobation){
         const newSymbol: Symbol = new Symbol(
             handlerComprobation.getIdDynamic(),     //id
-            this.id,                                //nameCode
+            null,                                //nameCode
             this.id,                                //name
             SymbolType.ATRIBUT,                         //symbolType
             false,                                  //isFunction

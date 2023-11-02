@@ -198,6 +198,7 @@ export class FunctionProcedure extends Node {
         }
 
         //agregar ambito
+        handlerComprobation.addAmbitS(this.id);
         handlerComprobation.addAmbit();
         handlerComprobation.sizeFuncProc = 0;
 
@@ -225,6 +226,7 @@ export class FunctionProcedure extends Node {
 
         //sacar el ambito
         handlerComprobation.popAmbit();
+        handlerComprobation.popAmbitS();
         handlerComprobation.sizeFuncProc = 0;
 
         return this.type;
