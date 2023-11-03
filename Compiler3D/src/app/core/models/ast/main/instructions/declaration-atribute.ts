@@ -193,6 +193,7 @@ export class DeclarationAtribute extends Node{
                 //error
                 const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
+                return ;
             }
         } else {
             //Agreagar a la tabla de simbolos

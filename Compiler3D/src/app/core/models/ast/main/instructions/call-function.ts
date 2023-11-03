@@ -76,7 +76,7 @@ export class CallFunction extends Node {
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //buscar la funciones para comprobar si existe
-        const symbolFunc = handlerComprobation.searchSymbol(this.id);
+        const symbolFunc = handlerComprobation.searchSymbolThis(this.id);
         this.type = symbolFunc.type;
 
         //Verificar que sea una funcion o procedimiento
@@ -102,13 +102,17 @@ export class CallFunction extends Node {
             if (this.params.length > 0) {
                 const paramSymbol = symbolFunc.listParams;
                 for (let i = 0; i < listParamsOfNode.length; i++) {
-                    if (listParamsOfNode[i] != paramSymbol[i]) {
+                    if (listParamsOfNode[i].name != paramSymbol[i].name) {
                         //Error no son del mismo tipo
                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros no coincide en la funcion << ${this.token} >>.`, ErrorType.SEMANTIC); 
                         handlerComprobation.listError.push(errorGramm);
                     }
                 }
             }
+        }
+
+        if (!symbolFunc.isFunction) {
+            this.type = null;
         }
 
         return this.type;

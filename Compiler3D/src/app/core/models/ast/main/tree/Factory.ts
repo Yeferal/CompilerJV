@@ -14,6 +14,8 @@ export class Factory {
 
     factory(){
         //Inicializar Handler y Enviroment
+        console.log(this.treeAst);
+        
         let handlerComprobation: HandlerComprobation = new HandlerComprobation();
         let environment: Environment = new Environment();
         try {

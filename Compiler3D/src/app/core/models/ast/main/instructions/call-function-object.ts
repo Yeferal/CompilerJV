@@ -93,8 +93,24 @@ export class CallFunctionObject extends Node {
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        //buscar el objeto en la tabla de tipos por ambitos
+        //is es this entonces que lo busque como un atributo
+        let symbolObj = null;
+        if (this.isThis) {
+            symbolObj = handlerComprobation.searchSymbolThis(this.idObj);
+            
+        } else {
+            symbolObj = handlerComprobation.searchSymbol(this.idObj);
+        }
+
+        if (symbolObj == null) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.idObj, `No existe una variable con el nombre << ${this.idObj} >> dentro del ambito.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
         //buscar la funciones para comprobar si existe
-        const symbolFunc = handlerComprobation.searchSymbol(this.id);
+        const symbolFunc = handlerComprobation.searchSymbolAtribClass(this.id, symbolObj.type.name);
         this.type = symbolFunc.type;
 
         //Verificar que sea una funcion o procedimiento
@@ -124,9 +140,14 @@ export class CallFunctionObject extends Node {
                         //Error no son del mismo tipo
                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros no coincide en la funcion << ${this.token} >>.`, ErrorType.SEMANTIC); 
                         handlerComprobation.listError.push(errorGramm);
+                        return ;
                     }
                 }
             }
+        }
+
+        if (!symbolFunc.isFunction) {
+            this.type = null;
         }
 
         return this.type;

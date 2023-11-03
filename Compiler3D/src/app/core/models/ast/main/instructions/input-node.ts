@@ -1,3 +1,5 @@
+import { ErrorType } from "../../error/ErrorType";
+import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
@@ -30,7 +32,19 @@ export class InputNode extends Node {
 
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        throw new Error("Method not implemented.");
+        const symbol = handlerComprobation.searchSymbol(this.id);
+        if (symbol == null) {
+            //si no existe crea un error y lo agrega a la lista de errores
+            const errorGramm = new ErrorGramm(this.positionToken, this.id, `No existe una variable con el nombre << ${this.id} >> dentro del ambito.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        if (this.type.name != symbol.type.name) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << input${this.type.name} => ${this.id} >> El tipo de dato de la variable ${this.id} no es compatible con el tipo de dato del input.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+        }
+        return this.type;
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {

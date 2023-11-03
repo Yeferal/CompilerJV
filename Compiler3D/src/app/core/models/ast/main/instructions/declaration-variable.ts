@@ -116,28 +116,54 @@ export class DeclarationVarible extends Node{
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        if (this.type == null) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El token o id << ${this.id}>>, no tine tipo de dato.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
         //Verifica que no exista otra simbolo con el mismo nombre
         const resName = handlerComprobation.searchSymbol(this.id);
 
         //Falta agregar si el simbolo es un parametro entonces que use el this como referencia
-        if (resName) {
+        if (resName != null) {
             //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
             const errorGramm = new ErrorGramm(this.positionToken, this.token, `Ya existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        if (this.isFinal && this.asignation == null) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `Una declaracion final debe de tener un valor de asignacion << ${this.id}>>.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+        if (!handlerComprobation.isExistType(this.type.name)) {  
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato << ${this.type.name}>> no existe.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
         }
 
         //Verificar el tipo de asignacion
-        if (this.asignation) {
-            const resAsig = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-            if (resAsig) {
-                if ( this.type == resAsig) {
+        if (this.asignation != null) {
+            const resAsig: DynamicDataType = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            
+            if (!handlerComprobation.isExistType(resAsig.name)) {  
+                const errorGramm = new ErrorGramm(this.asignation.positionToken, this.asignation.token, `El tipo de dato << ${resAsig.name}>> no existe.`, ErrorType.SEMANTIC); 
+                handlerComprobation.listError.push(errorGramm);
+                return ;
+            }
+
+            if (resAsig != null) {
+                if ( this.type.name == resAsig.name) {
                     //Agreagar a la tabla de simbolos
                     this.addSymbol(handlerComprobation);
                     return this.type;
                 } else {
                     //Verificar si la asignacion es posible, por ejemplo que se de tipo int y que la asignacion sea un char lo cual se puede
                     const resVeri = this._typeVerifier.verifierTypeAsignationNode(this.type, resAsig);
-                    if (resVeri) {
+                    if (resVeri != null) {
                         //Agreagar a la tabla de simbolos
                         this.addSymbol(handlerComprobation);
                         return this.type;
@@ -151,6 +177,7 @@ export class DeclarationVarible extends Node{
                 //error
                 const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
+                return ;
             }
         } else {
             //Agreagar a la tabla de simbolos

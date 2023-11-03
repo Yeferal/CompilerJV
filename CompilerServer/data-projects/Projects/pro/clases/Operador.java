@@ -1,3 +1,5 @@
+package pro.clases;
+
 @Getter @Setter
 public class Operador {
 	private int id;
@@ -17,11 +19,19 @@ public class Operador {
 		int b = 2;
 		int c = (2*5)+a*b/a*2;
 		int res = Math.abs(c);
+      
 	}
 
 	public ClaseFunc(int id, String name){
 		this.id = id;
 		this.name = name;
+      this.clase.r = 5;
+      this.clase.r = a;
+      this.clase.clase = new Operator();
+      this.clase.clase = new int[4];
+      this.clase.clase = new Operator[4];
+      this.clase.clase = {4,4,4};
+      this.id = this.arrData[0][0][0];
 	}
 
 	public void pintar(){

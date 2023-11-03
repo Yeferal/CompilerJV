@@ -1,5 +1,5 @@
 export enum DataType{
-    DOUBLE = 'float',
+    FLOAT = 'float',
     INTEGER = 'int',
     CHAR = 'char',
     STRING = 'string',

@@ -1,3 +1,7 @@
+package pro.clases;
+
+import pro.clases.Operador;
+
 public class MathEspecial {
   
   private int res;

@@ -7,7 +7,9 @@ import { DeclarationType } from "../utils/declaration-type";
 import { EncapsulationType } from "../utils/encapsulation-type";
 import { DeclarationArray } from "./declaration-array";
 import { DeclarationAtribute } from "./declaration-atribute";
+import { DeclarationParam } from "./declaration-param";
 import { DeclarationVar } from "./declaration-var";
+import { DeclarationVarible } from "./declaration-variable";
 
 
 export class ListDeclaration extends Node {
@@ -104,14 +106,19 @@ export class ListDeclaration extends Node {
                 declarationArray.isFinal = this.isFinal;
                 declarationArray.encapsulationType = this.encapsulationType;
                 declarationArray.type = this.type;
+			} else if (this.listDeclaration[i] instanceof DeclarationParam) {
+				const declarationParam = this.listDeclaration[i] as DeclarationParam;
+                declarationParam.type = this.type;
+			} else if (this.listDeclaration[i] instanceof DeclarationVar) {
+				const declarationVar = this.listDeclaration[i] as DeclarationVar;
+                declarationVar.isFinal = this.isFinal;
+                declarationVar.type = this.type;
+			} else if (this.listDeclaration[i] instanceof DeclarationVarible) {
+				const declarationVarible = this.listDeclaration[i] as DeclarationVarible;
+                declarationVarible.isFinal = this.isFinal;
+                declarationVarible.type = this.type;
 			}
-            // this.listDeclaration[i].type = this.DynamicDataType;
 
-            // if (this.listDeclaration[i] instanceof DeclarationVar) {
-                
-            // } else if (this.listDeclaration[i] instanceof DeclarationArray) {
-                
-            // }
             this.listDeclaration[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             
         }

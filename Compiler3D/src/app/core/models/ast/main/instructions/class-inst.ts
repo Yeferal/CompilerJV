@@ -3,7 +3,9 @@ import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { ImportNode } from "../import-node";
 import { Node } from "../node";
+import { PackageNode } from "../package-node";
 import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
@@ -21,6 +23,8 @@ export class ClassInst extends Node {
     private _isPublic: boolean;
     private _isFinal: boolean;
     private _instructions: Array<Node>;
+    private _packageNode: PackageNode;
+    private _listImport: Array<ImportNode>;
 
 	constructor(positionToken: PositionToken, token: string, isGetter: boolean, isSetter: boolean, name: string, nameExtends: string, isPublic: boolean, isFinal: boolean, instructions: Array<Node>) {
 		super(positionToken, null, token);
@@ -87,6 +91,22 @@ export class ClassInst extends Node {
 
 	public set instructions(value: Array<Node>) {
 		this._instructions = value;
+	}
+
+	public get packageNode(): PackageNode {
+		return this._packageNode;
+	}
+
+	public get listImport(): Array<ImportNode> {
+		return this._listImport;
+	}
+
+	public set packageNode(value: PackageNode) {
+		this._packageNode = value;
+	}
+
+	public set listImport(value: Array<ImportNode>) {
+		this._listImport = value;
 	}
 
 

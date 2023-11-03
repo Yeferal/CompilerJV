@@ -68,6 +68,7 @@ export class InstanceArray extends Node {
                 return ;
             }
         }
+        
         return this.type;
     }
 

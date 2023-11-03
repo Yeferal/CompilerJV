@@ -81,6 +81,14 @@ export class HandlerComprobation {
     public searchSymbol(name: string){
         return this.symbolAmbit.searchSymbol(name);
     }
+
+    public searchSymbolThis(name: string){
+        return this.symbolAmbit.searchSymbolThis(name);
+    }
+
+    public searchSymbolAtribClass(name: string, ambit: string){
+        return this.symbolTable.searchSymbolAtribClass(name, ambit);
+    }
     
     public paintError(){
         for (let i = 0; i < this.listError.length; i++) {

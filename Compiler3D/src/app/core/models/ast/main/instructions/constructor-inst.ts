@@ -1,3 +1,5 @@
+import { ErrorType } from "../../error/ErrorType";
+import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
@@ -112,8 +114,16 @@ export class ConstructorInst extends Node {
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         
         //agregar ambito
+        handlerComprobation.addAmbitS(this.id);
         handlerComprobation.addAmbit();
-        handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.sizeFuncProc = 1; //Comienza con 1 por el this
+
+        if (handlerComprobation.actualClass.name != this.id) {
+            //El construtor no pertenece a la clase
+            const errorGramm = new ErrorGramm(this.positionToken, this.id, `El constructor es incorrecto << ${this.id} >>.`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
 
         let listTypeParams: Array<DynamicDataType> = new Array<DynamicDataType>;
         //Verificar que los parametros sean correctos
@@ -132,8 +142,10 @@ export class ConstructorInst extends Node {
         this.addSymbol(handlerComprobation, listTypeParams);
 
         //sacar el ambito
+        handlerComprobation.popAmbitS();
         handlerComprobation.popAmbit();
         handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.resetPointer();
 
         return this.type;
 

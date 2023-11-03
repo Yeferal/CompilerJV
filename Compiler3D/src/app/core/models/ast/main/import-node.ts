@@ -1,8 +1,34 @@
-import { Environment } from "../environment/environment";
-import { HandlerComprobation } from "../environment/handler-comprobation";
-import { Node } from "../node";
+import { PositionToken } from "../error/position-token";
+import { Environment } from "./environment/environment";
+import { HandlerComprobation } from "./environment/handler-comprobation";
+import { Node } from "./node";
 
-export class InputInst extends Node{
+export class ImportNode extends Node {
+
+    private _path: string;
+
+
+	constructor(positionToken: PositionToken, token: string, path: string) {
+        super(positionToken, null, token);
+        this._path = path;
+	}
+
+    /**
+     * Getter path
+     * @return {string}
+     */
+	public get path(): string {
+		return this._path;
+	}
+
+    /**
+     * Setter path
+     * @param {string} value
+     */
+	public set path(value: string) {
+		this._path = value;
+	}
+
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         throw new Error("Method not implemented.");
     }

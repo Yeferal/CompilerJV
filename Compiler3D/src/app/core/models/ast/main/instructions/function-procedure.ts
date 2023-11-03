@@ -4,14 +4,11 @@ import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
+import { ReturnNode } from "../sentences/return-node";
 import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
 import { EncapsulationType } from "../utils/encapsulation-type";
-import { DeclarationArray } from "./declaration-array";
-import { DeclarationParam } from "./declaration-param";
-import { DeclarationVar } from "./declaration-var";
-import { ListDeclaration } from "./list-declaration";
 
 export class FunctionProcedure extends Node {
     private _isStatic: boolean;
@@ -165,7 +162,7 @@ export class FunctionProcedure extends Node {
     public addSymbol(handlerComprobation: HandlerComprobation, listTypeParams: Array<DynamicDataType>){
         const newSymbol: Symbol = new Symbol(
             handlerComprobation.getIdDynamic(),     //id
-            this.id,                                //nameCode
+            handlerComprobation.getAmbitS()+this.id,                                //nameCode
             this.id,                                //name
             this.isFunction? SymbolType.FUNCTION : SymbolType.PROCEDURE,//symbolType
             this.isFunction,                        //isFunction
@@ -177,7 +174,7 @@ export class FunctionProcedure extends Node {
             false,                                  //isArray
             null,                                   //listDims
             false,                                  //isReference
-            null,                     //encapsulationType
+            this.encapsulationType,                     //encapsulationType
             handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
             false                                   //isConst
         );
@@ -206,18 +203,23 @@ export class FunctionProcedure extends Node {
         //Verificar que los parametros sean correctos
         for (let j = 0; j < this.listParams.length; j++) {
             const resParam = this.listParams[j].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-            if (!this.isTypeCorrectParam(resParam)) {
-                //Error tipo de dato no admitido
-                const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato del parametro no es correcto.`, ErrorType.SEMANTIC); 
-                handlerComprobation.listError.push(errorGramm);
-                return this.type;
-            }
             listTypeParams.push(resParam);
         }
 
         //ejecutar las comprobaciones de las instrucciones
         for (let i = 0; i < this.instructions.length; i++) {
             this.instructions[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            if (this.instructions[i] instanceof ReturnNode) {
+                if (this.isFunction) {
+                    const returnNode = this.instructions[i] as ReturnNode;
+                    return returnNode.type;
+                } else {
+                    const errorGramm = new ErrorGramm(this.positionToken, this.token, `EL metodo << ${this.id}>>no es un funcion, por lo que no se puede usar el key return.`, ErrorType.SEMANTIC); 
+                    handlerComprobation.listError.push(errorGramm);
+                    return ;
+                }
+                
+            }
         }
 
         //agregar el simbolo

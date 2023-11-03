@@ -4,6 +4,9 @@ import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
+import { DynamicDataType } from "../utils/DynamicDataType";
+import { ClassInst } from "./class-inst";
+import { ConstructorInst } from "./constructor-inst";
 
 export class InstanceObject extends Node {
     private _id: string;
@@ -71,14 +74,60 @@ export class InstanceObject extends Node {
             this.type = resType;
         }
 
-        const symbolSearch = handlerComprobation.searchSymbol(this.id+"_"+this.id);
-        if (symbolSearch != null) {
-            console.log("Si lo encontro");
+        let listTypeParams: Array<DynamicDataType> = new Array<DynamicDataType>;
+        //Verificar que los parametros sean correctos
+        for (let j = 0; j < this.params.length; j++) {
+            const resParam = this.params[j].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            listTypeParams.push(resParam);
+        }
 
-        } else {
-            console.log("No lo encontro");
-            //El constructor aun no existe tenesmos que buscarlo, pero solo para sus parametros
-            
+        //El constructor aun no existe tenesmos que buscarlo, pero solo para sus parametros
+        let isExisteClass = false;
+        let isExisteConstructor = false;
+        for (let i = 0; i < handlerComprobation.listNode.length; i++) {
+            if (handlerComprobation.listNode[i] instanceof ClassInst) {
+                const element = handlerComprobation.listNode[i] as ClassInst;
+                if (element.name == handlerComprobation.actualClass.nameExtends) {
+                    isExisteClass = true;
+                    for (let j = 0; j < element.instructions.length; j++) {
+                        if (element.instructions[j] instanceof ConstructorInst) {
+                            isExisteConstructor = true;
+                            const constructorNode = element.instructions[j] as ConstructorInst;
+                            let listTypeParamsConst: Array<DynamicDataType> = new Array<DynamicDataType>;
+                            
+                            for (let k = 0; k < constructorNode.listParams.length; k++) {
+                                const resParam = constructorNode.listParams[k].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+                                listTypeParamsConst.push(resParam);
+                            }
+
+                            if (listTypeParams.length != listTypeParamsConst.length) {
+                                const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construtor de la clase << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                                handlerComprobation.listError.push(errorGramm);
+                                return ;
+                            }else {
+                                for (let k = 0; k < listTypeParamsConst.length; k++) {
+                                    if (listTypeParamsConst[k].name != listTypeParams[k].name) {
+                                        const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros de la clase no es el mismo << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                                        handlerComprobation.listError.push(errorGramm);
+                                        return ;
+                                    }
+                                }
+                                return ;
+                            }
+                        }
+                        
+                    }
+                    if (!isExisteConstructor) {
+                        if (listTypeParams.length > 0) {
+                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construto de la clase no es el mismo << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                            handlerComprobation.listError.push(errorGramm);
+                            return ;
+                        }
+                    }
+                    return ;
+                }
+                return ;
+            }
         }
 
         return this.type;

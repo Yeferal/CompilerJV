@@ -3,11 +3,20 @@ import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { Identifier } from "../expressions/identifier";
 import { Node } from "../node";
 import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
 import { EncapsulationType } from "../utils/encapsulation-type";
+import { CallArray } from "./call-array";
+import { CallFunction } from "./call-function";
+import { CallFunctionObject } from "./call-function-object";
+import { CallMath } from "./call-math";
+import { CallValueObject } from "./call-value-object";
+import { DataArray } from "./data-array";
+import { InstanceArray } from "./instance-array";
+import { InstanceObject } from "./instance-object";
 
 export class DeclarationVar extends Node {
 
@@ -16,6 +25,9 @@ export class DeclarationVar extends Node {
     private _id: string;
     private _asignation: Node;
     private _isReference: boolean = false;
+
+    public isArray = false;
+    public listDims: Array<number>;
 
 	constructor(positionToken: PositionToken, toke: string, id: string, asignation: Node, isFinal: boolean) {
 		super(positionToken, null, toke);
@@ -102,8 +114,8 @@ export class DeclarationVar extends Node {
             null,                                   //listParams
             handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
             1,                                      //Tamanio del symbol
-            false,                                  //isArray
-            null,                                   //listDims
+            this.isArray,                                  //isArray
+            this.listDims,                                   //listDims
             this.isReference,                       //isReference
             EncapsulationType.PUBLIC,                     //encapsulation
             handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
@@ -121,41 +133,92 @@ export class DeclarationVar extends Node {
         const resName = handlerComprobation.searchSymbol(this.id);
 
         //Falta agregar si el simbolo es un parametro entonces que use el this como referencia
-        if (resName) {
+        if (resName != null) {
             //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
             const errorGramm = new ErrorGramm(this.positionToken, this.token, `Ya existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC);
             handlerComprobation.listError.push(errorGramm);
         }
 
         //Verificar el tipo de asignacion
-        if (this.asignation) {
+        if (this.asignation != null) {
             const resAsig = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-            if (resAsig) {
-                if ( this.type == resAsig) {
-                    //Agreagar a la tabla de simbolos
+            if (resAsig != null) {
+                this.type = resAsig;
+                if (this.asignation instanceof Identifier) {
+                    const identifier = this.asignation as Identifier;
+                    let symbol;
+                    if (identifier.isThis) {
+                        symbol = handlerComprobation.searchSymbolThis(identifier.id);
+                    } else {
+                        symbol = handlerComprobation.searchSymbol(identifier.id);
+                    }
+                    this.isArray = symbol.isArray;
+                    this.listDims = symbol.listDims;
                     this.addSymbol(handlerComprobation);
                     return this.type;
-                } else {
-                    //Verificar si la asignacion es posible, por ejemplo que se de tipo int y que la asignacion sea un char lo cual se puede
-                    const resVeri = this._typeVerifier.verifierTypeAsignationNode(this.type, resAsig);
-                    if (resVeri) {
-                        //Agreagar a la tabla de simbolos
-                        this.addSymbol(handlerComprobation);
-                        return this.type;
-                    }
-                    //error
-                    const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> El tipo de dato de la variable ${this.id} no es compatible con el tipo de dato de la asignacion.`, ErrorType.SEMANTIC);
-                    handlerComprobation.listError.push(errorGramm);
-
+                } else if (this.asignation instanceof DataArray) {
+                    const dataArray = this.asignation as DataArray;
+                    this.isArray = true;
+                    // this.listDims = ;
+                    this.addSymbol(handlerComprobation);
+                    return this.type;
+                } else if (this.asignation instanceof InstanceArray) {
+                    const instanceArray = this.asignation as InstanceArray;
+                    this.isArray = true;
+                    this.listDims = null;
+                    this.addSymbol(handlerComprobation);
+                    return this.type;
+                } else if (this.asignation instanceof InstanceObject) {
+                    const instacneObject = this.asignation as InstanceObject;
+                    this.isArray = false;
+                    this.listDims = null;
+                    this.addSymbol(handlerComprobation);
+                    return this.type;
+                } else if (this.asignation instanceof CallArray){
+                    const callArray = this.asignation as CallArray;   
+                    this.isArray = false;
+                    this.listDims = null;
+                    this.addSymbol(handlerComprobation);
+                    return this.type;
+                } else if (this.asignation instanceof CallFunction){
+                    const callFunction = this.asignation as CallFunction;
+                    this.isArray = false;
+                    this.listDims = null;
+                    this.addSymbol(handlerComprobation);
+                    return this.type;
+                } else if (this.asignation instanceof CallFunctionObject){
+                    const callFunctionObject = this.asignation as CallFunctionObject;
+                    this.isArray = false;
+                    this.listDims = null;
+                    this.addSymbol(handlerComprobation);
+                    return this.type;
+                } else if (this.asignation instanceof CallValueObject){
+                    const callValueObject = this.asignation as CallValueObject;
+                    let symbol = handlerComprobation.searchSymbolAtribClass(callValueObject.idObj, callValueObject.id);
+                    this.isArray = symbol.isArray;
+                    this.listDims = symbol.listDims;
+                    this.addSymbol(handlerComprobation);
+                    return this.type;
+                } else if (this.asignation instanceof CallMath) {
+                    const callMath = this.asignation as CallMath;
+                    this.isArray = false;
+                    this.listDims = null;
+                    this.addSymbol(handlerComprobation);
+                    return this.type;
                 }
+                //Agreagar a la tabla de simbolos
+                this.addSymbol(handlerComprobation);
+                return this.type;
+
             }else {
                 //error
                 const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC);
                 handlerComprobation.listError.push(errorGramm);
             }
         } else {
-            //Agreagar a la tabla de simbolos
-            this.addSymbol(handlerComprobation);
+            //error
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC);
+            handlerComprobation.listError.push(errorGramm);
         }
         return this.type;
     }

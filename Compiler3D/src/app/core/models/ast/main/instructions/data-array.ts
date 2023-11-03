@@ -112,6 +112,7 @@ export class DataArray extends Node {
 
             //Fase 3: Contar u obtner el numero de dimensiones de toda la data. esto se hara en la asignacion o declaracion del arreglo, aqui no.
             
+            
             return resType; //retornamos el tipo de dato de los valores del arreglo
         }
         //ERROR de tipos

@@ -327,6 +327,7 @@ export class DeclarationArray extends Node{
                             }
                         } else if (this.asignation instanceof CallArray){
 
+                            
                         } else if (this.asignation instanceof CallFunction){
 
                         } else if (this.asignation instanceof CallFunctionObject){

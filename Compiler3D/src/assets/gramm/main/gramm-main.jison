@@ -1,7 +1,7 @@
 %{
     var resultado;
     var listErrors = [];
-
+    var packageNow = null;
 
     const { PositionToken } = require('src/app/core/models/ast/error/position-token.ts');
     const { ErrorGramm } = require("src/app/core/models/ast/error/error-gramm.ts");
@@ -10,6 +10,8 @@
     //TREE
     const { TreeAST } = require("src/app/core/models/ast/main/tree/TreeAST.ts");
     const { Node } = require("src/app/core/models/ast/main/node.ts");
+    const { PackageNode } = require("src/app/core/models/ast/main/package-node.ts");
+    const { ImportNode } = require("src/app/core/models/ast/main/import-node.ts");
     
     //EXPRESSIONS
     const { ArithmeticOperation } = require("src/app/core/models/ast/main/expressions/arithmetic-operation.ts");
@@ -87,6 +89,7 @@
         // console.log("Entro en los errores");
         const newError = new ErrorGramm(new PositionToken(row, column), token, description, errorType);
         listErrors.push(newError);
+        console.log("paquete:", packageNow);
         console.log(newError.toString());
     }
 
@@ -190,8 +193,8 @@ Decimal         {Numero} [.] {Numero}
 <INITIAL>"Math.exp"                                         { return 'math_exp';}
 
 /* RESERVADAS */
-<INITIAL>"package"                                           { return 'package';}
-<INITIAL>"import"                                           { return 'package';}
+<INITIAL>"package"                                           { return 'package_rsv';}
+<INITIAL>"import"                                           { return 'import_rsv';}
 <INITIAL>"public"                                           { return 'public';}
 <INITIAL>"private"                                          { return 'private';}
 <INITIAL>"class"                                            { return 'class';}
@@ -263,19 +266,65 @@ Decimal         {Numero} [.] {Numero}
 
 
 ini
-    :CODE EOF { /*console.log($1);*/ resultado = $1; /*return $1;*/ return new TreeAST($1, getListErrors());}
-    // |error EOF
+    :CODE_INIT EOF { /*console.log($1);*/ resultado = $1; /*return $1;*/ return new TreeAST($1, getListErrors());}
+    // |EMPTY EOF { /*console.log($1);*/ resultado = $1; /*return $1;*/ return new TreeAST($1, getListErrors());}
 ;
 
-
-CODE
-    :CODE STRUCT_MAIN { $$ = $1; $$.push($2); }
-    |CODE STRUCT_CLASS { $$ = $1; $$.push($2); }
-    |CODE STATE_COMMENT { $$ = $1; }
-    |CODE STATE_PACKAGE { $$ = $1; }
-    |CODE STATE_IMPORT { $$ = $1; }
+CODE_INIT
+    :STRUCT_CLASS_FULL { $$ = $1; }
+    |STATE_COMMENT CODE_INIT  { $$ = $2; }
     | { $$ = []; }
 ;
+
+CODE
+    :STRUCT_MAIN { $$ = $1; $$.push($2); }
+    |STRUCT_CLASS { $$ = $1; $$.push($2); }
+    | { $$ = []; }
+;
+
+// CODE_LAST
+//     :CODE_LAST STRUCT_MAIN { $$ = $1; $$.push($2); }
+//     |CODE_LAST STRUCT_CLASS { $$ = $1; $$.push($2); }
+//     |CODE_LAST STATE_COMMENT { $$ = $1; }
+//     | { $$ = []; }
+// ;
+
+CODE_LAST
+    :CODE_LAST STATE_COMMENT { $$ = $1; }
+    | { $$ = []; }
+;
+
+STRUCT_CLASS_FULL
+    :STATE_PACKAGE CODE_IMPORT STRUCT_MAIN CODE_LAST { $3.packageNode = $1; $3.listImport = $2; $$ = [$3]; }
+    |STATE_PACKAGE CODE_IMPORT STRUCT_CLASS CODE_LAST { $3.packageNode = $1; $3.listImport = $2; $$ = [$3]; }
+    |STATE_PACKAGE CODE_IMPORT { $$ = []; }
+;
+
+CODE_IMPORT
+    :CODE_IMPORT STATE_COMMENT { $$ = $1;}
+    |CODE_IMPORT STATE_IMPORT { $$ = $1; $$.push(new ImportNode(new PositionToken(this._$.first_line, this._$.first_column), $2, $2));}
+    | { $$ = []; }
+;
+
+STATE_PACKAGE
+    :package_rsv STRUCT_PACKAGE semicolon { packageNow = $2; $$ = new PackageNode(new PositionToken(this._$.first_line, this._$.first_column), $2, $2);}
+;
+
+STRUCT_PACKAGE
+    :STRUCT_PACKAGE period id { $$ = $1 + "." + $3;}
+    |id { $$ = $1;}
+;
+
+STATE_IMPORT
+    :import_rsv STRUCT_IMPORT semicolon { $$ = $2;}
+    |import_rsv STRUCT_IMPORT period mult semicolon { $$ = $2 + ".*";}
+;
+
+STRUCT_IMPORT
+    :STRUCT_IMPORT period id { $$ = $1 + "." + $3;}
+    |id { $$ = $1;}
+;
+
 
 DATATYPE_PRIMITIVE
     :float { $$ = new DynamicDataType(1,"FLOAT", 1); }
@@ -435,24 +484,7 @@ BLOCK_CONTENT_MAIN
     | { $$ = []; }
 ;
 
-STATE_PACKAGE
-    :package STRUCT_PACKAGE semicolon
-;
 
-STRUCT_PACKAGE
-    :STRUCT_PACKAGE comma id
-    |id
-;
-
-STATE_IMPORT
-    :import STRUCT_IMPORT semicolon
-    |import STRUCT_IMPORT comma mult semicolon
-;
-
-STRUCT_IMPORT
-    :STRUCT_IMPORT comma id
-    |id
-;
 
 
 /*
@@ -1049,6 +1081,42 @@ STRUCT_ASIGNATION_VAR
     {
         $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, $5, false, false);
     }
+    |id period id equal_mark new id parentheses_l parentheses_r semicolon
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, 
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, []), 
+        false, false);
+    }
+    |id period id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, 
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $6, $6, $8), 
+        false, false);
+    }
+
+
+    |id period id equal_mark VALUE_ARRAY_STATE semicolon
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, 
+        $5, 
+        false, false);
+    }
+    |id period id equal_mark new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, 
+        new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $6, $3, $7), 
+        false, false);
+    }
+    |id period id equal_mark new id STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, 
+        new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column),
+            new DynamicDataType(1,$6, 1),
+            $3, $7), 
+        false, false);
+    }
+
+
     |id equal_mark new id parentheses_l parentheses_r semicolon
     {
         $$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $1, $1,
@@ -1102,6 +1170,41 @@ STRUCT_ASIGNATION_VAR
 
     //Cuando es un objeto
     |this id period id equal_mark ASIGNATION_VAR semicolon {$$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, $6, true, false);}
+    |this id period id equal_mark new id parentheses_l parentheses_r semicolon 
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, 
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $7, $7, []), 
+        true, false);
+    }
+    |this id period id equal_mark new id parentheses_l STATE_PARAM_OBJECT parentheses_r semicolon 
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, 
+        new InstanceObject(new PositionToken(this._$.first_line, this._$.first_column), $7, $7, $9), 
+        true, false);
+    }
+
+    |this id period id equal_mark VALUE_ARRAY_STATE semicolon
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $5, 
+        $6, 
+        false, false);
+    }
+    |this id period id equal_mark new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, 
+        new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $7, $4, $8), 
+        false, false);
+    }
+    |this id period id equal_mark new id STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
+    {
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, 
+        new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column),
+            new DynamicDataType(1,$7, 1),
+            $4, $8), 
+        false, false);
+    }
+
+    
     |this id equal_mark new id parentheses_l parentheses_r semicolon
     {
         $$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2,

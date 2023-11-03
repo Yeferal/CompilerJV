@@ -27,6 +27,7 @@ export class Symbol {
     private _value: any;
     private _parent: any;
     private _numDims: number; //Para la contidad de dimensiones del arreglo
+    private _packageS: number; //Para la contidad de dimensiones del arreglo
 
     /**
      * @constructor 
@@ -242,6 +243,22 @@ export class Symbol {
      */
 	public set numDims(value: number) {
 		this._numDims = value;
+	}
+
+    /**
+     * Getter packageS
+     * @return {number}
+     */
+	public get packageS(): number {
+		return this._packageS;
+	}
+
+    /**
+     * Setter packageS
+     * @param {number} value
+     */
+	public set packageS(value: number) {
+		this._packageS = value;
 	}
 
 }

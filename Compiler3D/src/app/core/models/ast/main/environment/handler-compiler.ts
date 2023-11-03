@@ -23,6 +23,7 @@ export class HandlerCompiler {
             
             for (let i = 0; i < list.length; i++) {
                 if (list[i].text != null && list[i].text != undefined && list[i].text != "") {
+                    this.parser.yy.packageNow = list[i].path;
                     const resTree = this.parser.parse(list[i].text);
                     listTree.push(resTree);
                 }

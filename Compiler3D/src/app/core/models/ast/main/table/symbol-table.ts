@@ -1,6 +1,7 @@
 import { Stack } from 'typescript-collections';
 import { Symbol } from './symbol';
 import { forEach } from 'typescript-collections/dist/lib/arrays';
+import { SymbolType } from './symbol-type';
 
 export class SymbolTable {
     public stackTable: Stack<Array<Symbol>> = new Stack<Array<Symbol>>();
@@ -23,6 +24,32 @@ export class SymbolTable {
             for (let i = 0; i < tableTemp.length; i++) {
                 const symbol = tableTemp[i];
                 if (name === symbol.name) {
+                    return symbol;
+                }
+            }
+        }
+        return null;
+    }
+
+    public searchSymbolThis(name: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (name === symbol.name && symbol.symbolType == SymbolType.ATRIBUT) {
+                    return symbol;
+                }
+            }
+        }
+        return null;
+    }
+
+    public searchSymbolAtribClass(name: string, ambit: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (name === symbol.name && ambit == symbol.ambit) {
                     return symbol;
                 }
             }
