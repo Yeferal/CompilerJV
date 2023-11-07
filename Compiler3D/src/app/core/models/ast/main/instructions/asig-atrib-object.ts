@@ -124,12 +124,12 @@ export class AsigAtribObject extends Node {
             return ;
         }
 
-        if (this.isArray && (symbolObj.isArray==null || !symbolObj.isArray)) {
-            const errorGramm = new ErrorGramm(this.positionToken, this.idObj, `El symbolo << ${this.idObj} >> no es un arreglo.`, ErrorType.SEMANTIC); 
-            handlerComprobation.listError.push(errorGramm);
-            return ;
-        }
-        this.type = symbolObj.type;
+        // if (this.isArray && (symbolObj.isArray==null || !symbolObj.isArray)) {
+        //     const errorGramm = new ErrorGramm(this.positionToken, this.idObj, `El symbolo << ${this.idObj} >> no es un arreglo.`, ErrorType.SEMANTIC); 
+        //     handlerComprobation.listError.push(errorGramm);
+        //     return ;
+        // }
+        
         
 
         //buscar el atributo en la tabla de tipos general
@@ -153,27 +153,39 @@ export class AsigAtribObject extends Node {
             return ;
         }
 
+        this.type = symbolAtrib.type;
+
         const resAsig = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        
+        
         if (resAsig == null) {
+            console.log(resAsig);
+            
             const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
             return ;
         }
 
         if (this.type.name != resAsig.name) {
+            console.log(this.type.name, "!=", resAsig.name);
             const errorGramm = new ErrorGramm(this.positionToken, this.token, `No es posible realizar la asignacion << ${this.token} ${this.asignation.token} >> Los Tipos de datos no son compatibles.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
             return ;
         }
 
+        
+
         if (this.isArray) {
+
             if (this.asignation instanceof DataArray) {
-                return ;
+                return this.type;
             } else if (this.asignation instanceof InstanceArray) {
-                return ;
+                return this.type;
             } else if (this.asignation instanceof Identifier) {
                 const identifier = this.asignation as Identifier;
                 const symbolId = handlerComprobation.searchSymbol(identifier.id);
+                console.log("Simbolo arreglo: ", symbolId);
+                
                 if (symbolId.isArray == null || !symbolId.isArray) {
                     const errorGramm = new ErrorGramm(this.positionToken, this.idAtrib, `El symbolo atributo << ${this.idAtrib} >> es un arreglo por lo que la asignacion no es posbile.`, ErrorType.SEMANTIC); 
                     handlerComprobation.listError.push(errorGramm);
@@ -185,11 +197,14 @@ export class AsigAtribObject extends Node {
                 return ;
             }
         } else {
+            
+            
             if (this.asignation instanceof DataArray) {
                 const errorGramm = new ErrorGramm(this.positionToken, this.idAtrib, `El symbolo atributo << ${this.idAtrib} >> no es un arreglo por lo que la asignacion no es posbile.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
                 return ;
             } else if (this.asignation instanceof InstanceArray) {
+                
                 const errorGramm = new ErrorGramm(this.positionToken, this.idAtrib, `El symbolo atributo << ${this.idAtrib} >> no es un arreglo por lo que la asignacion no es posbile.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
                 return ;

@@ -90,7 +90,7 @@ export class SuperInst extends Node  {
                     }
                     return ;
                 }
-                return ;
+                // return ;
             }
         }
         if (!isExisteClass) {

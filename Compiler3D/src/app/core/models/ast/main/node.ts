@@ -11,6 +11,7 @@ export abstract class Node {
     private _type: DynamicDataType;
     private _token: string;
     public isRunning: boolean = false;
+    public isGen3D: boolean = false;
     public _typeVerifier: TypeVerifier = new TypeVerifier();
 
     /**

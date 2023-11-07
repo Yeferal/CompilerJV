@@ -77,7 +77,9 @@ export class CallArray extends Node {
         //Verifica que los dims sean enteros
         for (let i = 0; i < this.dimensions.length; i++) {
             const resType = this.dimensions[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-            if (resType != handlerComprobation.typeTable.getDataType("INTEGER")) {
+            // console.log(resType);
+            
+            if (resType.name != "INTEGER") {
                 //Error no es un entero
                 const errorGramm = new ErrorGramm(this.positionToken, this.token, `El valor de la dimension no es un entero en el arreglo << ${this.id} >>.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);

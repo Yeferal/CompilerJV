@@ -13,6 +13,7 @@ import { EncapsulationType } from "../utils/encapsulation-type";
 import { ConstructorInst } from "./constructor-inst";
 import { FunctionProcedure } from "./function-procedure";
 import { ListDeclaration } from "./list-declaration";
+import { MainNode } from "./main-node";
 
 export class ClassInst extends Node {
     private _isGetter: boolean;
@@ -131,16 +132,19 @@ export class ClassInst extends Node {
             this.isFinal                            //isFinal
         );
 
-        newSymbol.ambit = handlerComprobation.getAmbitS();
+        // newSymbol.ambit = handlerComprobation.getAmbitS();
         if (this.nameExtends != null) {
             newSymbol.parent = this.nameExtends
         }
+        newSymbol.packageS = handlerComprobation.actualPKG.path;
 
         handlerComprobation.addSymbol(newSymbol);
         
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        handlerComprobation.actualPKG = this.packageNode;
+
         //Buscar que no exista una clase con ese nombre, que exista el extends
         const classSearch = handlerComprobation.searchSymbol(this.name);
         
@@ -170,21 +174,19 @@ export class ClassInst extends Node {
             }
         }
         let countSize = 0;
-        if (this.isGetter || this.isSetter) {
-            for (let i = 0; i < this.instructions.length; i++) {
-                const instruction = this.instructions[i];
-                if (instruction instanceof ListDeclaration) {
-                    const listDeclaration = instruction as ListDeclaration;
-                    countSize += listDeclaration.listDeclaration.length;
-                }
+        for (let i = 0; i < this.instructions.length; i++) {
+            if (this.instructions[i] instanceof ListDeclaration) {
+                const listDeclaration = this.instructions[i] as ListDeclaration;
+                countSize += listDeclaration.listDeclaration.length;
             }
         }
-
+        
         //SI todo esta bien agregar a la tabla de simbolos la clase
         //Agregar a la tabla de simbolos la clase
         this.type = new DynamicDataType(1, this.name, countSize);
         handlerComprobation.typeTable.setSizeType(this.name, countSize);
         this.addSymbol(handlerComprobation, countSize);
+        handlerComprobation.clearAmbitS();
         handlerComprobation.addAmbitS(this.name);
         handlerComprobation.addAmbit();
         
@@ -218,17 +220,7 @@ export class ClassInst extends Node {
             }
         }
 
-        handlerComprobation.sizeFuncProc = 0;
-        handlerComprobation.resetPointer();
-        //Obtiene el Constructor
-        for (let i = 0; i < this.instructions.length; i++) {
-            const instruction = this.instructions[i];
-            if (instruction instanceof ConstructorInst) {
-                // console.log("lista de declaracion");
-                const listDeclaration = instruction as ConstructorInst;
-                // listDeclaration.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-            }
-        }
+        
 
         handlerComprobation.sizeFuncProc = 0;
         handlerComprobation.resetPointer();
@@ -237,25 +229,40 @@ export class ClassInst extends Node {
             const instruction = this.instructions[i];
             if (instruction instanceof FunctionProcedure) {
                 const functionProc = instruction as FunctionProcedure;
-                // console.log(functionProc);
+                functionProc.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
                 
             }
         }
 
-        // handlerComprobation.sizeFuncProc = 0;
-        //recorre el contenido de las funciones
-        // for (let i = 0; i < this.instructions.length; i++) {
-        //     const instruction = this.instructions[i];
-        //     if (instruction instanceof FunctionProcedure) {
-        //         const listDeclaration = instruction as FunctionProcedure;
-        //         listDeclaration.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-        //     }
-        // }
+        handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.resetPointer();
+        //Obtiene el Constructor
+        for (let i = 0; i < this.instructions.length; i++) {
+            const instruction = this.instructions[i];
+            if (instruction instanceof ConstructorInst) {
+                // console.log("lista de declaracion");
+                const listDeclaration = instruction as ConstructorInst;
+                listDeclaration.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            }
+        }
+
+        handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.resetPointer();
+        handlerComprobation.clearAmbitS();
+
+        for (let i = 0; i < this.instructions.length; i++) {
+            const instruction = this.instructions[i];
+            if (instruction instanceof MainNode) {
+                const mainNode = instruction as MainNode;
+                mainNode.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            }
+        }
 
         handlerComprobation.popAmbit();
         handlerComprobation.popAmbitS();
         handlerComprobation.sizeFuncProc = 0;
         handlerComprobation.resetPointer();
+        handlerComprobation.clearAmbitS();
         
         this.isRunning = true;
         return ;

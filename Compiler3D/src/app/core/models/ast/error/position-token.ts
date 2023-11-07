@@ -6,7 +6,7 @@ export class PositionToken {
 
 	constructor(row: number, column: number) {
 		this._row = row;
-		this._column = column;
+		this._column = column + 1;
 	}
 
     /**

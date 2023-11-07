@@ -64,6 +64,7 @@ export class Factory {
                 if (!this.treeAst.listRoot[i].isRunning) {
                     handlerComprobation.actualClass = this.treeAst.listRoot[i] as ClassInst;
                     this.treeAst.listRoot[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+                    handlerComprobation.actualClass = null;
                 }
             }
             
@@ -71,7 +72,7 @@ export class Factory {
         //Recorre solo los archivo main
         for (let i = 0; i < this.treeAst.listRoot.length; i++) {
             if (this.treeAst.listRoot[i] instanceof MainNode) {
-                    // this.treeAst.listRoot[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+                    this.treeAst.listRoot[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             }
             
         }

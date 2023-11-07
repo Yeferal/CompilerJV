@@ -166,11 +166,11 @@ export class AsignationVar extends Node {
             return ;
         }
 
-        if (symbol.isArray==null || !symbol.isArray) {
-            const errorGramm = new ErrorGramm(this.positionToken, this.id, `El symbolo << ${this.id} >> no es un arreglo.`, ErrorType.SEMANTIC); 
-            handlerComprobation.listError.push(errorGramm);
-            return ;
-        }
+        // if (symbol.isArray==null || !symbol.isArray) {
+        //     const errorGramm = new ErrorGramm(this.positionToken, this.id, `El symbolo << ${this.id} >> no es un arreglo.`, ErrorType.SEMANTIC); 
+        //     handlerComprobation.listError.push(errorGramm);
+        //     return ;
+        // }
 
         this.type = symbol.type;
 
@@ -191,6 +191,7 @@ export class AsignationVar extends Node {
                         //error de tipo de simbolo, no es un arreglo
                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `La simbolo << ${identifier.id}>> es un variable de tipo arreglo.`, ErrorType.SEMANTIC);
                         handlerComprobation.listError.push(errorGramm);
+                        return ;
                     }
                 }
 

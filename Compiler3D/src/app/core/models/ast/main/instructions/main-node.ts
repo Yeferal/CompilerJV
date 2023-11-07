@@ -4,6 +4,10 @@ import { HandlerComprobation } from "../environment/handler-comprobation";
 import { ImportNode } from "../import-node";
 import { Node } from "../node";
 import { PackageNode } from "../package-node";
+import { Symbol } from "../table/symbol";
+import { SymbolType } from "../table/symbol-type";
+import { DynamicDataType } from "../utils/DynamicDataType";
+import { EncapsulationType } from "../utils/encapsulation-type";
 
 export class MainNode extends Node {
 
@@ -64,9 +68,62 @@ export class MainNode extends Node {
 		this._listImport = value;
 	}
 
+    public addSymbol(handlerComprobation: HandlerComprobation){
+        const newSymbol: Symbol = new Symbol(
+            handlerComprobation.getIdDynamic(),     //id
+            "main",                                //nameCode
+            "main",                                //name
+            SymbolType.MAIN,                 //symbolType
+            false,                        //isFunction
+            null,                              //type, tipo de dato
+            null,                 //numParams
+            null,                         //listParams
+            null, //direccion o el numero de puntero para la pila de ejecucion
+            handlerComprobation.sizeFuncProc,       //Tamanio del symbol
+            false,                                  //isArray
+            null,                                   //listDims
+            false,                                  //isReference
+            EncapsulationType.PUBLIC,                     //encapsulation
+            handlerComprobation.getPackageRoot()+"main",//fullname, desde que paquete hasta el id
+            false                                   //isConst
+        );
+            // console.log(handlerComprobation.actualPKG.path);
+            
+        newSymbol.ambit = handlerComprobation.actualPKG.path;
+        newSymbol.packageS = handlerComprobation.actualPKG.path;
+
+        handlerComprobation.addSymbol(newSymbol);
+        // console.log(newSymbol);
+        
+    }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        throw new Error("Method not implemented.");
+        if (this.packageNode != null) {
+            handlerComprobation.actualPKG = this.packageNode;
+        }
+        this.addSymbol(handlerComprobation);
+        
+
+        handlerComprobation.addAmbitS(handlerComprobation.actualPKG.path);
+        handlerComprobation.addAmbit();
+        handlerComprobation.sizeFuncProc = 0;
+
+        for (let i = 0; i < this.instructions.length; i++) {
+            this.instructions[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+            
+        }
+
+        // this.size = handlerComprobation.sizeFuncProc;
+        // handlerComprobation.setListParamsTableSymbol("main", handlerComprobation.actualClass.name, listTypeParams);
+        // handlerComprobation.setListSizeTableSymbol(this.id, handlerComprobation.actualClass.name, this.size);
+        
+        //sacar el ambito
+        handlerComprobation.popAmbitS();
+        handlerComprobation.popAmbit();
+        handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.resetPointer();
+
+        return ;
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {

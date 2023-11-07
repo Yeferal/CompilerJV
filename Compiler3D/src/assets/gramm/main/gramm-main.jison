@@ -133,12 +133,12 @@ Decimal         {Numero} [.] {Numero}
 <INITIAL>"%"                                                { return "mod"; }
 
 /*OPERADORES RACIONALES*/
-<INITIAL>"<"                                                { return 'less_than';}
-<INITIAL>">"                                                { return 'greater_than';}
-<INITIAL>"=="                                               { return 'equals_equals';}
-<INITIAL>"<="                                               { return 'less_equals';}
-<INITIAL>">="                                               { return 'greater_equals';}
-<INITIAL>"!="                                               { return 'inequality';}
+<INITIAL>"<="                                               {/*paint('op_racional: '+yytext);*/ return 'less_equals';}
+<INITIAL>">="                                               {/*paint('op_racional: '+yytext);*/ return 'greater_equals';}
+<INITIAL>"=="                                               {/*paint('op_racional: '+yytext);*/ return 'equals_equals';}
+<INITIAL>"!="                                               {/*paint('op_racional: '+yytext);*/ return 'inequality';}
+<INITIAL>"<"                                                {/*paint('op_racional: '+yytext);*/ return 'less_than';}
+<INITIAL>">"                                                {/*paint('op_racional: '+yytext);*/ return 'greater_than';}
 
 
 /*OPERADORES LOGICOS*/
@@ -235,9 +235,9 @@ Decimal         {Numero} [.] {Numero}
 /* EXPRESIONES REGULARES */
 <INITIAL>\"[^\"]*\"			                                {/* paint(yytext); */ yytext = yytext.substr(0,yyleng-0); return 'string_primitive'; }
 <INITIAL>\'[^\']?\'			                                {/* paint(yytext); */yytext = yytext.substr(0,yyleng-0); return 'char_primitive'; }
-<INITIAL>{Decimal}                                          {/*paint('decimal: '+yytext); */ return 'decimal_primitive';}
-<INITIAL>{Numero}  	                                        {/* paint('entero: '+yytext); */ return 'integer_primitive';}
-<INITIAL>{id}                                               { return 'id';}
+<INITIAL>{Decimal}                                          {/*paint('decimal: '+yytext);*/  return 'decimal_primitive';}
+<INITIAL>{Numero}  	                                        {/*paint('entero: '+yytext);*/  return 'integer_primitive';}
+<INITIAL>{id}                                               {/*paint('id: '+yytext);*/ return 'id';}
 
 /**/
 <INITIAL>\s+                                                /* skip whitespace */
@@ -255,10 +255,14 @@ Decimal         {Numero} [.] {Numero}
 %right 'not'
 
 //Presedencia operadores matematicos
-%left 'equals' 'equals_equals' 'inequality' 'less_than' 'less_equals' 'greater_than' 'greater_equals'
+// %left 'equals' 'equals_equals' 'inequality' 'less_than' 'less_equals' 'greater_than' 'greater_equals'
+
+%left 'equals' 'equals_equals' 'inequality'
+%left 'less_than' 'greater_than' 'less_equals'  'greater_equals'
 %left 'plus' 'minus'
 %left 'mod' 'div' 'mult'
 %left UMINUS
+%left '(' ')'
 
 %start ini
 
@@ -372,14 +376,14 @@ STATE_COMMENT
 */
 
 DATA_VALUE
-    :decimal_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"FLOAT", 1), $1, parseFloat($1));}
-    |integer_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1), $1, parseInt($1));}
+    :decimal_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"FLOAT", 1), $1, $1);}
+    |integer_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"INTEGER", 1), $1, $1);}
     |char_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"CHAR", 1), $1, $1);}
     |true { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"BOOLEAN", 1), $1, true);}
     |false { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"BOOLEAN", 1), $1, false);}
     |string_primitive { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"STRING", 1), $1, $1);}
     |id { $$ = new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, false);}
-    |this id { $$ = new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, true);}
+    |this id { $$ = new Identifier(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, true);}
     |null { $$ = new Primitive(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1,"NULL", 0), $1, null);}
     |STRUCT_CALL_FUNCTION { $$ = $1;}
     |STRUCT_CALL_ARRAY { $$ = $1;}
@@ -404,7 +408,7 @@ ARITHMETIC_OPERATION
             );
         }
     |parentheses_l ARITHMETIC_OPERATION parentheses_r { $$ = $2; }
-    |DATA_VALUE { $$ = $1; }
+    |DATA_VALUE { $$ = $1; /*console.log($1);*/ }
 ;
 
 RATIONAL_OPERATION
@@ -419,8 +423,8 @@ RATIONAL_OPERATION
 
 STATE_RATIONAL_OP
     :RATIONAL_OPERATION { $$ = $1; }
-    |parentheses_l RATIONAL_OPERATION parentheses_r { $$ = $2; }
-    |ARITHMETIC_OPERATION { $$ = $1; }
+    |parentheses_l RATIONAL_OPERATION parentheses_r  { $$ = $2; }
+    |ARITHMETIC_OPERATION { /*console.log($1);*/ $$ = $1; }
 ;
 
 LOGICAL_OPERATION
@@ -1099,13 +1103,13 @@ STRUCT_ASIGNATION_VAR
     {
         $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, 
         $5, 
-        false, false);
+        false, true);
     }
     |id period id equal_mark new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
     {
         $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, 
         new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $6, $3, $7), 
-        false, false);
+        false, true);
     }
     |id period id equal_mark new id STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
     {
@@ -1113,7 +1117,7 @@ STRUCT_ASIGNATION_VAR
         new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column),
             new DynamicDataType(1,$6, 1),
             $3, $7), 
-        false, false);
+        false, true);
     }
 
 
@@ -1185,15 +1189,15 @@ STRUCT_ASIGNATION_VAR
 
     |this id period id equal_mark VALUE_ARRAY_STATE semicolon
     {
-        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $5, 
+        $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, 
         $6, 
-        false, false);
+        false, true);
     }
     |this id period id equal_mark new DATATYPE_PRIMITIVE STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
     {
         $$ = new AsigAtribObject(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, 
         new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column), $7, $4, $8), 
-        false, false);
+        false, true);
     }
     |this id period id equal_mark new id STRUCT_VALUE_DIMS_VAR_ARRAY semicolon
     {
@@ -1201,7 +1205,7 @@ STRUCT_ASIGNATION_VAR
         new InstanceArray(new PositionToken(this._$.first_line, this._$.first_column),
             new DynamicDataType(1,$7, 1),
             $4, $8), 
-        false, false);
+        false, true);
     }
 
     

@@ -9,4 +9,5 @@ export enum SymbolType {
     PARAM = "PARAM",
     MAIN = "MAIN",
     VAR = "VAR",
+    RETURN = "RETURN",
 }

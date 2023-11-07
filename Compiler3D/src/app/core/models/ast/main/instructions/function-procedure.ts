@@ -162,14 +162,14 @@ export class FunctionProcedure extends Node {
     public addSymbol(handlerComprobation: HandlerComprobation, listTypeParams: Array<DynamicDataType>){
         const newSymbol: Symbol = new Symbol(
             handlerComprobation.getIdDynamic(),     //id
-            handlerComprobation.getAmbitS()+this.id,                                //nameCode
+            handlerComprobation.getAmbitS(),                                //nameCode
             this.id,                                //name
             this.isFunction? SymbolType.FUNCTION : SymbolType.PROCEDURE,//symbolType
             this.isFunction,                        //isFunction
             this.type,                              //type, tipo de dato
             this.listParams.length,                 //numParams
             listTypeParams,                         //listParams
-            handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
+            null, //direccion o el numero de puntero para la pila de ejecucion
             handlerComprobation.sizeFuncProc,       //Tamanio del symbol
             false,                                  //isArray
             null,                                   //listDims
@@ -179,9 +179,61 @@ export class FunctionProcedure extends Node {
             false                                   //isConst
         );
 
+        newSymbol.ambit = handlerComprobation.actualClass.name;
+
+        handlerComprobation.addSymbol(newSymbol);
+    }
+
+    private addSymbolThis(handlerComprobation: HandlerComprobation){
+        const newSymbol: Symbol = new Symbol(
+            handlerComprobation.getIdDynamic(),     //id
+            null,                                //nameCode
+            "this",                                //name
+            SymbolType.KEY_WORD,                 //symbolType
+            false,                        //isFunction
+            null,                              //type, tipo de dato
+            null,                 //numParams
+            null,                         //listParams
+            handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
+            1,       //Tamanio del symbol
+            false,                                  //isArray
+            null,                                   //listDims
+            false,                                  //isReference
+            EncapsulationType.PUBLIC,                     //encapsulation
+            handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
+            false                                   //isConst
+        );
+
         newSymbol.ambit = handlerComprobation.getAmbitS();
 
         handlerComprobation.addSymbol(newSymbol);
+        handlerComprobation.sizeFuncProc++;
+    }
+
+    private addSymbolReturn(handlerComprobation: HandlerComprobation){
+        const newSymbol: Symbol = new Symbol(
+            handlerComprobation.getIdDynamic(),     //id
+            null,                                //nameCode
+            "return",                                //name
+            SymbolType.RETURN,                 //symbolType
+            false,                        //isFunction
+            this.type,                              //type, tipo de dato
+            null,                 //numParams
+            null,                         //listParams
+            handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
+            1,       //Tamanio del symbol
+            false,                                  //isArray
+            null,                                   //listDims
+            false,                                  //isReference
+            EncapsulationType.PUBLIC,                     //encapsulation
+            handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
+            false                                   //isConst
+        );
+
+        newSymbol.ambit = handlerComprobation.getAmbitS();
+
+        handlerComprobation.addSymbol(newSymbol);
+        handlerComprobation.sizeFuncProc++;
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
@@ -199,6 +251,11 @@ export class FunctionProcedure extends Node {
         handlerComprobation.addAmbit();
         handlerComprobation.sizeFuncProc = 0;
 
+        // Comprobaciones de extends si es override
+
+        this.addSymbol(handlerComprobation, []);
+        this.addSymbolThis(handlerComprobation);
+
         let listTypeParams: Array<DynamicDataType> = new Array<DynamicDataType>;
         //Verificar que los parametros sean correctos
         for (let j = 0; j < this.listParams.length; j++) {
@@ -206,15 +263,21 @@ export class FunctionProcedure extends Node {
             listTypeParams.push(resParam);
         }
 
-        //ejecutar las comprobaciones de las instrucciones
+        // ejecutar las comprobaciones de las instrucciones
         for (let i = 0; i < this.instructions.length; i++) {
             this.instructions[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             if (this.instructions[i] instanceof ReturnNode) {
                 if (this.isFunction) {
                     const returnNode = this.instructions[i] as ReturnNode;
-                    return returnNode.type;
+                    if (returnNode.type.name != this.type.name) {
+                        const errorGramm = new ErrorGramm(this.positionToken, this.token, `EL metodo << ${this.id} >>no es del mismo tipo que el valor de retorno.`, ErrorType.SEMANTIC); 
+                        handlerComprobation.listError.push(errorGramm);
+                        return ;
+                    }
+                    break;
+                    // return returnNode.type;  
                 } else {
-                    const errorGramm = new ErrorGramm(this.positionToken, this.token, `EL metodo << ${this.id}>>no es un funcion, por lo que no se puede usar el key return.`, ErrorType.SEMANTIC); 
+                    const errorGramm = new ErrorGramm(this.positionToken, this.token, `EL metodo << ${this.id} >>no es un funcion, por lo que no se puede usar el key return.`, ErrorType.SEMANTIC); 
                     handlerComprobation.listError.push(errorGramm);
                     return ;
                 }
@@ -222,14 +285,23 @@ export class FunctionProcedure extends Node {
             }
         }
 
-        //agregar el simbolo
+        //agregar el simbolo return
+        if (this.isFunction) {
+            this.addSymbolReturn(handlerComprobation);
+        }
+        
         this.size = handlerComprobation.sizeFuncProc;
-        this.addSymbol(handlerComprobation, listTypeParams);
+        handlerComprobation.setListParamsTableSymbol(this.id, handlerComprobation.actualClass.name, listTypeParams);
+        handlerComprobation.setListSizeTableSymbol(this.id, handlerComprobation.actualClass.name, this.size);
+
+
 
         //sacar el ambito
+        
         handlerComprobation.popAmbit();
         handlerComprobation.popAmbitS();
         handlerComprobation.sizeFuncProc = 0;
+        handlerComprobation.resetPointer();
 
         return this.type;
     }

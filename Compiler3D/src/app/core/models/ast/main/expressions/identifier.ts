@@ -53,8 +53,15 @@ export class Identifier extends Node{
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //Busca la variable en la tabla se simbolos
         //comprobacion de ambito y nombre
-        const symbol = handlerComprobation.searchSymbol(this.id);
+        let symbol = null;
+        if (this.isThis) {
+            symbol = handlerComprobation.searchSymbolAtribClass(this.id, handlerComprobation.actualClass.name);
+        } else {
+            symbol = handlerComprobation.searchSymbol(this.id);
+        }
+        
         //si existe la variable, retorna el tipo de dato de la variable
+        // console.log(symbol);
         
         if (symbol != null) {
             this.type = symbol.type;

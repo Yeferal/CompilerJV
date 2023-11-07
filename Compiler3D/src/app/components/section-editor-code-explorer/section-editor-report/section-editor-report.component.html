@@ -74,6 +74,7 @@
                     <td>final</td>
                     <td>static</td>
                     <td>Encapsulamiento</td>
+                    <td>Paquete</td>
                     <!-- <td></td> -->
                 </tr>
             </thead>
@@ -87,7 +88,16 @@
                         <td>{{item.type?.name}}</td>
 
                         <td>{{item.numParams? item.numParams : ""}}</td>
-                        <td>{{item.listParams? item.listParams?.toString() : ""}}</td>
+                        <!-- <td>{{item.listParams? item.listParams?.toString() : ""}}</td> -->
+                        <td>
+                            <ng-container *ngIf="item.listParams" >
+                                [
+                                <ng-container *ngFor="let itemLP of item.listParams">
+                                    {{itemLP.name}}, 
+                                </ng-container>
+                                ]
+                            </ng-container>
+                        </td>
                         <td>{{item.isArray? item.isArray : ""}}</td>
                         <td>{{item.listDims? item.listDims?.toString() : ""}}</td>
 
@@ -97,6 +107,7 @@
                         <td>{{item.isConst}}</td>
                         <td>{{item.isStatic}}</td>
                         <td>{{item.encapsulation}}</td>
+                        <td>{{item.packageS}}</td>
                         
                     </tr>
                 </ng-container>

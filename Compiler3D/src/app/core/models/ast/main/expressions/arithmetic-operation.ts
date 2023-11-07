@@ -56,6 +56,7 @@ export class ArithmeticOperation extends Node {
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         let resLeft = this.nodeLeft.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         let resRight = this.nodeRight.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        
         if (resLeft != null && resRight != null) {
             //Comprobacion de tipos
             const resType: DynamicDataType = this._typeVerifier.verifierTypeArithNode(resLeft, resRight, this.arithType);

@@ -4,8 +4,10 @@ import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
+import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
+import { FunctionProcedure } from "./function-procedure";
 
 export class CallFunction extends Node {
     private _id: string;
@@ -76,8 +78,51 @@ export class CallFunction extends Node {
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //buscar la funciones para comprobar si existe
-        const symbolFunc = handlerComprobation.searchSymbolThis(this.id);
-        this.type = symbolFunc.type;
+        let symbolFunc = handlerComprobation.searchSymbolThis(this.id);
+        if (symbolFunc == null) {
+            // buscar en las funciones del nodo class actual 
+            let classAc = handlerComprobation.actualClass;
+            for (let i = 0; i < classAc.instructions.length; i++) {
+                if (classAc.instructions[i] instanceof FunctionProcedure) {
+                    const funProcTemp = classAc.instructions[i] as FunctionProcedure;
+                    if (funProcTemp.id == this.id) {
+                        let listTypeParams: Array<DynamicDataType> = new Array<DynamicDataType>;
+                        //Verificar que los parametros sean correctos
+                        for (let j = 0; j < funProcTemp.listParams.length; j++) {
+                            listTypeParams.push(funProcTemp.listParams[j].type);
+                        }
+
+                        symbolFunc = new Symbol(
+                            0,     //id
+                            null,                                //nameCode
+                            funProcTemp.id,                                //name
+                            funProcTemp.isFunction? SymbolType.FUNCTION : SymbolType.PROCEDURE,//symbolType
+                            funProcTemp.isFunction,                        //isFunction
+                            funProcTemp.type,                              //type, tipo de dato
+                            funProcTemp.listParams.length,                 //numParams
+                            listTypeParams,                         //listParams
+                            null, //direccion o el numero de puntero para la pila de ejecucion
+                            handlerComprobation.sizeFuncProc,       //Tamanio del symbol
+                            false,                                  //isArray
+                            null,                                   //listDims
+                            false,                                  //isReference
+                            null,                     //encapsulationType
+                            null,//fullname, desde que paquete hasta el id
+                            false                                   //isConst
+                        );
+
+                        this.type = funProcTemp.type;
+                    }
+                }
+            }
+            if (symbolFunc == null) {
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `No existe una funcion o procedimiento << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                handlerComprobation.listError.push(errorGramm);
+                return this.type;
+            }
+        } else {
+            this.type = symbolFunc.type;
+        }
 
         //Verificar que sea una funcion o procedimiento
         if (!this.isTypeCorrect(symbolFunc.symbolType)) {

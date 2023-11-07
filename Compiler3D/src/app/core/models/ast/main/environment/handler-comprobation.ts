@@ -5,13 +5,15 @@ import { TypeTable } from '../table/TypeTable';
 import { Symbol } from '../table/symbol';
 import { Node } from '../node';
 import { ClassInst } from '../instructions/class-inst';
+import { DynamicDataType } from '../utils/DynamicDataType';
+import { PackageNode } from '../package-node';
 
 export class HandlerComprobation {
     public symbolTable: SymbolTable = new SymbolTable();
     public symbolAmbit: SymbolTable = new SymbolTable();
     public typeTable: TypeTable = new TypeTable();
-    public ambits: Stack<string> = new Stack<string>;
-    public pointers: Stack<number> = new Stack<number>;
+    public ambits: Stack<string> = new Stack<string>();
+    public pointers: Stack<number> = new Stack<number>();
     public pointerNow: number;
     public listError: Array<ErrorGramm> = new Array<ErrorGramm>;
     public flagId = 0;
@@ -21,11 +23,12 @@ export class HandlerComprobation {
     public listStatic: Array<Node> = [];
     public actualClass: ClassInst;
     public listNode: Array<Node>;
+    public actualPKG: PackageNode;
 
     constructor(){
         this.pointers.push(0);
         this.pointerNow = this.pointers.peek()
-        this.ambits.push(""); //GLOBAL
+        // this.ambits.push(""); //GLOBAL
     }
 
     public getIdDynamic(){
@@ -35,7 +38,22 @@ export class HandlerComprobation {
     }
 
     public addAmbitS(ambit: string){
-        this.ambits.push(ambit);
+        if (this.ambits.isEmpty()) {
+            // console.log(this.ambits.isEmpty(),this.ambits.peek(), this.ambits);
+            this.ambits.push(ambit);
+
+        } else {
+            // console.log(this.ambits);
+            if (this.ambits.peek() == "") {
+                this.ambits.push(ambit);
+            } else {
+                this.ambits.push(this.ambits.peek()+"_"+ambit);
+            }
+            
+        }
+
+        // this.ambits.push(ambit);
+        
     }
 
     public getAmbitS(): string{
@@ -69,8 +87,13 @@ export class HandlerComprobation {
 
     public popAmbitS(){
         if (!this.ambits.isEmpty()) {
+            // console.log(this.ambits);
             this.ambits.pop();
         }
+    }
+
+    public clearAmbitS(){
+        this.ambits.clear();
     }
 
     public addSymbol(symbol: Symbol){
@@ -100,5 +123,13 @@ export class HandlerComprobation {
 
     public isExistType(name: string): boolean {
         return this.typeTable.isExistType(name);
+    }
+
+    public setListParamsTableSymbol(name: string, ambit: string, listParams: Array<DynamicDataType>): Symbol{
+        return this.symbolTable.setListParams(name, ambit, listParams);
+    }
+
+    public setListSizeTableSymbol(name: string, ambit: string, size: number): Symbol{
+        return this.symbolTable.setListSize(name, ambit, size);
     }
 }

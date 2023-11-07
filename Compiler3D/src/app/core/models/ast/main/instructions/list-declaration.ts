@@ -98,6 +98,7 @@ export class ListDeclaration extends Node {
                 declarationAtribite.isFinal = this.isFinal;
                 declarationAtribite.encapsulationType = this.encapsulationType;
                 declarationAtribite.type = this.type;
+				
             } else if (this.listDeclaration[i] instanceof DeclarationArray) {
 				const declarationArray = this.listDeclaration[i] as DeclarationArray;
 				declarationArray.isSetter = this.isSetter;

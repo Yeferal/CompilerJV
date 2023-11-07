@@ -147,15 +147,16 @@ export class DeclarationVarible extends Node{
 
         //Verificar el tipo de asignacion
         if (this.asignation != null) {
-            const resAsig: DynamicDataType = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             
-            if (!handlerComprobation.isExistType(resAsig.name)) {  
-                const errorGramm = new ErrorGramm(this.asignation.positionToken, this.asignation.token, `El tipo de dato << ${resAsig.name}>> no existe.`, ErrorType.SEMANTIC); 
-                handlerComprobation.listError.push(errorGramm);
-                return ;
-            }
+            const resAsig: DynamicDataType = this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
 
             if (resAsig != null) {
+                if (!handlerComprobation.isExistType(resAsig.name)) {  
+                    const errorGramm = new ErrorGramm(this.asignation.positionToken, this.asignation.token, `El tipo de dato << ${resAsig.name}>> no existe.`, ErrorType.SEMANTIC); 
+                    handlerComprobation.listError.push(errorGramm);
+                    return ;
+                }
+
                 if ( this.type.name == resAsig.name) {
                     //Agreagar a la tabla de simbolos
                     this.addSymbol(handlerComprobation);

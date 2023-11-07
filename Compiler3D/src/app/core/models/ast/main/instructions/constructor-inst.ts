@@ -5,7 +5,9 @@ import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
 import { Symbol } from "../table/symbol";
+import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
+import { EncapsulationType } from "../utils/encapsulation-type";
 
 export class ConstructorInst extends Node {
     private _id: string;
@@ -87,28 +89,56 @@ export class ConstructorInst extends Node {
 	}
 
     public addSymbol(handlerComprobation: HandlerComprobation, listTypeParams: Array<DynamicDataType>){
-        // const newSymbol: Symbol = new Symbol(
-        //     handlerComprobation.getIdDynamic(),     //id
-        //     this.id,                                //nameCode
-        //     this.id,                                //name
-        //     this.isFunction? SymbolType.FUNCTION : SymbolType.PROCEDURE,//symbolType
-        //     this.isFunction,                        //isFunction
-        //     this.type,                              //type, tipo de dato
-        //     this.listParams.length,                 //numParams
-        //     listTypeParams,                         //listParams
-        //     handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
-        //     handlerComprobation.sizeFuncProc,       //Tamanio del symbol
-        //     false,                                  //isArray
-        //     null,                                   //listDims
-        //     false,                                  //isReference
-        //     this.encapsulation,                     //encapsulation
-        //     handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
-        //     false                                   //isConst
-        // );
+        const newSymbol: Symbol = new Symbol(
+            handlerComprobation.getIdDynamic(),     //id
+            handlerComprobation.getAmbitS(),                                //nameCode
+            this.id,                                //name
+            SymbolType.CONSTRUCTOR,                 //symbolType
+            false,                        //isFunction
+            this.type,                              //type, tipo de dato
+            this.listParams.length,                 //numParams
+            listTypeParams,                         //listParams
+            null, //direccion o el numero de puntero para la pila de ejecucion
+            handlerComprobation.sizeFuncProc,       //Tamanio del symbol
+            false,                                  //isArray
+            null,                                   //listDims
+            false,                                  //isReference
+            EncapsulationType.PUBLIC,                     //encapsulation
+            handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
+            false                                   //isConst
+        );
 
-        // newSymbol.ambit = handlerComprobation.getAmbitS();
+        newSymbol.ambit = handlerComprobation.actualClass.name;
 
-        // handlerComprobation.addSymbol(newSymbol);
+        handlerComprobation.addSymbol(newSymbol);
+        // console.log(newSymbol);
+        
+    }
+
+    private addSymbolThis(handlerComprobation: HandlerComprobation){
+        const newSymbol: Symbol = new Symbol(
+            handlerComprobation.getIdDynamic(),     //id
+            null,                                //nameCode
+            "this",                                //name
+            SymbolType.KEY_WORD,                 //symbolType
+            false,                        //isFunction
+            null,                              //type, tipo de dato
+            null,                 //numParams
+            null,                         //listParams
+            handlerComprobation.getAndAddPointer(), //direccion o el numero de puntero para la pila de ejecucion
+            1,       //Tamanio del symbol
+            false,                                  //isArray
+            null,                                   //listDims
+            false,                                  //isReference
+            EncapsulationType.PUBLIC,                     //encapsulation
+            handlerComprobation.getPackageRoot()+this.id,//fullname, desde que paquete hasta el id
+            false                                   //isConst
+        );
+
+        newSymbol.ambit = handlerComprobation.getAmbitS();
+
+        handlerComprobation.addSymbol(newSymbol);
+        handlerComprobation.sizeFuncProc++;
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
@@ -116,7 +146,7 @@ export class ConstructorInst extends Node {
         //agregar ambito
         handlerComprobation.addAmbitS(this.id);
         handlerComprobation.addAmbit();
-        handlerComprobation.sizeFuncProc = 1; //Comienza con 1 por el this
+        handlerComprobation.sizeFuncProc = 0;
 
         if (handlerComprobation.actualClass.name != this.id) {
             //El construtor no pertenece a la clase
@@ -124,6 +154,8 @@ export class ConstructorInst extends Node {
             handlerComprobation.listError.push(errorGramm);
             return ;
         }
+        this.addSymbol(handlerComprobation, []);
+        this.addSymbolThis(handlerComprobation);
 
         let listTypeParams: Array<DynamicDataType> = new Array<DynamicDataType>;
         //Verificar que los parametros sean correctos
@@ -131,15 +163,19 @@ export class ConstructorInst extends Node {
             const resParam = this.listParams[j].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             listTypeParams.push(resParam);
         }
+        
+        
 
         //ejecutar las comprobaciones de las instrucciones
         for (let i = 0; i < this.instructions.length; i++) {
             this.instructions[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         }
 
+        
         //agregar el simbolo
         this.size = handlerComprobation.sizeFuncProc;
-        this.addSymbol(handlerComprobation, listTypeParams);
+        handlerComprobation.setListParamsTableSymbol(this.id, handlerComprobation.actualClass.name, listTypeParams);
+        handlerComprobation.setListSizeTableSymbol(this.id, handlerComprobation.actualClass.name, this.size);
 
         //sacar el ambito
         handlerComprobation.popAmbitS();

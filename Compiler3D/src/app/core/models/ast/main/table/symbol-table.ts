@@ -2,6 +2,7 @@ import { Stack } from 'typescript-collections';
 import { Symbol } from './symbol';
 import { forEach } from 'typescript-collections/dist/lib/arrays';
 import { SymbolType } from './symbol-type';
+import { DynamicDataType } from '../utils/DynamicDataType';
 
 export class SymbolTable {
     public stackTable: Stack<Array<Symbol>> = new Stack<Array<Symbol>>();
@@ -12,7 +13,9 @@ export class SymbolTable {
 
     public addNewTable(){
         let newTable = new Array<Symbol>;
-        if (!this.stackTable.isEmpty) {
+        if (!this.stackTable.isEmpty()) {
+            
+            
             newTable.push(...this.stackTable.peek());
         }
         this.stackTable.add(newTable);
@@ -34,8 +37,10 @@ export class SymbolTable {
     public searchSymbolThis(name: string): Symbol{
         if (!this.stackTable.isEmpty()) {
             const tableTemp = this.stackTable.peek();
+            
             for (let i = 0; i < tableTemp.length; i++) {
                 const symbol = tableTemp[i];
+                
                 if (name === symbol.name && symbol.symbolType == SymbolType.ATRIBUT) {
                     return symbol;
                 }
@@ -49,6 +54,9 @@ export class SymbolTable {
             const tableTemp = this.stackTable.peek();
             for (let i = 0; i < tableTemp.length; i++) {
                 const symbol = tableTemp[i];
+                // console.log(symbol);
+                // console.log(name, "===",symbol.name, ambit, "==", symbol.ambit);
+                
                 if (name === symbol.name && ambit == symbol.ambit) {
                     return symbol;
                 }
@@ -62,8 +70,33 @@ export class SymbolTable {
     }
 
     public popTableAmbit(){
-        if (!this.stackTable.isEmpty) {
+        if (!this.stackTable.isEmpty()) {
             this.stackTable.pop();
         }
+    }
+
+    public setListParams(name: string, ambit: string, listParams: Array<DynamicDataType>){
+        if (!this.stackTable.isEmpty()) {
+            for (let i = 0; i < this.stackTable.peek().length; i++) {
+                if (name === this.stackTable.peek()[i].name && ambit == this.stackTable.peek()[i].ambit) {
+                    this.stackTable.peek()[i].listParams = listParams;
+                    
+                    return this.stackTable.peek()[i];
+                }
+            }
+        }
+        return null;
+    }
+
+    public setListSize(name: string, ambit: string, size: number){
+        if (!this.stackTable.isEmpty()) {
+            for (let i = 0; i < this.stackTable.peek().length; i++) {
+                if (name === this.stackTable.peek()[i].name && ambit == this.stackTable.peek()[i].ambit) {
+                    this.stackTable.peek()[i].size = size;
+                    return this.stackTable.peek()[i];
+                }
+            }
+        }
+        return null;
     }
 }

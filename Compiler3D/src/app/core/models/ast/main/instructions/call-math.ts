@@ -9,11 +9,11 @@ import { MathType } from "../utils/math-type";
 
 export class CallMath extends Node {
     private _mathType: MathType;
-    private _paramRight: Node;
     private _paramLeft: Node;
+    private _paramRight: Node;
 
 
-	constructor(positionToken: PositionToken, token: string, mathType: MathType, paramRight: Node, paramLeft: Node) {
+	constructor(positionToken: PositionToken, token: string, mathType: MathType, paramLeft: Node, paramRight: Node) {
 		super(positionToken, null, token);
         this._mathType = mathType;
 		this._paramRight = paramRight;
@@ -72,12 +72,12 @@ export class CallMath extends Node {
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         let resLeft = null;
         let resRight = null;
-
+        
         if (this.paramLeft != null) {
             resLeft = this.paramLeft.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         }
 
-        if (this.paramLeft != null) {
+        if (this.paramRight!= null) {
             resRight = this.paramRight.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         }
         
@@ -93,6 +93,7 @@ export class CallMath extends Node {
             case MathType.SIN:
             case MathType.ATAN:
             case MathType.EXP:
+                
                 if (resLeft == null) {
                     const errorGramm = new ErrorGramm(this.positionToken, this.token, `Parametros invalidos de la funciones Math.x << ${this.mathType} >>.`, ErrorType.SEMANTIC); 
                     handlerComprobation.listError.push(errorGramm);

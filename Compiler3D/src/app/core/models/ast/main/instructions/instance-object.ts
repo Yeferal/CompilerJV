@@ -7,6 +7,7 @@ import { Node } from "../node";
 import { DynamicDataType } from "../utils/DynamicDataType";
 import { ClassInst } from "./class-inst";
 import { ConstructorInst } from "./constructor-inst";
+import { DeclarationParam } from "./declaration-param";
 
 export class InstanceObject extends Node {
     private _id: string;
@@ -67,7 +68,7 @@ export class InstanceObject extends Node {
         const resType = handlerComprobation.typeTable.getDataType(this.id);
         if (resType == null) {
             //Error no existe un tipo de dato
-            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato << ${this.type.name}>> no existe.`, ErrorType.SEMANTIC); 
+            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato << ${this.id}>> no existe.`, ErrorType.SEMANTIC); 
             handlerComprobation.listError.push(errorGramm);
             return ;
         }else {
@@ -80,28 +81,37 @@ export class InstanceObject extends Node {
             const resParam = this.params[j].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             listTypeParams.push(resParam);
         }
-
+        // console.log(this.type);
         //El constructor aun no existe tenesmos que buscarlo, pero solo para sus parametros
         let isExisteClass = false;
         let isExisteConstructor = false;
         for (let i = 0; i < handlerComprobation.listNode.length; i++) {
+            //Buscas que sea una clase
+            
             if (handlerComprobation.listNode[i] instanceof ClassInst) {
                 const element = handlerComprobation.listNode[i] as ClassInst;
-                if (element.name == handlerComprobation.actualClass.nameExtends) {
+                // Encuentra la clase
+                // console.log(element.name, "==", handlerComprobation.actualClass.name);
+                
+                if (element.name == handlerComprobation.actualClass.name) {
                     isExisteClass = true;
+                    // console.log(this.type);
+                    // Busca el constructor
                     for (let j = 0; j < element.instructions.length; j++) {
                         if (element.instructions[j] instanceof ConstructorInst) {
+                            // Encuentra el constructor
                             isExisteConstructor = true;
                             const constructorNode = element.instructions[j] as ConstructorInst;
                             let listTypeParamsConst: Array<DynamicDataType> = new Array<DynamicDataType>;
-                            
+                            // En lista los tipos de datos de los parametros
                             for (let k = 0; k < constructorNode.listParams.length; k++) {
-                                const resParam = constructorNode.listParams[k].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
-                                listTypeParamsConst.push(resParam);
+                                
+                                const resParam = constructorNode.listParams[k] as DeclarationParam;
+                                listTypeParamsConst.push(resParam.type);
                             }
 
                             if (listTypeParams.length != listTypeParamsConst.length) {
-                                const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construtor de la clase << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                                const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construtor de la clase << ${this.id} >> no es el mismo.`, ErrorType.SEMANTIC); 
                                 handlerComprobation.listError.push(errorGramm);
                                 return ;
                             }else {
@@ -112,24 +122,24 @@ export class InstanceObject extends Node {
                                         return ;
                                     }
                                 }
-                                return ;
+                                return this.type;
                             }
                         }
                         
                     }
                     if (!isExisteConstructor) {
                         if (listTypeParams.length > 0) {
-                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construto de la clase no es el mismo << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construto de la clase no es el mismo << ${this.id} >> no es el mismo.`, ErrorType.SEMANTIC); 
                             handlerComprobation.listError.push(errorGramm);
                             return ;
                         }
                     }
                     return ;
                 }
-                return ;
+                // return ;
             }
         }
-
+        
         return this.type;
     }
 

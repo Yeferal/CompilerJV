@@ -46,7 +46,9 @@ export class PrintNode extends Node {
 	}
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        return ;
+        const resType = this.value.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        this.type = resType;
+        return this.type;
     }
 
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {
