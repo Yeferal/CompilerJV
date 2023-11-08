@@ -7,6 +7,7 @@ import { Node } from '../node';
 import { ClassInst } from '../instructions/class-inst';
 import { DynamicDataType } from '../utils/DynamicDataType';
 import { PackageNode } from '../package-node';
+import { MainNode } from '../instructions/main-node';
 
 export class HandlerComprobation {
     public symbolTable: SymbolTable = new SymbolTable();
@@ -24,6 +25,7 @@ export class HandlerComprobation {
     public actualClass: ClassInst;
     public listNode: Array<Node>;
     public actualPKG: PackageNode;
+    public listMain: Array<MainNode> = [];
 
     constructor(){
         this.pointers.push(0);

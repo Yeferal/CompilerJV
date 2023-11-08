@@ -1260,11 +1260,14 @@ break;
 case 437:
 this.$ = new SuperInst(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-4], $$[$0-2]);
 break;
-case 439: case 440: case 441: case 442: case 443: case 444: case 446: case 447: case 448: case 449: case 450: case 451: case 452: case 453: case 454: case 455: case 456: case 457: case 458: case 459: case 460: case 519: case 520: case 521: case 522: case 523: case 524: case 526: case 527: case 528: case 529: case 530: case 531: case 532: case 533: case 534: case 535: case 536: case 537: case 538: case 539:
+case 439: case 440: case 441: case 442: case 443: case 444: case 446: case 447: case 448: case 449: case 450: case 451: case 452: case 453: case 454: case 455: case 456: case 457: case 458: case 459: case 519: case 520: case 521: case 522: case 523: case 524: case 526: case 527: case 528: case 529: case 530: case 531: case 532: case 533: case 534: case 535: case 536: case 537: case 538: case 539:
 this.$ = $$[$0-1]; this.$.push($$[$0]); 
 break;
 case 445: case 525:
 this.$ = $$[$0-1]; 
+break;
+case 460:
+this.$ = $$[$0-1]; this.$.push($$[$0]); console.log($$[$0]); 
 break;
 case 461: case 540:
 this.$ = []; 
@@ -2306,64 +2309,66 @@ case 67: return 205;
 break;
 case 68: return 204;
 break;
-case 69: return 156;
+case 69: return "super"; 
 break;
-case 70: return 158;
+case 70: return 156;
 break;
-case 71: return 153;
+case 71: return 158;
 break;
-case 72: return 151;
+case 72: return 153;
 break;
-case 73: return 154;
+case 73: return 151;
 break;
-case 74: return 160;
+case 74: return 154;
 break;
-case 75: return 165;
+case 75: return 160;
 break;
-case 76: return 170;
+case 76: return 165;
 break;
-case 77: return 194;
+case 77: return 170;
 break;
-case 78: return 168;
+case 78: return 194;
 break;
-case 79: return 195;
+case 79: return 168;
 break;
-case 80: return 196;
+case 80: return 195;
 break;
-case 81: return 63;
+case 81: return 196;
 break;
-case 82: return 207;
+case 82: return 63;
 break;
-case 83: return 130;
+case 83: return 207;
 break;
-case 84: return 48;
+case 84: return 130;
 break;
-case 85: return 103;
+case 85: return 48;
 break;
-case 86: return 104;
+case 86: return 103;
 break;
-case 87: return 178;
+case 87: return 104;
 break;
-case 88:/* paint(yy_.yytext); */ yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 46; 
+case 88: return 178;
 break;
-case 89:/* paint(yy_.yytext); */yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 43; 
+case 89:/* paint(yy_.yytext); */ yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 46; 
 break;
-case 90:/*paint('decimal: '+yy_.yytext);*/  return 41;
+case 90:/* paint(yy_.yytext); */yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 43; 
 break;
-case 91:/*paint('entero: '+yy_.yytext);*/  return 42;
+case 91:/*paint('decimal: '+yy_.yytext);*/  return 41;
 break;
-case 92:/*paint('id: '+yy_.yytext);*/ return 19;
+case 92:/*paint('entero: '+yy_.yytext);*/  return 42;
 break;
-case 93:/* skip whitespace */
+case 93:/*paint('id: '+yy_.yytext);*/ return 19;
 break;
-case 94: console.log(yy_.yytext); return 5;
+case 94:/* skip whitespace */
 break;
-case 95: addError(yy_.yylloc.first_line, yy_.yylloc.first_column, yy_.yytext, "Token Invalido", ErrorType.LEXICAL); return 'INVALID';
+case 95: console.log(yy_.yytext); return 5;
+break;
+case 96: addError(yy_.yylloc.first_line, yy_.yylloc.first_column, yy_.yytext, "Token Invalido", ErrorType.LEXICAL); return 'INVALID';
 break;
 }
 },
-rules: [/^(?:[/][/][/]*[^\n]*[\n]?)/,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/,/^(?:\+\+)/,/^(?:--)/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:\/)/,/^(?:%)/,/^(?:<=)/,/^(?:>=)/,/^(?:==)/,/^(?:!=)/,/^(?:<)/,/^(?:>)/,/^(?:&&)/,/^(?:\|\|)/,/^(?:!)/,/^(?:\.)/,/^(?::)/,/^(?:,)/,/^(?:;)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:\{)/,/^(?:\})/,/^(?:=)/,/^(?:main\b)/,/^(?:float\b)/,/^(?:int\b)/,/^(?:char\b)/,/^(?:boolean\b)/,/^(?:String\b)/,/^(?:readfloat\b)/,/^(?:readint\b)/,/^(?:readchar\b)/,/^(?:readboolean\b)/,/^(?:(readS|reads)tring\b)/,/^(?:Math\.abs\b)/,/^(?:Math\.ceil\b)/,/^(?:Math\.floor\b)/,/^(?:Math\.round\b)/,/^(?:Math\.max\b)/,/^(?:Math\.min\b)/,/^(?:Math\.pow\b)/,/^(?:Math\.sqrt\b)/,/^(?:Math\.random\b)/,/^(?:Math\.toRadians\b)/,/^(?:Math\.acos\b)/,/^(?:Math\.sin\b)/,/^(?:Math\.atan\b)/,/^(?:Math\.exp\b)/,/^(?:package\b)/,/^(?:import\b)/,/^(?:public\b)/,/^(?:private\b)/,/^(?:class\b)/,/^(?:final\b)/,/^(?:static\b)/,/^(?:extends\b)/,/^(?:void\b)/,/^(?:this\.)/,/^(?:new\b)/,/^(?:true\b)/,/^(?:false\b)/,/^(?:System\.out\.println\b)/,/^(?:System\.out\.print\b)/,/^(?:while\b)/,/^(?:do\b)/,/^(?:else\s+if\b)/,/^(?:if\b)/,/^(?:else\b)/,/^(?:for\b)/,/^(?:switch\b)/,/^(?:case\b)/,/^(?:break\b)/,/^(?:default\b)/,/^(?:continue\b)/,/^(?:return\b)/,/^(?:\.equals\b)/,/^(?:toString\b)/,/^(?:var\b)/,/^(?:null\b)/,/^(?:@Getter\b)/,/^(?:@Setter\b)/,/^(?:@Override\b)/,/^(?:"[^\"]*")/,/^(?:'[^\']?')/,/^(?:((([0-9])([0-9])*)[.](([0-9])([0-9])*)))/,/^(?:(([0-9])([0-9])*))/,/^(?:([a-zA-Z]([a-zA-Z_]|[0-9])*))/,/^(?:\s+)/,/^(?:$)/,/^(?:.)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95],"inclusive":true}}
+rules: [/^(?:[/][/][/]*[^\n]*[\n]?)/,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/,/^(?:\+\+)/,/^(?:--)/,/^(?:\+)/,/^(?:-)/,/^(?:\*)/,/^(?:\/)/,/^(?:%)/,/^(?:<=)/,/^(?:>=)/,/^(?:==)/,/^(?:!=)/,/^(?:<)/,/^(?:>)/,/^(?:&&)/,/^(?:\|\|)/,/^(?:!)/,/^(?:\.)/,/^(?::)/,/^(?:,)/,/^(?:;)/,/^(?:\()/,/^(?:\))/,/^(?:\[)/,/^(?:\])/,/^(?:\{)/,/^(?:\})/,/^(?:=)/,/^(?:main\b)/,/^(?:float\b)/,/^(?:int\b)/,/^(?:char\b)/,/^(?:boolean\b)/,/^(?:String\b)/,/^(?:readfloat\b)/,/^(?:readint\b)/,/^(?:readchar\b)/,/^(?:readboolean\b)/,/^(?:(readS|reads)tring\b)/,/^(?:Math\.abs\b)/,/^(?:Math\.ceil\b)/,/^(?:Math\.floor\b)/,/^(?:Math\.round\b)/,/^(?:Math\.max\b)/,/^(?:Math\.min\b)/,/^(?:Math\.pow\b)/,/^(?:Math\.sqrt\b)/,/^(?:Math\.random\b)/,/^(?:Math\.toRadians\b)/,/^(?:Math\.acos\b)/,/^(?:Math\.sin\b)/,/^(?:Math\.atan\b)/,/^(?:Math\.exp\b)/,/^(?:package\b)/,/^(?:import\b)/,/^(?:public\b)/,/^(?:private\b)/,/^(?:class\b)/,/^(?:final\b)/,/^(?:static\b)/,/^(?:extends\b)/,/^(?:void\b)/,/^(?:this\.)/,/^(?:new\b)/,/^(?:true\b)/,/^(?:false\b)/,/^(?:System\.out\.println\b)/,/^(?:System\.out\.print\b)/,/^(?:super\b)/,/^(?:while\b)/,/^(?:do\b)/,/^(?:else\s+if\b)/,/^(?:if\b)/,/^(?:else\b)/,/^(?:for\b)/,/^(?:switch\b)/,/^(?:case\b)/,/^(?:break\b)/,/^(?:default\b)/,/^(?:continue\b)/,/^(?:return\b)/,/^(?:\.equals\b)/,/^(?:toString\b)/,/^(?:var\b)/,/^(?:null\b)/,/^(?:@Getter\b)/,/^(?:@Setter\b)/,/^(?:@Override\b)/,/^(?:"[^\"]*")/,/^(?:'[^\']?')/,/^(?:((([0-9])([0-9])*)[.](([0-9])([0-9])*)))/,/^(?:(([0-9])([0-9])*))/,/^(?:([a-zA-Z]([a-zA-Z_]|[0-9])*))/,/^(?:\s+)/,/^(?:$)/,/^(?:.)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96],"inclusive":true}}
 });
 return lexer;
 })();

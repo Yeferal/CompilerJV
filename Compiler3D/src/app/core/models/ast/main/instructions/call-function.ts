@@ -77,6 +77,7 @@ export class CallFunction extends Node {
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        
         //buscar la funciones para comprobar si existe
         let symbolFunc = handlerComprobation.searchSymbolThis(this.id);
         if (symbolFunc == null) {

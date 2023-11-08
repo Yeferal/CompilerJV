@@ -100,11 +100,17 @@ export class MainNode extends Node {
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         if (this.packageNode != null) {
             handlerComprobation.actualPKG = this.packageNode;
+        } else {
+            this.packageNode = handlerComprobation.actualPKG;
         }
         this.addSymbol(handlerComprobation);
         
+        let nameAmbit = handlerComprobation.actualPKG.path;
+        if (handlerComprobation.actualClass != null) {
+            nameAmbit += "."+handlerComprobation.actualClass.name
+        }
 
-        handlerComprobation.addAmbitS(handlerComprobation.actualPKG.path);
+        handlerComprobation.addAmbitS(nameAmbit);
         handlerComprobation.addAmbit();
         handlerComprobation.sizeFuncProc = 0;
 
@@ -122,6 +128,8 @@ export class MainNode extends Node {
         handlerComprobation.popAmbit();
         handlerComprobation.sizeFuncProc = 0;
         handlerComprobation.resetPointer();
+
+        handlerComprobation.listMain.push(this);
 
         return ;
     }

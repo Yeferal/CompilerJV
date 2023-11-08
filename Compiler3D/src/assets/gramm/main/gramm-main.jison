@@ -208,7 +208,7 @@ Decimal         {Numero} [.] {Numero}
 <INITIAL>"false"                                            { return 'false';}
 <INITIAL>"System.out.println"                               { return 'println';}
 <INITIAL>"System.out.print"                                 { return 'printf';}
-
+<INITIAL>"super"                                             { return "super"; }
 
 
 /* SENTENCIAS */
@@ -2236,7 +2236,7 @@ CODE_CONSTRUCT
     |CODE_CONSTRUCT STRUCT_INPUT {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_RETURN {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_TOSTRING {$$ = $1; $$.push($2); }
-    |CODE_CONSTRUCT STATE_SUPER {$$ = $1; $$.push($2); }
+    |CODE_CONSTRUCT STATE_SUPER {$$ = $1; $$.push($2); console.log($2); }
     // |CODE_CONSTRUCT
     // |CODE_CONSTRUCT
     | {$$ = []; }

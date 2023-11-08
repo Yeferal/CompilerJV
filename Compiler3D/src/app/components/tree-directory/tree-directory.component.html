@@ -12,3 +12,24 @@
         <!-- El footer del directorybar si es necesario-->
     </div>
 </section>
+
+
+
+<app-modal [isShowModal]="isOpen" [titleModal]="'Programa de Ejecucion'" (closeModalMsg)="receiveCloseModal($event)" #modalChild>
+    <div class="container">
+        <h3 class="my-2">Se encontraron multiples Main, elije uno:</h3>
+        <div class="card">
+            <div class="card-body">
+                <div class="row content-list-projects scrolling-mode">
+                    <ul class="list-projects col-12 p-0">
+                        <ng-container *ngFor="let item of listMains; let i = index">
+                            <li (dblclick)="sendMain(i, modalChild)" class="">
+                                <label>{{"main"}} => {{item.packageNode.path}}</label>
+                            </li>
+                        </ng-container>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-modal>

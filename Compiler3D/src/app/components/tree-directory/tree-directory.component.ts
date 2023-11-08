@@ -10,6 +10,8 @@ import { transformProject } from 'src/app/core/Global/transform';
 import { HandlerCompiler } from 'src/app/core/models/ast/main/environment/handler-compiler';
 import { firstValueFrom } from 'rxjs';
 import { ShareCodeEditorService } from 'src/app/services/share-code-editor.service';
+import { MainNode } from 'src/app/core/models/ast/main/instructions/main-node';
+import { ModalComponent } from '../modal/modal.component';
 
 @Component({
   selector: 'app-tree-directory',
@@ -18,6 +20,10 @@ import { ShareCodeEditorService } from 'src/app/services/share-code-editor.servi
 })
 export class TreeDirectoryComponent {
   projectsNow: NodeDir;
+  listMains: Array<MainNode> = [];
+  isOpen: boolean = false;
+
+  handlerCompiler = new HandlerCompiler(this.shareCodeEditorService, this);
 
   constructor(private filesService: FilesService, 
     private shareProjectService: ShareProjectService, 
@@ -58,6 +64,16 @@ export class TreeDirectoryComponent {
     this.verifyOpenProject();
     // this.generateCode3D();
   }
+
+  receiveCloseModal($event: boolean) {
+    this.isOpen = $event;
+  }
+
+  openModal(){
+    this.isOpen = true;
+  }
+
+  
 
   getLibrary(){
     this.filesService.getLibrary().subscribe({
@@ -137,8 +153,13 @@ export class TreeDirectoryComponent {
   }
 
   compile3D(list: Array<NodeDir>){
-    const handlerCompiler = new HandlerCompiler(this.shareCodeEditorService);
-    handlerCompiler.compiler(list);
+    this.handlerCompiler = new HandlerCompiler(this.shareCodeEditorService, this);
+    this.handlerCompiler.compiler(list);
+  }
+
+  sendMain(i: number, modalChild: ModalComponent){
+    modalChild.closeModal();
+    this.handlerCompiler.compiler3D(this.listMains[i]);
   }
 
   generateCodeAssem(){

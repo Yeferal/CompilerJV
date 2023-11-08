@@ -33,6 +33,7 @@ export class SuperInst extends Node  {
 	}
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        
         let listTypeParams: Array<DynamicDataType> = new Array<DynamicDataType>;
         //Verificar que los parametros sean correctos
         for (let j = 0; j < this.params.length; j++) {
@@ -60,7 +61,7 @@ export class SuperInst extends Node  {
                             let listTypeParamsConst: Array<DynamicDataType> = new Array<DynamicDataType>;
                             
                             for (let k = 0; k < constructorNode.listParams.length; k++) {
-                                const resParam = constructorNode.listParams[k].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+                                const resParam = constructorNode.listParams[k].type;
                                 listTypeParamsConst.push(resParam);
                             }
 
