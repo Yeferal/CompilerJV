@@ -7,13 +7,13 @@ public class MathEspecial extends Operador {
   private int res;
   
   void main(){
-  	int num1= 3;
+  	int num1= 3 + 8 * 1;
     int num2= 2;
   }
   
   public MathEspecial(int id, String name, int res) {
   	super(id, name);
-    this.res = res;
+    this.res = res + 5 * 8 / 1;
   }
   
   public float sumar(float num1, float num2){

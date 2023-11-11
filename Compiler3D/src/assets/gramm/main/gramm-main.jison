@@ -233,8 +233,8 @@ Decimal         {Numero} [.] {Numero}
 <INITIAL>"@Override"                                        { return 'override';}
 
 /* EXPRESIONES REGULARES */
-<INITIAL>\"[^\"]*\"			                                {/* paint(yytext); */ yytext = yytext.substr(0,yyleng-0); return 'string_primitive'; }
-<INITIAL>\'[^\']?\'			                                {/* paint(yytext); */yytext = yytext.substr(0,yyleng-0); return 'char_primitive'; }
+<INITIAL>\"[^\"]*\"			                                { yytext = yytext.substr(1,yyleng-2); /*paint(yytext);*/ return 'string_primitive'; }
+<INITIAL>\'[^\']?\'			                                {/* paint(yytext); */yytext = yytext.substr(1,yyleng-2); /*paint(yytext);*/ return 'char_primitive'; }
 <INITIAL>{Decimal}                                          {/*paint('decimal: '+yytext);*/  return 'decimal_primitive';}
 <INITIAL>{Numero}  	                                        {/*paint('entero: '+yytext);*/  return 'integer_primitive';}
 <INITIAL>{id}                                               {/*paint('id: '+yytext);*/ return 'id';}
@@ -2236,7 +2236,7 @@ CODE_CONSTRUCT
     |CODE_CONSTRUCT STRUCT_INPUT {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_RETURN {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_TOSTRING {$$ = $1; $$.push($2); }
-    |CODE_CONSTRUCT STATE_SUPER {$$ = $1; $$.push($2); console.log($2); }
+    |CODE_CONSTRUCT STATE_SUPER {$$ = $1; $$.push($2); }
     // |CODE_CONSTRUCT
     // |CODE_CONSTRUCT
     | {$$ = []; }

@@ -1260,14 +1260,11 @@ break;
 case 437:
 this.$ = new SuperInst(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-4], $$[$0-2]);
 break;
-case 439: case 440: case 441: case 442: case 443: case 444: case 446: case 447: case 448: case 449: case 450: case 451: case 452: case 453: case 454: case 455: case 456: case 457: case 458: case 459: case 519: case 520: case 521: case 522: case 523: case 524: case 526: case 527: case 528: case 529: case 530: case 531: case 532: case 533: case 534: case 535: case 536: case 537: case 538: case 539:
+case 439: case 440: case 441: case 442: case 443: case 444: case 446: case 447: case 448: case 449: case 450: case 451: case 452: case 453: case 454: case 455: case 456: case 457: case 458: case 459: case 460: case 519: case 520: case 521: case 522: case 523: case 524: case 526: case 527: case 528: case 529: case 530: case 531: case 532: case 533: case 534: case 535: case 536: case 537: case 538: case 539:
 this.$ = $$[$0-1]; this.$.push($$[$0]); 
 break;
 case 445: case 525:
 this.$ = $$[$0-1]; 
-break;
-case 460:
-this.$ = $$[$0-1]; this.$.push($$[$0]); console.log($$[$0]); 
 break;
 case 461: case 540:
 this.$ = []; 
@@ -2349,9 +2346,9 @@ case 87: return 104;
 break;
 case 88: return 178;
 break;
-case 89:/* paint(yy_.yytext); */ yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 46; 
+case 89: yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); /*paint(yy_.yytext);*/ return 46; 
 break;
-case 90:/* paint(yy_.yytext); */yy_.yytext = yy_.yytext.substr(0,yy_.yyleng-0); return 43; 
+case 90:/* paint(yy_.yytext); */yy_.yytext = yy_.yytext.substr(1,yy_.yyleng-2); /*paint(yy_.yytext);*/ return 43; 
 break;
 case 91:/*paint('decimal: '+yy_.yytext);*/  return 41;
 break;

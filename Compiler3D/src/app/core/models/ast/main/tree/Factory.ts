@@ -18,6 +18,7 @@ export class Factory {
         
         let handlerComprobation: HandlerComprobation = new HandlerComprobation();
         let environment: Environment = new Environment();
+        // console.log(this.treeAst.listRoot);
         
         try {
             this.collectFromTypes(handlerComprobation);
@@ -31,10 +32,14 @@ export class Factory {
         this.shareCodeEditorService.setTypeTable(handlerComprobation.typeTable);
         this.shareCodeEditorService.setListError(handlerComprobation.listError);
 
-        try {
-            this.compiler3dFactory(environment);
-        } catch (error) {
-            console.error(error);
+        if (handlerComprobation.listError.length==0) {
+            try {
+                environment.symbolTable = handlerComprobation.symbolTable;
+                environment.typeTable = handlerComprobation.typeTable;
+                this.compiler3dFactory(environment);
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         return handlerComprobation;
@@ -143,12 +148,28 @@ export class Factory {
 
 
     compiler3dFactory(environment: Environment): Environment{
+
+        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: "h"});
+        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: "ptr"});
         for (let i = 0; i < this.treeAst.listRoot.length; i++) {
             if (this.treeAst.listRoot[i] instanceof ClassInst) {
-                    this.treeAst.listRoot[i].execute(environment);
+                environment.acutalClass = this.treeAst.listRoot[i] as ClassInst;
+                environment.isClass = true;
+                this.treeAst.listRoot[i].execute(environment);
+                environment.acutalClass = null
+                environment.isClass = false;
             }
-            
         }
+
+        for (let i = 0; i < this.treeAst.listRoot.length; i++) {
+            if (this.treeAst.listRoot[i] instanceof MainNode) {
+                this.treeAst.listRoot[i].execute(environment);
+            }
+        }
+
+        console.log("Codigo 3d");
+        
+        environment.handlerQuartet.paint();
 
         return environment;
     }

@@ -1,3 +1,4 @@
+import { Quartet } from "../../../tree-direction/quartet";
 import { ErrorType } from "../../error/ErrorType";
 import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
@@ -281,7 +282,60 @@ export class ClassInst extends Node {
         throw new Error("Method not implemented.");
     }
 
+    public generatePrincipalQuartet(environment: Environment){
+        let symbolConstructor = environment.searchSymbolConstructor(this.name);
+        // tm1 = h
+        const nT1 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(nT1);
+        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "h", arg2: null, result: "t"+nT1});
+        // h = h + 2
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "h", arg2: symbolConstructor.size, result: "h"});
+        // tm2 = ptr + 0
+        const nT2 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(nT2);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+nT2});
+        // stack[tm2] = tm1
+        environment.handlerQuartet.insertQuartet({operator: "stack", arg1: "t"+nT1, arg2: null, result: "t"+nT2});
+
+    }
+
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        
+        //Primero el constructor
+        let isExisteConstructor = false;
+        for (let i = 0; i < this.instructions.length; i++) {
+            if (this.instructions[i] instanceof ConstructorInst) {
+                isExisteConstructor = true;
+                //Generar los cuartetos de las instruciones que contiene el constructor
+                this.instructions[i].execute(environment);
+                break;
+            }
+        }
+
+        // Si no existe, crear un constructor vacio
+        if (!isExisteConstructor) {
+            environment.handlerQuartet.insertQuartet({operator: "constructor", arg1: this.name, arg2: this.name, result: null});
+
+            this.generatePrincipalQuartet(environment);
+            
+            environment.handlerQuartet.insertQuartet({operator: "close", arg1: null, arg2: null, result: null});
+        }
+
+        //Segunto los atributos
+        // for (let i = 0; i < this.instructions.length; i++) {
+        //     if (this.instructions[i] instanceof ListDeclaration) {
+        //         this.instructions[i].execute(environment);
+        //         break;
+        //     }
+        // }
+
+        //Tercero las funciones
+        // for (let i = 0; i < this.instructions.length; i++) {
+        //     if (this.instructions[i] instanceof FunctionProcedure) {
+        //         this.instructions[i].execute(environment);
+        //         break;
+        //     }
+        // }
+        
     }
 }

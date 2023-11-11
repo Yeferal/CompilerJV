@@ -3,6 +3,7 @@ import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { LogicalOperation } from "../expressions/logical-operation";
 import { Node } from "../node";
 import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
@@ -200,6 +201,73 @@ export class DeclarationVarible extends Node{
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        
+        if (this.asignation != null) {
+            environment.isAsig = true;
+            let tAsig = this.asignation.execute(environment);
+            environment.isAsig = false;
+            //Si la asingacion es una operacion booleana
+            if (this.asignation instanceof LogicalOperation) {
+                tAsig = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tAsig);
+                tAsig = "t"+tAsig;
+                const etJump = environment.addEt();
+                if (!environment.etTrue.isEmpty()) {
+                    while (!environment.etTrue.isEmpty()) {
+                        environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etTrue.pop()});
+                    }
+                }
+                //Aqui va el valor del t verdadero
+                environment.handlerQuartet.insertQuartet({operator: "=", arg1: "1", arg2: null, result: tAsig});
+                environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etJump});
+
+                if (!environment.etFalse.isEmpty()) {
+                    while (!environment.etFalse.isEmpty()) {
+                        environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etFalse.pop()});
+                    }
+                }
+                //Aqui va el valor del t FALSO
+                environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: tAsig});
+                environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etJump});
+            }
+            if (environment.isClass) {
+                
+            } else {
+                let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow);
+
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
+                
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
+
+                if (this.type.name == "STRING") {
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    // // Tiene que ir a buscar el valor del string en la pila de strings
+                    // const tTemp3 = environment.addT();
+                    // environment.handlerQuartet.listTempsString.push(tTemp3);
+                    // environment.handlerQuartet.insertQuartet({operator: "stack_string_declar", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
+                    // return "t"+tTemp3;
+                } else if (this.type.name == "FLOAT") {
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                } else if (this.type.name == "CHAR") {
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                } else if (this.type.name == "INTEGER") {
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                } else if (this.type.name == "BOOLEAN") {
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                } else {
+                    //Si es un valor de tipo objeto y no primitivo
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                }
+            }
+        }
+        
+        
     }
 }

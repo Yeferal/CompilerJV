@@ -199,7 +199,43 @@ export class ConstructorInst extends Node {
         throw new Error("Method not implemented.");
     }
 
+    public generatePrincipalQuartet(environment: Environment){
+        let symbolConstructor = environment.searchSymbolConstructor(this.id);
+        // tm1 = h
+        const nT1 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(nT1);
+        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "h", arg2: null, result: "t"+nT1});
+        // h = h + 2
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "h", arg2: symbolConstructor.size, result: "h"});
+        // tm2 = ptr + 0
+        const nT2 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(nT2);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+nT2});
+        // stack[tm2] = tm1
+        environment.handlerQuartet.insertQuartet({operator: "stack", arg1: "t"+nT1, arg2: null, result: "t"+nT2});
+
+    }
+
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        environment.handlerQuartet.insertQuartet({operator: "constructor", arg1: this.id, arg2: this.id, result: null});
+        this.generatePrincipalQuartet(environment);
+
+        //Obtener Parametros
+        for (let i = 0; i < this.listParams.length; i++) {
+            this.listParams[i].execute(environment);
+            
+        }
+
+        //Ejecutar las instrucciones
+        for (let i = 0; i < this.instructions.length; i++) {
+            // const element = array[i];
+            
+        }
+
+        environment.handlerQuartet.insertQuartet({operator: "close", arg1: null, arg2: null, result: null});
+        //Guardar heap
+        //Apartar heap
+        //Apartar heap
+        // throw new Error("Method not implemented.");
     }
 }

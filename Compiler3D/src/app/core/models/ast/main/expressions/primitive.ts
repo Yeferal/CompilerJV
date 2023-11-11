@@ -1,3 +1,4 @@
+import { Quartet } from "../../../tree-direction/quartet";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
@@ -44,7 +45,21 @@ export class Primitive extends Node{
     }
 
     public override execute(environment: Environment): any {
-        return this.value;
+        if (this.type.name == "STRING") {
+            //En teorioa tendria que crear una variable de tipo char[] para almacenar y luego agregarlo y retornar la etiqueta
+            const tTemp = environment.addT();
+            environment.handlerQuartet.listTempsString.push(tTemp);
+            const quartetAsigString: Quartet = { operator: "=s", arg1: "\""+ this.value +"\"", arg2: null, result: "t"+tTemp };
+            environment.handlerQuartet.insertQuartet(quartetAsigString);
+
+            return "t"+tTemp;    
+        }else {
+            if (this.type.name == "BOOLEAN") {
+                return this.value? 1 : 0;
+            }
+            return this.value;
+        }
+        
     }
 
 }

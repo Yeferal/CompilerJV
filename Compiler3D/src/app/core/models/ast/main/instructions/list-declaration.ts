@@ -139,6 +139,8 @@ export class ListDeclaration extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        for (let i = 0; i < this.listDeclaration.length; i++) {
+			this.listDeclaration[i].execute(environment);
+		}
     }
 }

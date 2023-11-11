@@ -147,6 +147,22 @@ export class MainNode extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        environment.actualPKG = this.packageNode;
+
+        let nameAmbit = environment.actualPKG.path;
+        if (environment.acutalClass != null) {
+            nameAmbit += "."+environment.acutalClass.name
+        }
+        environment.handlerQuartet.insertQuartet({operator: "main", arg1: "main", arg2: "", result: ""});
+
+        environment.ambitNow = nameAmbit;
+        
+        for (let i = 0; i < this.instructions.length; i++) {
+            this.instructions[i].execute(environment);
+            
+        }
+
+        environment.handlerQuartet.insertQuartet({operator: "close", arg1: "", arg2: "", result: ""});
+        environment.ambitNow = "";
     }
 }

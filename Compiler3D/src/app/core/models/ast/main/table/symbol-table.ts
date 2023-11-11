@@ -65,6 +65,48 @@ export class SymbolTable {
         return null;
     }
 
+    public searchSymbolVar(name: string, ambit: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (name === symbol.name && ambit == symbol.ambit && symbol.symbolType == SymbolType.VAR) {
+                    return symbol;
+                }
+            }
+        }
+        return this.searchSymbolParam(name, ambit);
+    }
+
+    public searchSymbolParam(name: string, ambit: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (name === symbol.name && ambit == symbol.ambit && symbol.symbolType == SymbolType.PARAM) {
+                    return symbol;
+                }
+            }
+        }
+        return null;
+    }
+
+
+
+    public searchSymbolConstructor(name: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (name === symbol.name && symbol.symbolType == SymbolType.CONSTRUCTOR) {
+                    return symbol;
+                }
+            }
+        }
+        return null;
+    }
+    
+
     public addSymbol(symbol: Symbol){
         this.stackTable.peek().push(symbol);
     }
