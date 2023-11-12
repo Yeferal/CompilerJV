@@ -53,6 +53,8 @@ export class ConditionalSwitchCase extends Node {
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //AGREGAR UN AMBITO
         // handlerComprobation.addAmbit();
+        
+        this.type = this.valueCase.type;
 
         if (this.instructions.length > 0) {
             for (let i = 0; i < this.instructions.length; i++) {
@@ -60,13 +62,17 @@ export class ConditionalSwitchCase extends Node {
                 //Evaluar si es un return para determinar el tipo de dato
                 if (this.instructions[i] instanceof ReturnNode) {
                     const returnNode = this.instructions[i] as ReturnNode;
-                    return returnNode.type;
+                    this.type = returnNode.type;
+                    // return returnNode.type;
+                    return this.type;
                 } else if (this.instructions[i] instanceof BreakNode) {
                     const breakNode = this.instructions[i] as BreakNode;
-                    return breakNode.type;
+                    // return breakNode.type;
+                    return this.type;
                 } else if (this.instructions[i] instanceof ContinueNode) {
                     const continueNode = this.instructions[i] as ContinueNode;
-                    return continueNode.type;
+                    // return continueNode.type;
+                    return this.type;
                 }
                 // const element = array[i];
             }
@@ -90,6 +96,27 @@ export class ConditionalSwitchCase extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Instricciones del case", arg2: null, result: null});
+        if (this.instructions.length > 0) {
+            for (let i = 0; i < this.instructions.length; i++) {
+                this.instructions[i].execute(environment);
+                //Evaluar si es un return para determinar el tipo de dato
+                if (this.instructions[i] instanceof ReturnNode) {
+                    const returnNode = this.instructions[i] as ReturnNode;
+                    this.type = returnNode.type;
+                    // return returnNode.type;
+                    return this.type;
+                } else if (this.instructions[i] instanceof BreakNode) {
+                    const breakNode = this.instructions[i] as BreakNode;
+                    // return breakNode.type;
+                    return this.type;
+                } else if (this.instructions[i] instanceof ContinueNode) {
+                    const continueNode = this.instructions[i] as ContinueNode;
+                    // return continueNode.type;
+                    return this.type;
+                }
+                // const element = array[i];
+            }
+        }
     }
 }

@@ -73,6 +73,13 @@ export class DefaultNode extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Instricciones del Default", arg2: null, result: null});
+        for (let i = 0; i < this.instructions.length; i++) {
+            this.instructions[i].execute(environment);
+            
+        }
+        if (!environment.etsBack.isEmpty()) {
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: environment.etsBack.peek()});
+        }
     }
 }

@@ -85,15 +85,21 @@ export class InstanceObject extends Node {
         //El constructor aun no existe tenesmos que buscarlo, pero solo para sus parametros
         let isExisteClass = false;
         let isExisteConstructor = false;
+        
+        // if (handlerComprobation.actualClass!= null) {
+            
+        // }
         for (let i = 0; i < handlerComprobation.listNode.length; i++) {
-            //Buscas que sea una clase
+            //Busca que sea una clase
             
             if (handlerComprobation.listNode[i] instanceof ClassInst) {
                 const element = handlerComprobation.listNode[i] as ClassInst;
+                // console.log(handlerComprobation.actualClass);
+                
                 // Encuentra la clase
                 // console.log(element.name, "==", handlerComprobation.actualClass.name);
                 
-                if (element.name == handlerComprobation.actualClass.name) {
+                if (element.name == this.id) {
                     isExisteClass = true;
                     // console.log(this.type);
                     // Busca el constructor
@@ -129,7 +135,7 @@ export class InstanceObject extends Node {
                     }
                     if (!isExisteConstructor) {
                         if (listTypeParams.length > 0) {
-                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construto de la clase no es el mismo << ${this.id} >> no es el mismo.`, ErrorType.SEMANTIC); 
+                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construtor de la clase no es el mismo << ${this.id} >> no es el mismo.`, ErrorType.SEMANTIC); 
                             handlerComprobation.listError.push(errorGramm);
                             return ;
                         }
@@ -156,6 +162,34 @@ export class InstanceObject extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        //Buscar el construtor
+        const symbolConstructor = environment.symbolTable.searchSymbolConstructor(this.id);
+        const sizeStack = environment.sizeMain;
+        
+        if (this.params!= null && this.params.length>0) {
+            //Preparar el heap
+            
+    
+            //Preparar los parametros
+            for (let i = 0; i < this.params.length; i++) {
+                const tAsig = this.params[i].execute(environment);
+
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "PREPARANDO EL PARAMETRO PARA LA INSTANCIA DE "+this.id, arg2: null, result: null});
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp)
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: sizeStack, result: "t"+tTemp});
+
+                const tTemp2 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp2)
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: i+1, result: "t"+tTemp2});
+                environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: i+1, result: "t"+tTemp2});
+                
+            }
+        }
+
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: sizeStack, result: "ptr"});
+        environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: symbolConstructor.name+"_"+symbolConstructor.name, arg2: null, result: null});
+        environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: sizeStack, result: "ptr"});
+
     }
 }

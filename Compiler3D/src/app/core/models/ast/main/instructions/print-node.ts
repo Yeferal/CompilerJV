@@ -66,6 +66,7 @@ export class PrintNode extends Node {
 
     public override execute(environment: Environment): any {
         const ln = this.isLn? "\n" : "";
+        
         if (this.value instanceof Primitive) {
             if (this.value.type.name == "STRING") {
                 environment.handlerQuartet.insertQuartet({operator: "printfsimple", arg1: "\""+this.value.value+ln+"\"", arg2: null, result: null});

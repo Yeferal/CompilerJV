@@ -143,12 +143,6 @@ export class DeclarationParam extends Node {
     }
 
     public override execute(environment: Environment): any {
-        if (this.isArray) {
-            
-        } else {
-            
-        }
-
-
+        
     }
 }

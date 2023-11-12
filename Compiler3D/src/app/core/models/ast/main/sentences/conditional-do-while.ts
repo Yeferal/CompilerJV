@@ -3,6 +3,7 @@ import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { LogicalOperation } from "../expressions/logical-operation";
 import { Node } from "../node";
 import { BreakNode } from "./break-node";
 import { ContinueNode } from "./continue-node";
@@ -83,6 +84,58 @@ export class ConditionalDoWhile extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        const etTempBack= environment.addEt();
+        environment.etsBack.push("et"+etTempBack);
+        
+
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Generadno el do while", arg2: null, result: null});
+        const etTempInit= environment.addEt();
+        environment.etsInit.push("et"+etTempInit);
+        environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etTempInit});
+        
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Instricciones del do while", arg2: null, result: null});
+        for (let i = 0; i < this.instructions.length; i++) {
+            this.instructions[i].execute(environment);
+            
+        }
+
+        const tCondition = this.condition.execute(environment);
+
+        if (this.condition instanceof LogicalOperation) {
+            if (!environment.etTrue.isEmpty()) {
+                while (!environment.etTrue.isEmpty()) {
+                    environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etTrue.pop()});
+                }
+            }
+
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etTempInit});
+
+
+            if (!environment.etFalse.isEmpty()) {
+                while (!environment.etFalse.isEmpty()) {
+                    environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etFalse.pop()});
+                }
+            }
+
+        } else {
+            const etTempTrue = environment.addEt();
+            const etTempFalse = environment.addEt();
+
+            environment.handlerQuartet.insertQuartet({operator: "if_simple", arg1: tCondition, arg2: null, result: "et"+etTempTrue});
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etTempFalse});
+
+            environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etTempTrue});
+
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etTempInit});
+            
+            environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etTempFalse});
+
+        }
+
+        if (!environment.etsInit.isEmpty()) {
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: environment.etsInit.pop()});
+        }
+        environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etsBack.pop()});
+
     }
 }

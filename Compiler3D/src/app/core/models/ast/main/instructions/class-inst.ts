@@ -300,7 +300,7 @@ export class ClassInst extends Node {
     }
 
     public override execute(environment: Environment): any {
-        
+        environment.ambitNow.push(environment.acutalClass.name);
         //Primero el constructor
         let isExisteConstructor = false;
         for (let i = 0; i < this.instructions.length; i++) {
@@ -321,21 +321,21 @@ export class ClassInst extends Node {
             environment.handlerQuartet.insertQuartet({operator: "close", arg1: null, arg2: null, result: null});
         }
 
-        //Segunto los atributos
-        // for (let i = 0; i < this.instructions.length; i++) {
-        //     if (this.instructions[i] instanceof ListDeclaration) {
-        //         this.instructions[i].execute(environment);
-        //         break;
-        //     }
-        // }
+        // Segunto los atributos
+        for (let i = 0; i < this.instructions.length; i++) {
+            if (this.instructions[i] instanceof ListDeclaration) {
+                // this.instructions[i].execute(environment);
+            }
+        }
 
         //Tercero las funciones
-        // for (let i = 0; i < this.instructions.length; i++) {
-        //     if (this.instructions[i] instanceof FunctionProcedure) {
-        //         this.instructions[i].execute(environment);
-        //         break;
-        //     }
-        // }
+        for (let i = 0; i < this.instructions.length; i++) {
+            if (this.instructions[i] instanceof FunctionProcedure) {
+                this.instructions[i].execute(environment);
+            }
+        }
+
+        environment.ambitNow.pop();
         
     }
 }

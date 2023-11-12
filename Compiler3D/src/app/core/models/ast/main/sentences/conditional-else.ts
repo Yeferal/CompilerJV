@@ -76,6 +76,13 @@ export class ConditionalElse extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Instricciones del else", arg2: null, result: null});
+        for (let i = 0; i < this.instructions.length; i++) {
+            // console.log(this.instructions[i]);
+            
+            this.instructions[i].execute(environment);
+            
+        }
     }
 }

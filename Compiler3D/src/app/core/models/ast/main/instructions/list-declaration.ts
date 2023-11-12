@@ -142,5 +142,6 @@ export class ListDeclaration extends Node {
         for (let i = 0; i < this.listDeclaration.length; i++) {
 			this.listDeclaration[i].execute(environment);
 		}
+		
     }
 }

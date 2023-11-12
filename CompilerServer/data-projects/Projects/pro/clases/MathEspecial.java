@@ -13,7 +13,7 @@ public class MathEspecial extends Operador {
   
   public MathEspecial(int id, String name, int res) {
   	super(id, name);
-    this.res = res + 5 * 8 / 1;
+    //this.res = res + 5 * 8 / 1;
   }
   
   public float sumar(float num1, float num2){

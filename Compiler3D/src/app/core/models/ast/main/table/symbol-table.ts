@@ -91,6 +91,19 @@ export class SymbolTable {
         return null;
     }
 
+    public searchSymbolReturn(ambit: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (ambit == symbol.ambit && symbol.symbolType == SymbolType.RETURN) {
+                    return symbol;
+                }
+            }
+        }
+        return null;
+    }
+
 
 
     public searchSymbolConstructor(name: string): Symbol{
@@ -99,6 +112,45 @@ export class SymbolTable {
             for (let i = 0; i < tableTemp.length; i++) {
                 const symbol = tableTemp[i];
                 if (name === symbol.name && symbol.symbolType == SymbolType.CONSTRUCTOR) {
+                    return symbol;
+                }
+            }
+        }
+        return null;
+    }
+
+    public searchSymbolClass(name: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (name === symbol.name && symbol.symbolType == SymbolType.CLASS) {
+                    return symbol;
+                }
+            }
+        }
+        return null;
+    }
+
+    public searchSymbolMain(ambit: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (ambit == symbol.ambit && symbol.symbolType == SymbolType.MAIN) {
+                    return symbol;
+                }
+            }
+        }
+        return null;
+    }
+
+    public searchSymbolFuncProc(name: string, ambit: string): Symbol{
+        if (!this.stackTable.isEmpty()) {
+            const tableTemp = this.stackTable.peek();
+            for (let i = 0; i < tableTemp.length; i++) {
+                const symbol = tableTemp[i];
+                if (name === symbol.name && ambit == symbol.ambit && (symbol.symbolType == SymbolType.VOID || symbol.symbolType == SymbolType.PROCEDURE || symbol.symbolType == SymbolType.FUNCTION)) {
                     return symbol;
                 }
             }

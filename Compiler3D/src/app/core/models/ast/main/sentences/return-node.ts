@@ -47,6 +47,20 @@ export class ReturnNode extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        
+        const tRetorn = this.value.execute(environment);
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion del return", arg2: null, result: null});
+
+        //Encontrar el simbolo del return
+        let symbol = environment.symbolTable.searchSymbolReturn(environment.ambitNow.peek());
+
+        // const tTemp = environment.addT();
+        // environment.handlerQuartet.listTempsInt.push(tTemp);
+        // environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+
+        //goto a la etiquera da salida
+        if (!environment.etsReturn.isEmpty()) {
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: environment.etsReturn.peek()});
+        }
     }
 }

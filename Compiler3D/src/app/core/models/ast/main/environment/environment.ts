@@ -12,14 +12,20 @@ export class Environment {
     public isClass = false;
     public acutalClass: ClassInst;
     public actualPKG: PackageNode;
-    public ambitNow: string;
+    public ambitNow: Stack<string> = new Stack<string>();
+    public voidNow: Stack<string> = new Stack<string>();
     public etTrue: Stack<string> = new Stack<string>();
     public etFalse: Stack<string> = new Stack<string>();
     public isAsig: boolean = false;
+    public etsReturn: Stack<string> = new Stack<string>();
+    public etsBack: Stack<string> = new Stack<string>();
+    public etsInit: Stack<string> = new Stack<string>();
+    public isFunc: boolean = false;
+    public sizeMain = 0;
     public et = 1;
     public t = 0;
     public h = 0;
-    public stack = 0;
+    public ps = 0;
 
 	public get handlerQuartet(): HandlerQuartet  {
 		return this._handlerQuartet;
@@ -44,6 +50,12 @@ export class Environment {
     public addH(hAdd: number): number {
         this.h += hAdd;
         return this.h;
+    }
+
+    public addPs(): number {
+        const psTemp = this.ps;
+        this.ps++;
+        return psTemp;
     }
 
     public searchSymbol(name: string){

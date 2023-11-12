@@ -77,10 +77,16 @@ export class CallFunction extends Node {
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
-        
+
         //buscar la funciones para comprobar si existe
         let symbolFunc = handlerComprobation.searchSymbolThis(this.id);
+        
         if (symbolFunc == null) {
+            if (handlerComprobation.actualClass==null) {
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `No existe una funcion o procedimiento << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                handlerComprobation.listError.push(errorGramm);
+                return this.type;
+            }
             // buscar en las funciones del nodo class actual 
             let classAc = handlerComprobation.actualClass;
             for (let i = 0; i < classAc.instructions.length; i++) {
@@ -164,6 +170,15 @@ export class CallFunction extends Node {
         return this.type;
     }
 
+    public genSubName(symbol: Symbol): string{
+        let text = "_"+this.type.name;
+        for (let i = 0; i < symbol.listParams.length; i++) {
+            text += "_"+symbol.listParams[i].name
+            
+        }
+        return text;
+    }
+
     public override executeComprobationControlFlow(handlerComprobation: HandlerComprobation): any {
         return this.type;
     }
@@ -177,6 +192,29 @@ export class CallFunction extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        const symbolFuncParent = environment.symbolTable.searchSymbolFuncProc(environment.voidNow.peek(), environment.acutalClass.name);
+        const symbolFunc = environment.symbolTable.searchSymbolFuncProc(this.id, environment.acutalClass.name);
+
+        //Preparar parametros si los hay
+        if (this.params!= null && this.params.length>0) {
+            for (let i = 0; i < this.params.length; i++) {
+                const tAsig = this.params[i].execute(environment);
+
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "PREPARANDO EL PARAMETRO PARA EL SUPER", arg2: null, result: null});
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp)
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolFuncParent.size, result: "t"+tTemp});
+
+                const tTemp2 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp2)
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: i+1, result: "t"+tTemp2});
+                environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: i+1, result: "t"+tTemp2});
+                
+            }
+        }
+
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolFuncParent.size, result: "ptr"});
+        environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: symbolFunc.nameCode+this.genSubName(symbolFunc), arg2: null, result: null});
+        environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: symbolFuncParent.size, result: "ptr"});
     }
 }

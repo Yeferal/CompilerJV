@@ -214,7 +214,19 @@ export class DeclarationAtribute extends Node{
         throw new Error("Method not implemented.");
     }
 
+    public addPointString(environment: Environment){
+        if (this.type.name == "STRING") {
+            const ps = environment.addPs();
+            let symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.ambitNow.peek());
+            const tTemp = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
+            environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: ps, arg2: null, result: "t"+tTemp});
+        }
+    }
+
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        
+        this.addPointString(environment);
     }
 }

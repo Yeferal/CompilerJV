@@ -244,6 +244,6 @@ export class AsignationArray extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        // throw new Error("Method not implemented.");
     }
 }

@@ -115,6 +115,34 @@ export class SuperInst extends Node  {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        const symbolParent = environment.symbolTable.searchSymbolConstructor(environment.acutalClass.nameExtends);
+        const symbolChild = environment.symbolTable.searchSymbolConstructor(environment.acutalClass.name);
+        if (this.params!= null && this.params.length>0) {
+            //Preparar el heap
+            
+    
+            //Preparar los parametros
+            for (let i = 0; i < this.params.length; i++) {
+                const tAsig = this.params[i].execute(environment);
+
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "PREPARANDO EL PARAMETRO PARA EL SUPER", arg2: null, result: null});
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp)
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolChild.size, result: "t"+tTemp});
+
+                const tTemp2 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp2)
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: i+1, result: "t"+tTemp2});
+                environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: i+1, result: "t"+tTemp2});
+                
+            }
+        }
+
+        // const tTemp = environment.addT();
+        // environment.handlerQuartet.listTempsInt.push(tTemp);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolChild.size, result: "ptr"});
+        environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: symbolParent.name+"_"+symbolParent.name, arg2: null, result: null});
+        environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: symbolChild.size, result: "ptr"});
+        
     }
 }

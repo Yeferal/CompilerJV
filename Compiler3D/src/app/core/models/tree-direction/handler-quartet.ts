@@ -67,6 +67,8 @@ export class HandlerQuartet {
             // Concatenacion
             case "concat":
                 return "sprintf(" + quartet.result + ", " + quartet.arg1 + ", " + quartet.arg2 + ");";
+            case "concat_s":
+                return "strcat(" + quartet.result + ", " + quartet.arg1 + ");";
             
             // Print
             case "printfsimple":
@@ -84,11 +86,15 @@ export class HandlerQuartet {
             
             // Inputs
             case "scanf":
-                return quartet.result + " = " + quartet.arg1 + " " + quartet.operator + " " + quartet.arg2 + ";";
+                return "scanf(\"" + quartet.arg1 + "\", &" + quartet.result + ");";
             case "scanff":
-                return quartet.result + " = " + quartet.arg1 + " " + quartet.operator + " " + quartet.arg2 + ";";
+                return "scanf(\"" + quartet.arg1 + "\", &" + quartet.result + ");";
             case "scanfi":
-                return quartet.result + " = " + quartet.arg1 + " " + quartet.operator + " " + quartet.arg2 + ";";
+                return "scanf(\"" + quartet.arg1 + "\", &" + quartet.result + ");";
+            case "scanfs":
+                return "scanf(\"" + quartet.arg1 + "\", &" + quartet.result + ");";
+            case "clear_buf":
+                return `while (getchar() != '\n');`;
 
             // Rationales
             case "<=":
@@ -104,8 +110,8 @@ export class HandlerQuartet {
             case "||":
             case "!":
 
-            case "if":
-                return "if ( " + quartet.arg1 + " " + quartet.operator + " " + quartet.arg2 + " ) " + " goto " + quartet.result + ";";
+            case "if_equals":
+                return "if ( " + quartet.arg1 + " == " + quartet.arg2 + " ) " + " goto " + quartet.result + ";";
             case "if_simple":
                 return "if ( " + quartet.arg1 + " ) " + " goto " + quartet.result + ";";
 
@@ -133,6 +139,9 @@ export class HandlerQuartet {
             case "close":
                 return "}\n";
             //param
+
+            case "call_func":
+                return quartet.arg1+"();";
 
             // stack asign (stack, tx, null, tpstack)
             case "stack_asig":
@@ -169,7 +178,7 @@ export class HandlerQuartet {
 
             // stack asign (stack, tx, null, tpstack)
             case "stack_string_asig":
-                return "stackS[" + quartet.result + "] = \"" + quartet.arg1 + "\";";
+                return "stackS[" + quartet.result + "] = " + quartet.arg1 + ";";
             // case "stack_string_asig_f":
             //     return "stackS[" + quartet.result + "] = (float)" + quartet.arg1 + ";";
             // case "stack_string_asig_i":

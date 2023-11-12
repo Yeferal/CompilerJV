@@ -28,6 +28,9 @@ export class BreakNode extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        if (!environment.etsBack.isEmpty()) {
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: environment.etsBack.peek()});
+        }
+        
     }
 }

@@ -318,7 +318,35 @@ export class FunctionProcedure extends Node {
         throw new Error("Method not implemented.");
     }
 
+    public genSubName(symbol: Symbol): string{
+        let text = this.type.name;
+        for (let i = 0; i < symbol.listParams.length; i++) {
+            text += "_"+symbol.listParams[i].name
+            
+        }
+        return text;
+    }
+
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        if (environment.isClass) {
+            const symbolFunc = environment.symbolTable.searchSymbolFuncProc(this.id, environment.acutalClass.name);
+            // console.log({operator: "function", arg1: environment.acutalClass.name, arg2: this.id, result: this.genSubName(symbolFunc)});
+            
+            environment.handlerQuartet.insertQuartet({operator: "function", arg1: environment.acutalClass.name, arg2: this.id, result: this.genSubName(symbolFunc)});
+            environment.ambitNow.push(symbolFunc.nameCode);
+            environment.voidNow.push(this.id);
+
+            //Parametros nada
+
+            //Ejeutar instrucciones
+            for (let i = 0; i < this.instructions.length; i++) {
+                this.instructions[i].execute(environment);
+                
+            }
+
+            environment.ambitNow.pop();
+            environment.voidNow.pop();
+            environment.handlerQuartet.insertQuartet({operator: "close", arg1: null, arg2: null, result: null});
+        }
     }
 }

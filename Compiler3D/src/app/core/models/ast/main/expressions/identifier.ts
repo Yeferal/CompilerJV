@@ -4,6 +4,7 @@ import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
+import { SymbolType } from "../table/symbol-type";
 import { DataType } from "../utils/DataType";
 
 export class Identifier extends Node{
@@ -92,7 +93,6 @@ export class Identifier extends Node{
         if (environment.isClass) {
             if (this.isThis) {
                 const symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
-                console.log(symbol);
 
                 environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
 
@@ -139,61 +139,136 @@ export class Identifier extends Node{
                     return "t"+tTemp4;
                 }
             } else {
-                let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow);
-
+                let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
                 if (symbol == null) {
                     symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
-                }
-                console.log(symbol);
+                    
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
 
-                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+                    const tTemp = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+                    const tTemp2 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
 
-                const tTemp = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp);
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
-                const tTemp2 = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp2);
-                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del "+this.id, arg2: null, result: null});
+                    const tTemp3 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp3);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
 
-                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del "+this.id, arg2: null, result: null});
-                const tTemp3 = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp3);
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
+                    const tTemp4 = environment.addT();
+                    if (this.type.name == "STRING") {
+                        environment.handlerQuartet.listTempsInt.push(tTemp4);
+                        // Tiene que ir a buscar el valor del string en la pila de strings
+                        // Obtenemos la posicion en el stackS
+                        environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
 
-                const tTemp4 = environment.addT();
-                if (this.type.name == "STRING") {
-                    environment.handlerQuartet.listTempsInt.push(tTemp4);
-                    // Tiene que ir a buscar el valor del string en la pila de strings
-                    // Obtenemos la posicion en el stackS
-                    environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
-
-                    const tTemp5 = environment.addT();
-                    environment.handlerQuartet.listTempsString.push(tTemp5);
-                    environment.handlerQuartet.insertQuartet({operator: "stack_string_declar", arg1: "t"+tTemp4, arg2: null, result: "t"+tTemp5});
-                    return "t"+tTemp5;
-                } else if (this.type.name == "FLOAT") {
-                    environment.handlerQuartet.listTempsFloat.push(tTemp4);
-                    environment.handlerQuartet.insertQuartet({operator: "heap_declar_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
-                    return "t"+tTemp4;
-                } else if (this.type.name == "CHAR") {
-                    environment.handlerQuartet.listTempsInt.push(tTemp4);
-                    environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
-                    return "t"+tTemp4;
-                } else if (this.type.name == "INTEGER") {
-                    environment.handlerQuartet.listTempsInt.push(tTemp4);
-                    environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
-                    return "t"+tTemp4;
-                } else {
-                    //Si es un valor de tipo objeto y no primitivo
-                    environment.handlerQuartet.listTempsInt.push(tTemp4);
-                    environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
-                    // Retorna su posicion en memoria del objeto
-                    return "t"+tTemp4;
+                        const tTemp5 = environment.addT();
+                        environment.handlerQuartet.listTempsString.push(tTemp5);
+                        environment.handlerQuartet.insertQuartet({operator: "stack_string_declar", arg1: "t"+tTemp4, arg2: null, result: "t"+tTemp5});
+                        return "t"+tTemp5;
+                    } else if (this.type.name == "FLOAT") {
+                        environment.handlerQuartet.listTempsFloat.push(tTemp4);
+                        environment.handlerQuartet.insertQuartet({operator: "heap_declar_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        return "t"+tTemp4;
+                    } else if (this.type.name == "CHAR") {
+                        environment.handlerQuartet.listTempsInt.push(tTemp4);
+                        environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        return "t"+tTemp4;
+                    } else if (this.type.name == "INTEGER") {
+                        environment.handlerQuartet.listTempsInt.push(tTemp4);
+                        environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        return "t"+tTemp4;
+                    } else {
+                        //Si es un valor de tipo objeto y no primitivo
+                        environment.handlerQuartet.listTempsInt.push(tTemp4);
+                        environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        // Retorna su posicion en memoria del objeto
+                        return "t"+tTemp4;
+                    }
+                }else {
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
+    
+                    // const tTemp = environment.addT();
+                    // environment.handlerQuartet.listTempsInt.push(tTemp);
+                    // environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+                    // const tTemp2 = environment.addT();
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    // environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+    
+                    // environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del "+this.id, arg2: null, result: null});
+                    // const tTemp3 = environment.addT();
+                    // environment.handlerQuartet.listTempsInt.push(tTemp3);
+                    // environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
+                    const tTemp3 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp3);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp3});
+    
+                    const tTemp4 = environment.addT();
+                    if (this.type.name == "STRING") {
+                        if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
+                            environment.handlerQuartet.listTempsInt.push(tTemp4);
+                            // Tiene que ir a buscar el valor del string en la pila de strings
+                            // Obtenemos la posicion en el stackS
+                            environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        } else {
+                            environment.handlerQuartet.listTempsInt.push(tTemp4);
+                            // Tiene que ir a buscar el valor del string en la pila de strings
+                            // Obtenemos la posicion en el stackS
+                            environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        }
+    
+                        const tTemp5 = environment.addT();
+                        environment.handlerQuartet.listTempsString.push(tTemp5);
+                        environment.handlerQuartet.insertQuartet({operator: "stack_string_declar", arg1: "t"+tTemp4, arg2: null, result: "t"+tTemp5});
+                        return "t"+tTemp5;
+                    } else if (this.type.name == "FLOAT") {
+                        if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
+                            environment.handlerQuartet.listTempsFloat.push(tTemp4);
+                            environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        } else {
+                            environment.handlerQuartet.listTempsFloat.push(tTemp4);
+                            environment.handlerQuartet.insertQuartet({operator: "heap_declar_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        }
+                        
+                        return "t"+tTemp4;
+                    } else if (this.type.name == "CHAR") {
+                        if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
+                            environment.handlerQuartet.listTempsInt.push(tTemp4);
+                            environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        } else {
+                            environment.handlerQuartet.listTempsInt.push(tTemp4);
+                            environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        }
+                        return "t"+tTemp4;
+                    } else if (this.type.name == "INTEGER") {
+                        if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
+                            environment.handlerQuartet.listTempsInt.push(tTemp4);
+                            environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        } else {
+                            environment.handlerQuartet.listTempsInt.push(tTemp4);
+                            environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        }
+                        return "t"+tTemp4;
+                    } else {
+                        if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
+                            //Si es un valor de tipo objeto y no primitivo
+                            environment.handlerQuartet.listTempsInt.push(tTemp4);
+                            environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        } else {
+                            //Si es un valor de tipo objeto y no primitivo
+                            environment.handlerQuartet.listTempsInt.push(tTemp4);
+                            environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        }
+                        // Retorna su posicion en memoria del objeto
+                        return "t"+tTemp4;
+                    }
                 }
             }
 
         } else {
-            let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow);
+            let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
 
             environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
 

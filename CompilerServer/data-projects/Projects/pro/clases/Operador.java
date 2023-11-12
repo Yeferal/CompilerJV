@@ -12,7 +12,6 @@ public class Operador {
 	private String name;
 	String typo = "clase";
     Operador clase = null;
-    //Operador clase2 = new Operador();
 
 	void main() {
 		int a = 3;
@@ -25,10 +24,10 @@ public class Operador {
 	public Operador(int id, String name){
 		this.id = id;
 		this.name = name;
-        this.clase.r = 5;
-        this.clase.clase = new Operador(4, "Operacion xD");
+        //this.clase.r = 5;
+        /*this.clase.clase = new Operador(4, "Operacion xD");
         this.clase.arrInstance = {4,4,4};
-        this.id = this.arrData[0][0][0];
+        this.id = this.arrData[0][0][0];*/
     }
 
 	public void pintar(){
@@ -44,7 +43,7 @@ public class Operador {
 	}
 
 	public int getId(){
-      int s = 4;
+        int s = 4;
 		return this.id;
 	}
 }

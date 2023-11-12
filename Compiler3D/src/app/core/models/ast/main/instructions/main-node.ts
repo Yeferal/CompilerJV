@@ -14,6 +14,7 @@ export class MainNode extends Node {
     private _instructions: Array<Node>;
     private _packageNode: PackageNode;
     private _listImport: Array<ImportNode>;
+    size: number = 0;
 
 	constructor(positionToken: PositionToken, token: string, instructions: Array<Node>) {
 		super(positionToken, null, token);
@@ -68,7 +69,7 @@ export class MainNode extends Node {
 		this._listImport = value;
 	}
 
-    public addSymbol(handlerComprobation: HandlerComprobation){
+    public addSymbol(handlerComprobation: HandlerComprobation, ambitMain: string){
         const newSymbol: Symbol = new Symbol(
             handlerComprobation.getIdDynamic(),     //id
             "main",                                //nameCode
@@ -89,7 +90,7 @@ export class MainNode extends Node {
         );
             // console.log(handlerComprobation.actualPKG.path);
             
-        newSymbol.ambit = handlerComprobation.actualPKG.path;
+        newSymbol.ambit = ambitMain;
         newSymbol.packageS = handlerComprobation.actualPKG.path;
 
         handlerComprobation.addSymbol(newSymbol);
@@ -103,12 +104,14 @@ export class MainNode extends Node {
         } else {
             this.packageNode = handlerComprobation.actualPKG;
         }
-        this.addSymbol(handlerComprobation);
+        
         
         let nameAmbit = handlerComprobation.actualPKG.path;
         if (handlerComprobation.actualClass != null) {
             nameAmbit += "."+handlerComprobation.actualClass.name
         }
+
+        this.addSymbol(handlerComprobation, nameAmbit);
 
         handlerComprobation.addAmbitS(nameAmbit);
         handlerComprobation.addAmbit();
@@ -119,9 +122,10 @@ export class MainNode extends Node {
             
         }
 
-        // this.size = handlerComprobation.sizeFuncProc;
-        // handlerComprobation.setListParamsTableSymbol("main", handlerComprobation.actualClass.name, listTypeParams);
-        // handlerComprobation.setListSizeTableSymbol(this.id, handlerComprobation.actualClass.name, this.size);
+        // console.log("main", handlerComprobation.actualPKG.path, handlerComprobation.sizeFuncProc);
+        
+        this.size = handlerComprobation.sizeFuncProc;
+        handlerComprobation.setListSizeTableSymbol("main", nameAmbit, this.size);
         
         //sacar el ambito
         handlerComprobation.popAmbitS();
@@ -153,9 +157,12 @@ export class MainNode extends Node {
         if (environment.acutalClass != null) {
             nameAmbit += "."+environment.acutalClass.name
         }
+        const symbolMain = environment.symbolTable.searchSymbolMain(nameAmbit);
+        environment.sizeMain = symbolMain.size;
+        
         environment.handlerQuartet.insertQuartet({operator: "main", arg1: "main", arg2: "", result: ""});
 
-        environment.ambitNow = nameAmbit;
+        environment.ambitNow.push(nameAmbit);
         
         for (let i = 0; i < this.instructions.length; i++) {
             this.instructions[i].execute(environment);
@@ -163,6 +170,6 @@ export class MainNode extends Node {
         }
 
         environment.handlerQuartet.insertQuartet({operator: "close", arg1: "", arg2: "", result: ""});
-        environment.ambitNow = "";
+        environment.ambitNow.pop();
     }
 }

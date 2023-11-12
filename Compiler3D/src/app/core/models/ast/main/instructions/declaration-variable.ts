@@ -200,8 +200,32 @@ export class DeclarationVarible extends Node{
         throw new Error("Method not implemented.");
     }
 
-    public override execute(environment: Environment): any {
+    public addPointString(environment: Environment){
+        if (this.type.name == "STRING") {
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Asignando posicion del string en el stackS", arg2: null, result: null});
+            const ps = environment.addPs();
+            let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+            const tTemp = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
+            environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: ps, arg2: null, result: "t"+tTemp});
+        }
+    }
+
+    public gen3DGeneral(environment: Environment){
+        let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de d"+this.id, arg2: null, result: null});
         
+        const tTemp = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
+
+        return tTemp;
+    }
+
+    public override execute(environment: Environment): any {
+        this.addPointString(environment);
         if (this.asignation != null) {
             environment.isAsig = true;
             let tAsig = this.asignation.execute(environment);
@@ -233,37 +257,62 @@ export class DeclarationVarible extends Node{
             if (environment.isClass) {
                 
             } else {
-                let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow);
-
-                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
-                
-                const tTemp = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp);
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
 
                 if (this.type.name == "STRING") {
-                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
-                    // // Tiene que ir a buscar el valor del string en la pila de strings
-                    // const tTemp3 = environment.addT();
-                    // environment.handlerQuartet.listTempsString.push(tTemp3);
-                    // environment.handlerQuartet.insertQuartet({operator: "stack_string_declar", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
-                    // return "t"+tTemp3;
+                    const tTemp = this.gen3DGeneral(environment);
+
+                    const tTemp2 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+                    environment.handlerQuartet.insertQuartet({operator: "stack_string_asig", arg1:  tAsig, arg2: null, result: "t"+tTemp2});
+                    
                 } else if (this.type.name == "FLOAT") {
+                    const tTemp = this.gen3DGeneral(environment);
+
                     // environment.handlerQuartet.listTempsInt.push(tTemp2);
                     environment.handlerQuartet.insertQuartet({operator: "stack_asig", arg1: tAsig, arg2: null, result: "t"+tTemp});
                 } else if (this.type.name == "CHAR") {
+                    const tTemp = this.gen3DGeneral(environment);
+
                     // environment.handlerQuartet.listTempsInt.push(tTemp2);
                     environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
                 } else if (this.type.name == "INTEGER") {
+                    const tTemp = this.gen3DGeneral(environment);
+
                     // environment.handlerQuartet.listTempsInt.push(tTemp2);
                     environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
                 } else if (this.type.name == "BOOLEAN") {
+                    const tTemp = this.gen3DGeneral(environment);
+
                     // environment.handlerQuartet.listTempsInt.push(tTemp2);
                     environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
                 } else {
-                    //Si es un valor de tipo objeto y no primitivo
+                    let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del constructor", arg2: null, result: null});
+                    
+                    //Mover el puntero temporalmente
+                    const tTemp = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp});
+
+                    //Obtener la direcciones del this
+                    const tTemp2 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: "0", result: "t"+tTemp2});
+
+                    //Obtener la direcciones de valor this
+                    const tTemp3 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
+
+                    //Asignar la referencia a la variable
+                    const tTemp4 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp4});
+
                     // environment.handlerQuartet.listTempsInt.push(tTemp2);
-                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
                 }
             }
         }

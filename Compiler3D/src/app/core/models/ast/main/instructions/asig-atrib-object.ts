@@ -235,6 +235,8 @@ export class AsigAtribObject extends Node {
     }
 
     public override execute(environment: Environment): any {
+
+
         throw new Error("Method not implemented.");
     }
 }

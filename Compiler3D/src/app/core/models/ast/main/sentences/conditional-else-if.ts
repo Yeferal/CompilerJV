@@ -3,6 +3,7 @@ import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { LogicalOperation } from "../expressions/logical-operation";
 import { Node } from "../node";
 import { BreakNode } from "./break-node";
 import { ContinueNode } from "./continue-node";
@@ -84,6 +85,63 @@ export class ConditionalElseIf extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Generadno el else - if", arg2: null, result: null});
+        const tCondition = this.condition.execute(environment);
+
+        //Etiquetas verdaderas y las instrucciones
+        if (this.condition instanceof LogicalOperation) {
+            const etJump = environment.addEt();
+            if (!environment.etTrue.isEmpty()) {
+                while (!environment.etTrue.isEmpty()) {
+                    environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etTrue.pop()});
+                }
+            }
+
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Instricciones del else - if", arg2: null, result: null});
+            for (let i = 0; i < this.instructions.length; i++) {
+                this.instructions[i].execute(environment);
+                
+            }
+
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etJump});
+
+            
+            if (!environment.etFalse.isEmpty()) {
+                while (!environment.etFalse.isEmpty()) {
+                    environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etFalse.pop()});
+                }
+            }
+
+            return "et"+etJump;
+        } else {
+
+            const etTempTrue = environment.addEt();
+            const etTempFalse = environment.addEt();
+            // environment.etTrue.push("et"+etTempTrue);
+            // environment.etFalse.push("et"+etTempFalse);
+            environment.handlerQuartet.insertQuartet({operator: "if_simple", arg1: tCondition, arg2: null, result: "et"+etTempTrue});
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etTempFalse});
+
+            const etJump = environment.addEt();
+
+            environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etTempTrue});
+
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Instricciones del else - if", arg2: null, result: null});
+            for (let i = 0; i < this.instructions.length; i++) {
+                this.instructions[i].execute(environment);
+                
+            }
+
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etJump});
+
+            environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etTempFalse});
+            if (!environment.etFalse.isEmpty()) {
+                while (!environment.etFalse.isEmpty()) {
+                    environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etFalse.pop()});
+                }
+            }
+
+            return "et"+etJump;
+        }
     }
 }

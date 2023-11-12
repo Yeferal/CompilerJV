@@ -87,7 +87,7 @@
 
     function addError(row, column, token, description, errorType){
         // console.log("Entro en los errores");
-        const newError = new ErrorGramm(new PositionToken(row, column), token, description, errorType);
+        const newError = new ErrorGramm(new PositionToken(row, column), token, description+" -> "+packageNow, errorType);
         listErrors.push(newError);
         console.log("paquete:", packageNow);
         console.log(newError.toString());
@@ -197,6 +197,7 @@ Decimal         {Numero} [.] {Numero}
 <INITIAL>"import"                                           { return 'import_rsv';}
 <INITIAL>"public"                                           { return 'public';}
 <INITIAL>"private"                                          { return 'private';}
+<INITIAL>"protected"                                          { return 'private';}
 <INITIAL>"class"                                            { return 'class';}
 <INITIAL>"final"                                            { return 'final';}
 <INITIAL>"static"                                           { return 'static';}
@@ -482,7 +483,7 @@ BLOCK_CONTENT_MAIN
     |BLOCK_CONTENT_MAIN STATE_BREAK { $$ = $1; $$.push($2); }
     |BLOCK_CONTENT_MAIN STATE_CONTINUE { $$ = $1; $$.push($2); }
     |BLOCK_CONTENT_MAIN STATE_PRINTS { $$ = $1; $$.push($2); }
-    |BLOCK_CONTENT_MAIN STRUCT_INPUT { $$ = $1; $$.push($2); }
+    |BLOCK_CONTENT_MAIN STATE_INPUTS { $$ = $1; $$.push($2); }
     |BLOCK_CONTENT_MAIN STATE_RETURN { $$ = $1; $$.push($2); }
     |BLOCK_CONTENT_MAIN STATE_TOSTRING { $$ = $1; $$.push($2); }
     | { $$ = []; }
@@ -2233,7 +2234,7 @@ CODE_CONSTRUCT
     |CODE_CONSTRUCT STATE_BREAK {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_CONTINUE {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_PRINTS {$$ = $1; $$.push($2); }
-    |CODE_CONSTRUCT STRUCT_INPUT {$$ = $1; $$.push($2); }
+    |CODE_CONSTRUCT STATE_INPUTS {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_RETURN {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_TOSTRING {$$ = $1; $$.push($2); }
     |CODE_CONSTRUCT STATE_SUPER {$$ = $1; $$.push($2); }
@@ -2484,7 +2485,7 @@ CODE_FUNC_METOD
     |CODE_FUNC_METOD STATE_BREAK {$$ = $1; $$.push($2); }
     |CODE_FUNC_METOD STATE_CONTINUE {$$ = $1; $$.push($2); }
     |CODE_FUNC_METOD STATE_PRINTS {$$ = $1; $$.push($2); }
-    |CODE_FUNC_METOD STRUCT_INPUT {$$ = $1; $$.push($2); }
+    |CODE_FUNC_METOD STATE_INPUTS {$$ = $1; $$.push($2); }
     |CODE_FUNC_METOD STATE_RETURN {$$ = $1; $$.push($2); }
     |CODE_FUNC_METOD STATE_TOSTRING {$$ = $1; $$.push($2); }
     // |CODE_FUNC_METOD

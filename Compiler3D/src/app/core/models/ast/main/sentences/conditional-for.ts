@@ -3,6 +3,7 @@ import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { LogicalOperation } from "../expressions/logical-operation";
 import { Node } from "../node";
 import { BreakNode } from "./break-node";
 import { ContinueNode } from "./continue-node";
@@ -89,6 +90,8 @@ export class ConditionalFor extends Node {
     
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        this.asignation.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        
         this.condition.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         
         const resCondition = this.condition.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
@@ -141,6 +144,73 @@ export class ConditionalFor extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        const etTempBack= environment.addEt();
+        environment.etsBack.push("et"+etTempBack);
+
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Generando el FOR", arg2: null, result: null});
+        
+        //Inicializacion
+        this.asignation.execute(environment);
+
+        //etiqueta init
+        const etInit = environment.addEt();
+        environment.etsInit.push("et"+etInit);
+        environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etInit});
+
+        //evaluacion de la condicional
+        const tCondition = this.condition.execute(environment);
+        if (this.condition instanceof LogicalOperation) {
+            if (!environment.etTrue.isEmpty()) {
+                while (!environment.etTrue.isEmpty()) {
+                    environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etTrue.pop()});
+                }
+            }
+
+            //Ejecucion de las instrucciones
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Instricciones del FOR", arg2: null, result: null});
+            for (let i = 0; i < this.instructions.length; i++) {
+                this.instructions[i].execute(environment);
+            }
+            
+            //Incremento etc.
+            this.sentence.execute(environment);
+
+            //goto a la etiqueta de inicio
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etInit});
+
+            if (!environment.etFalse.isEmpty()) {
+                while (!environment.etFalse.isEmpty()) {
+                    environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etFalse.pop()});
+                }
+            }
+
+        } else {
+            const etTempTrue = environment.addEt();
+            const etTempFalse = environment.addEt();
+            environment.handlerQuartet.insertQuartet({operator: "if_simple", arg1: tCondition, arg2: null, result: "et"+etTempTrue});
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etTempFalse});
+
+            environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etTempTrue});
+            
+            //Ejecucion de las instrucciones
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Instricciones del FOR", arg2: null, result: null});
+            for (let i = 0; i < this.instructions.length; i++) {
+                this.instructions[i].execute(environment);
+            }
+            
+            //Incremento etc.
+            this.sentence.execute(environment);
+
+            //goto a la etiqueta de inicio
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etInit});
+
+            environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etTempFalse});
+        }
+        
+        if (!environment.etsInit.isEmpty()) {
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: environment.etsInit.pop()});
+        }
+        environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etsBack.pop()});
+        
     }
 }

@@ -151,6 +151,7 @@ export class Factory {
 
         environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: "h"});
         environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: "ptr"});
+        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: "ps"});
         for (let i = 0; i < this.treeAst.listRoot.length; i++) {
             if (this.treeAst.listRoot[i] instanceof ClassInst) {
                 environment.acutalClass = this.treeAst.listRoot[i] as ClassInst;

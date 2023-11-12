@@ -26,6 +26,9 @@ export class ContinueNode extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Continue", arg2: null, result: null});
+        if (!environment.etsInit.isEmpty()) {
+            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: environment.etsInit.peek()});
+        }
     }
 }

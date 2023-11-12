@@ -103,13 +103,45 @@ export class ArithmeticOperation extends Node {
         }
     }
 
+    public getAddMod(typeVal: DynamicDataType): string {
+        switch(typeVal.name){
+            case "STRING":
+                return "%s";
+            case "FLOAT":
+                return "%f";
+            case "INTEGER":
+                return "%d";
+            case "CHAR":
+                return "%c";
+            case "BOOLEAN":
+                return "%d";
+        }
+        return "";
+    }
+
     public override execute(environment: Environment): any {
         if (this.arithType == ArithType.ADD) {
             // Verifica si es una concatenacion o un suma entre numeros
             const resType: DynamicDataType = this._typeVerifier.verifierTypeArithNode(this.nodeLeft.type, this.nodeRight.type, this.arithType);
 
             if (resType.name == "STRING") {
+                const arg1 =  this.nodeLeft.execute(environment);
+                const arg2 =  this.nodeRight.execute(environment);
                 //CODIGO DE TRES DIRECCIONES PARA REALIZAR UNA CONCATENACION
+                const tTempConverte = environment.addT();
+                environment.handlerQuartet.listTempsString.push(tTempConverte);
+                // Convertir el val a cadena usando sprintf
+                environment.handlerQuartet.insertQuartet({operator: "concat", arg1: this.getAddMod(this.nodeRight.type), arg2: arg2, result: "t"+tTempConverte});
+
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsString.push(tTemp);
+                // Copiar arg1 a tTemp
+                environment.handlerQuartet.insertQuartet({ operator: "=s", arg1: arg1, arg2: null, result: "t"+tTemp });
+
+                // Concatenar tTempCoverte a tTemp
+                environment.handlerQuartet.insertQuartet({ operator: "concat_s", arg1: "t"+tTempConverte, arg2: null, result: "t"+tTemp });
+
+                return "t"+tTemp;
             } else {
                 const arg1 =  this.nodeLeft.execute(environment);
                 const arg2 =  this.nodeRight.execute(environment);
