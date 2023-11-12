@@ -113,7 +113,7 @@ export class RationalOperation extends Node{
 
         environment.handlerQuartet.listTempsInt.push(tTemp);
         const quartet: Quartet = {operator: this.getSignNode(), arg1: arg1, arg2: arg2, result: "t"+tTemp};
-        environment.handlerQuartet.insertQuartet(quartet);
+        environment.handlerQuartet.insertQuartet(quartet);      
 
         return "t"+tTemp;
     }

@@ -320,6 +320,9 @@ export class FunctionProcedure extends Node {
 
     public genSubName(symbol: Symbol): string{
         let text = this.type.name;
+        if (symbol.listParams == null) {
+            return text;
+        }
         for (let i = 0; i < symbol.listParams.length; i++) {
             text += "_"+symbol.listParams[i].name
             
@@ -335,8 +338,11 @@ export class FunctionProcedure extends Node {
             environment.handlerQuartet.insertQuartet({operator: "function", arg1: environment.acutalClass.name, arg2: this.id, result: this.genSubName(symbolFunc)});
             environment.ambitNow.push(symbolFunc.nameCode);
             environment.voidNow.push(this.id);
+            const etReturn = environment.addEt();
+            environment.etsReturn.push("t"+etReturn);
 
             //Parametros nada
+
 
             //Ejeutar instrucciones
             for (let i = 0; i < this.instructions.length; i++) {
@@ -346,6 +352,7 @@ export class FunctionProcedure extends Node {
 
             environment.ambitNow.pop();
             environment.voidNow.pop();
+            environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etsReturn.pop()});
             environment.handlerQuartet.insertQuartet({operator: "close", arg1: null, arg2: null, result: null});
         }
     }

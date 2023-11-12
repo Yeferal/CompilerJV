@@ -196,7 +196,8 @@ export class DeclarationVar extends Node {
                     return this.type;
                 } else if (this.asignation instanceof CallValueObject){
                     const callValueObject = this.asignation as CallValueObject;
-                    let symbol = handlerComprobation.searchSymbolAtribClass(callValueObject.idObj, callValueObject.id);
+                    let symbolObj = handlerComprobation.searchSymbol(callValueObject.idObj);
+                    let symbol = handlerComprobation.searchSymbolAtribClass(callValueObject.id, symbolObj.type.name);
                     this.isArray = symbol.isArray;
                     this.listDims = symbol.listDims;
                     this.addSymbol(handlerComprobation);
@@ -273,7 +274,7 @@ export class DeclarationVar extends Node {
     public override execute(environment: Environment): any {
 
         this.addPointString(environment);
-
+        
         environment.isAsig = true;
         let tAsig = this.asignation.execute(environment);
         environment.isAsig = false;
@@ -338,31 +339,38 @@ export class DeclarationVar extends Node {
                 environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
             } else {
                 let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+                if (this.asignation instanceof InstanceObject) {
+    
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del constructor o Return", arg2: null, result: null});
+                    
+                    //Mover el puntero temporalmente
+                    const tTemp = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp});
+    
+                    //Obtener la direcciones del this
+                    const tTemp2 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: "0", result: "t"+tTemp2});
+    
+                    //Obtener la direcciones de valor this
+                    const tTemp3 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
+    
+                    //Asignar la referencia a la variable
+                    const tTemp4 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp4});
+    
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                } else {
+                    const tTemp = this.gen3DGeneral(environment);
 
-                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del constructor", arg2: null, result: null});
-                
-                //Mover el puntero temporalmente
-                const tTemp = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp);
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp});
-
-                //Obtener la direcciones del this
-                const tTemp2 = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp);
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: "0", result: "t"+tTemp2});
-
-                //Obtener la direcciones de valor this
-                const tTemp3 = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp);
-                environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
-
-                //Asignar la referencia a la variable
-                const tTemp4 = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp);
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp4});
-
-                // environment.handlerQuartet.listTempsInt.push(tTemp2);
-                environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                }
             }
         }
     }

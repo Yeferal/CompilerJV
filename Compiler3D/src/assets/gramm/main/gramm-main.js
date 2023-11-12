@@ -1403,13 +1403,13 @@ case 546:
 this.$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-3], MathType.ROUND, $$[$0-1], null);
 break;
 case 547:
-this.$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-5], MathType.MAX, $$[$0-3], $$[$0-2]);
+this.$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-5], MathType.MAX, $$[$0-3], $$[$0-1]);
 break;
 case 548:
-this.$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-5], MathType.MIN, $$[$0-3], $$[$0-2]);
+this.$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-5], MathType.MIN, $$[$0-3], $$[$0-1]);
 break;
 case 549:
-this.$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-5], MathType.POW, $$[$0-3], $$[$0-2]);
+this.$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-5], MathType.POW, $$[$0-3], $$[$0-1]);
 break;
 case 550:
 this.$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $$[$0-3], MathType.SQRT, $$[$0-1], null);
@@ -1834,7 +1834,7 @@ _handle_error:
 
     function addError(row, column, token, description, errorType){
         // console.log("Entro en los errores");
-        const newError = new ErrorGramm(new PositionToken(row, column), token, description, errorType);
+        const newError = new ErrorGramm(new PositionToken(row, column), token, description+" -> "+packageNow, errorType);
         listErrors.push(newError);
         console.log("paquete:", packageNow);
         console.log(newError.toString());

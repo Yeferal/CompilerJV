@@ -172,6 +172,9 @@ export class CallFunction extends Node {
 
     public genSubName(symbol: Symbol): string{
         let text = "_"+this.type.name;
+        if (symbol.listParams == null) {
+            return text;
+        }
         for (let i = 0; i < symbol.listParams.length; i++) {
             text += "_"+symbol.listParams[i].name
             
@@ -200,7 +203,7 @@ export class CallFunction extends Node {
             for (let i = 0; i < this.params.length; i++) {
                 const tAsig = this.params[i].execute(environment);
 
-                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "PREPARANDO EL PARAMETRO PARA EL SUPER", arg2: null, result: null});
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "PREPARANDO EL PARAMETRO PARA EL "+this.id, arg2: null, result: null});
                 const tTemp = environment.addT();
                 environment.handlerQuartet.listTempsInt.push(tTemp)
                 environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolFuncParent.size, result: "t"+tTemp});

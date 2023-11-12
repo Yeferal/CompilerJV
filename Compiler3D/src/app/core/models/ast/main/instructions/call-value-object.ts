@@ -3,6 +3,7 @@ import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { Identifier } from "../expressions/identifier";
 import { Node } from "../node";
 
 export class CallValueObject extends Node {
@@ -116,6 +117,66 @@ export class CallValueObject extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        let symbolFuncParent;
+        if (environment.isClass) {
+            symbolFuncParent = environment.symbolTable.searchSymbolFuncProc(environment.voidNow.peek(), environment.acutalClass.name); 
+        } else {
+            symbolFuncParent = environment.symbolTable.searchSymbolMain(environment.ambitNow.peek());
+        }
+
+        let symbolObject;
+        if (environment.isClass) {
+            if (this.isThis) {
+                symbolObject = environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.acutalClass.name);
+            } else {
+                symbolObject = environment.symbolTable.searchSymbolVar(this.idObj, environment.ambitNow.peek());
+                if (symbolObject == null) {
+                    symbolObject = environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.acutalClass.name);
+                }
+            }
+        } else {
+            symbolObject = environment.symbolTable.searchSymbolVar(this.idObj, environment.ambitNow.peek());
+        }
+
+        let symbolAtrib = environment.symbolTable.searchSymbolVar(this.id, symbolObject.type.name);
+        if (symbolAtrib == null) {
+            symbolAtrib = environment.symbolTable.searchSymbolAtribClass(this.id, symbolObject.type.name);
+        }
+
+        const nodeId = new Identifier(this.positionToken, this.idObj, this.idObj, this.isThis);
+        nodeId.type = this.type;
+        const tTemp = nodeId.execute(environment);
+
+        //Preparar el heap para el this
+        const tTemp2 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp2);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp2});
+        const tTemp3 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp3);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp3});
+
+        environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tTemp, arg2: null, result: "t"+tTemp3});
+
+        //Mover el puntero temporalmente
+        const tTemp4 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp4);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp4});
+        const tTemp5 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp5);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp5});
+
+        environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp5, arg2: null, result: tTemp});
+
+        //Obteniedno la posicion del heap del atributo
+        const tTemp6 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp6);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp5, arg2: symbolAtrib.direction, result: "t"+tTemp6});
+
+        //obteniendo el valor del heap
+        const tTemp7 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp7);
+        environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp6, arg2: null, result: "t"+tTemp7});
+
+        return "t"+tTemp7;
     }
 }

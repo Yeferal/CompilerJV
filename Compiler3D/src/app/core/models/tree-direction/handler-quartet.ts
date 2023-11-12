@@ -100,6 +100,7 @@ export class HandlerQuartet {
             case "<=":
             case ">=":
             case "==":
+            case "!=":
             case "<":
             case ">":
             case "<=":
@@ -114,6 +115,7 @@ export class HandlerQuartet {
                 return "if ( " + quartet.arg1 + " == " + quartet.arg2 + " ) " + " goto " + quartet.result + ";";
             case "if_simple":
                 return "if ( " + quartet.arg1 + " ) " + " goto " + quartet.result + ";";
+
 
             //jump / goto
             case "jump":
@@ -192,6 +194,18 @@ export class HandlerQuartet {
             // case "stack_string_declar_i":
             //     return quartet.result + " = (int)stackS[" + quartet.arg1 + "];";
 
+            case "acos":
+                return quartet.result + " = acos(" + quartet.arg1 + ");";
+            case "asin":
+                return quartet.result + " = sin(" + quartet.arg1 + ");";
+            case "atan":
+                return quartet.result + " = atan(" + quartet.arg1 + ");";
+            case "exp":
+                return quartet.result + " = exp(" + quartet.arg1 + ");";
+            case "srand":
+                return "srand((unsigned int)time(NULL));"
+            case "rand":
+                return quartet.result + " = (float)" + quartet.arg1 + " / " + "(float)" + quartet.arg2 + ";";
         }
         return "";
     }

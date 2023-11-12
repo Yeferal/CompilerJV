@@ -54,9 +54,11 @@ export class ReturnNode extends Node {
         //Encontrar el simbolo del return
         let symbol = environment.symbolTable.searchSymbolReturn(environment.ambitNow.peek());
 
-        // const tTemp = environment.addT();
-        // environment.handlerQuartet.listTempsInt.push(tTemp);
-        // environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+        const tTemp = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
+
+        environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tRetorn, arg2: symbol.direction, result: "t"+tTemp});
 
         //goto a la etiquera da salida
         if (!environment.etsReturn.isEmpty()) {

@@ -5,13 +5,14 @@ import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
 import { DynamicDataType } from "../utils/DynamicDataType";
+import { GeneratorQuaMath } from "../utils/generator-qua-math";
 import { MathType } from "../utils/math-type";
 
 export class CallMath extends Node {
     private _mathType: MathType;
     private _paramLeft: Node;
     private _paramRight: Node;
-
+    private generatorMath: GeneratorQuaMath = new GeneratorQuaMath();
 
 	constructor(positionToken: PositionToken, token: string, mathType: MathType, paramLeft: Node, paramRight: Node) {
 		super(positionToken, null, token);
@@ -147,6 +148,50 @@ export class CallMath extends Node {
     }
 
     public override execute(environment: Environment): any {
-        throw new Error("Method not implemented.");
+        let tTempP1;
+        let tTempP2;
+
+        if (this.paramLeft != null) {
+            tTempP1 = this.paramLeft.execute(environment);
+        }
+
+        if (this.paramRight != null) {
+            tTempP2 = this.paramRight.execute(environment);
+        }
+
+        switch(this.mathType){
+            // De un parametro
+            case MathType.ABS:
+                return this.generatorMath.genABS(environment, tTempP1);
+            case MathType.CEIL:
+                return this.generatorMath.genCEIL(environment, tTempP1);
+            case MathType.FLOOR:
+                return this.generatorMath.genFLOOR(environment, tTempP1);
+            case MathType.ROUND:
+                return this.generatorMath.genROUND(environment, tTempP1);
+            case MathType.SQRT:
+                return this.generatorMath.genSQRT(environment, tTempP1);
+            case MathType.TO_RADIANS:
+                return this.generatorMath.genToRADIAN(environment, tTempP1);
+            case MathType.ACOS:
+                return this.generatorMath.genACOS(environment, tTempP1);
+            case MathType.SIN:
+                return this.generatorMath.genSIN(environment, tTempP1);
+            case MathType.ATAN:
+                return this.generatorMath.genATAN(environment, tTempP1);
+            case MathType.EXP:
+                return this.generatorMath.genEXP(environment, tTempP1);
+            //De dos parametros
+            case MathType.MAX:
+                return this.generatorMath.genMAX(environment, tTempP1, tTempP2);
+            case MathType.MIN:
+                return this.generatorMath.genMIN(environment, tTempP1, tTempP2);
+            case MathType.POW:
+                return this.generatorMath.genPOW(environment, tTempP1, tTempP2);
+            //De 0 parametros
+            case MathType.RANDOM:
+                return this.generatorMath.genRANDOM(environment);
+        }
     }
+
 }

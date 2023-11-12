@@ -9,6 +9,7 @@ import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
 import { EncapsulationType } from "../utils/encapsulation-type";
+import { InstanceObject } from "./instance-object";
 
 export class DeclarationVarible extends Node{
     private _isFinal: boolean;
@@ -287,32 +288,36 @@ export class DeclarationVarible extends Node{
                     // environment.handlerQuartet.listTempsInt.push(tTemp2);
                     environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
                 } else {
-                    let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
-
-                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del constructor", arg2: null, result: null});
-                    
-                    //Mover el puntero temporalmente
-                    const tTemp = environment.addT();
-                    environment.handlerQuartet.listTempsInt.push(tTemp);
-                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp});
-
-                    //Obtener la direcciones del this
-                    const tTemp2 = environment.addT();
-                    environment.handlerQuartet.listTempsInt.push(tTemp);
-                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: "0", result: "t"+tTemp2});
-
-                    //Obtener la direcciones de valor this
-                    const tTemp3 = environment.addT();
-                    environment.handlerQuartet.listTempsInt.push(tTemp);
-                    environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
-
-                    //Asignar la referencia a la variable
-                    const tTemp4 = environment.addT();
-                    environment.handlerQuartet.listTempsInt.push(tTemp);
-                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp4});
-
-                    // environment.handlerQuartet.listTempsInt.push(tTemp2);
-                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                    if (this.asignation instanceof InstanceObject) {
+                        let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+    
+                        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del constructor", arg2: null, result: null});
+                        
+                        //Mover el puntero temporalmente
+                        const tTemp = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp);
+                        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp});
+    
+                        //Obtener la direcciones del this
+                        const tTemp2 = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp);
+                        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: "0", result: "t"+tTemp2});
+    
+                        //Obtener la direcciones de valor this
+                        const tTemp3 = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp);
+                        environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
+    
+                        //Asignar la referencia a la variable
+                        const tTemp4 = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp);
+                        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp4});
+    
+                        // environment.handlerQuartet.listTempsInt.push(tTemp2);
+                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                    } else {
+                        
+                    }
                 }
             }
         }

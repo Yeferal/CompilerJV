@@ -2516,11 +2516,11 @@ STRUCT_CALL_FUNC_MATH
     // Math.round(double a)
     |math_round parentheses_l STATE_VALUE parentheses_r {$$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $1, MathType.ROUND, $3, null);}
     // Math.max(double a, double b)
-    |math_max parentheses_l STATE_VALUE comma STATE_VALUE parentheses_r {$$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $1, MathType.MAX, $3, $4);}
+    |math_max parentheses_l STATE_VALUE comma STATE_VALUE parentheses_r {$$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $1, MathType.MAX, $3, $5);}
     // Math.min(double a, double b)
-    |math_min parentheses_l STATE_VALUE comma STATE_VALUE parentheses_r {$$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $1, MathType.MIN, $3, $4);}
+    |math_min parentheses_l STATE_VALUE comma STATE_VALUE parentheses_r {$$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $1, MathType.MIN, $3, $5);}
     // Math.pow(double base, double exponente)
-    |math_pow parentheses_l STATE_VALUE comma STATE_VALUE parentheses_r {$$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $1, MathType.POW, $3, $4);}
+    |math_pow parentheses_l STATE_VALUE comma STATE_VALUE parentheses_r {$$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $1, MathType.POW, $3, $5);}
     // Math.sqrt(double a)
     |math_sqrt parentheses_l STATE_VALUE parentheses_r {$$ = new CallMath(new PositionToken(this._$.first_line, this._$.first_column), $1, MathType.SQRT, $3, null);}
     // Math.random()
