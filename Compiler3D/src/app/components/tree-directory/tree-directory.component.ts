@@ -122,7 +122,7 @@ export class TreeDirectoryComponent {
           this.shareProjectService.setRoot(newRoot);
           this.shareProjectService.sendDataRoot(newRoot);
 
-          this.generateCode3D();
+          // this.generateCode3D();
         },
         error: err => {
           console.log(err);
@@ -229,8 +229,8 @@ export class TreeDirectoryComponent {
     this.generatedService.postGenTreeAssm(data).subscribe({
       next: res => {
         this.sectionService.setTextAssm(res.data.text);
-        this.sectionService.sendData3dTxt(res.data.text);
-        this.sectionService.sendData(3);
+        this.sectionService.sendDataAssmTxt(res.data.text);
+        this.sectionService.sendData(4);
       }, error: err => {
         console.log(err);
         
@@ -309,7 +309,7 @@ export class TreeDirectoryComponent {
       listString: this.dataFactory.environment.handlerQuartet.listTempsString,
       listVoid: this.dataFactory.environment.handlerQuartet.listVoid
     }
-    this.generatedService.postGenTreeDir(data).subscribe({
+    this.generatedService.postDownTreeAssm(data).subscribe({
       next: res => {
         console.log(res);
       }, error: err => {

@@ -1,6 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { enterText } from 'src/app/Global/inputText';
+import { SectionService } from 'src/app/services/section.service';
 import { CursorCode, ShareCodeEditorService } from 'src/app/services/share-code-editor.service';
 
 @Component({
@@ -8,7 +9,7 @@ import { CursorCode, ShareCodeEditorService } from 'src/app/services/share-code-
   templateUrl: './section-editor-code-assembler.component.html',
   styleUrls: ['./section-editor-code-assembler.component.scss']
 })
-export class SectionEditorCodeAssemblerComponent {
+export class SectionEditorCodeAssemblerComponent implements OnInit {
   @ViewChild('editor') codeMirror: CodemirrorComponent;
 
   code: string = enterText;
@@ -20,11 +21,19 @@ export class SectionEditorCodeAssemblerComponent {
     // Agrega más opciones de configuración según tus necesidades
   };
 
-  constructor(private shareCodeEditorService: ShareCodeEditorService) {
+  constructor(private shareCodeEditorService: ShareCodeEditorService,
+    private sectionService: SectionService) {
 
+    this.sectionService.dataAssmTxt$.subscribe(
+      txt => {
+        this.code = this.sectionService.getTextAssm();
+      }
+    );
   }
 
-  
+  ngOnInit(): void {
+    this.code = this.sectionService.getTextAssm();
+  }
 
   compile(){
     

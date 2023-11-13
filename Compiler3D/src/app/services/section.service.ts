@@ -42,5 +42,9 @@ export class SectionService {
   sendData3dTxt(data: string) {
     this.data3dTxtSubject.next(data);
   }
+
+  sendDataAssmTxt(data: string) {
+    this.dataAssmTxtSubject.next(data);
+  }
   
 }

@@ -4,6 +4,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const { jsonResponse } = require("../../middleware/json");
 const { generate3DTHead, generate3DTInt, generate3DTFloat, generate3DTString, generate3DQuartet } = require('./handler-quartet-3d');
+const { generateAssmTHead, generateAssmTInt, generateAssmTFloat } = require('./gen-inst-assm');
 
 
 const controller = {}
@@ -46,13 +47,16 @@ controller.genTreeDir = async (req, res) => {
 
 controller.genAssm = async (req, res) => {
     try {
-        
-        
-        
+        let textHead = generateAssmTHead();
+        let textInts = generateAssmTInt(req.body.listInt);
+        let textFloat = generateAssmTFloat(req.body.listFloat);
+        let textTotal = textHead + textInts + textFloat;
+        console.log(textTotal);
+
         // const data = 
         const response = jsonResponse(
             'success',
-            {},
+            {text: textTotal},
             'Operacion Existosa',
             null
         );

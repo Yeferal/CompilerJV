@@ -104,7 +104,7 @@ controller.downTreeDir = async (req, res) => {
 controller.downAssm = async (req, res) => {
     try {
         
-        console.log(req.body);
+        // console.log(req.body);
         // const data = 
         const response = jsonResponse(
             'success',
