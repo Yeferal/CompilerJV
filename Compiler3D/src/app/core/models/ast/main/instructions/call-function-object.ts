@@ -114,6 +114,8 @@ export class CallFunctionObject extends Node {
         //buscar la funciones para comprobar si existe
         const symbolFunc = handlerComprobation.searchSymbolAtribClass(this.id, symbolObj.type.name);
         this.type = symbolFunc.type;
+        // console.log(this.type);
+        
 
         //Verificar que sea una funcion o procedimiento
         if (!this.isTypeCorrect(symbolFunc.symbolType)) {
@@ -138,7 +140,9 @@ export class CallFunctionObject extends Node {
             if (this.params.length > 0) {
                 const paramSymbol = symbolFunc.listParams;
                 for (let i = 0; i < listParamsOfNode.length; i++) {
-                    if (listParamsOfNode[i] != paramSymbol[i]) {
+                    // console.log(listParamsOfNode[i], "!=", paramSymbol[i]);
+                    
+                    if (listParamsOfNode[i].name != paramSymbol[i].name) {
                         //Error no son del mismo tipo
                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros no coincide en la funcion << ${this.token} >>.`, ErrorType.SEMANTIC); 
                         handlerComprobation.listError.push(errorGramm);
@@ -149,7 +153,7 @@ export class CallFunctionObject extends Node {
         }
 
         if (!symbolFunc.isFunction) {
-            this.type = null;
+            // this.type = null;
         }
 
         return this.type;
@@ -182,31 +186,40 @@ export class CallFunctionObject extends Node {
     public override execute(environment: Environment): any {
         
 
-        let symbolFuncParent;
+        let symbolAmbit;
         if (environment.isClass) {
-            symbolFuncParent = environment.symbolTable.searchSymbolFuncProc(environment.voidNow.peek(), environment.acutalClass.name); 
+            symbolAmbit = environment.symbolTable.searchSymbolFuncProc(environment.voidNow.peek(), environment.acutalClass.name); 
         } else {
-            symbolFuncParent = environment.symbolTable.searchSymbolMain(environment.ambitNow.peek());
+            symbolAmbit = environment.symbolTable.searchSymbolMain(environment.ambitNow.peek());
         }
         
         
-        let symbolFunc = environment.symbolTable.searchSymbolVar(this.idObj, environment.ambitNow.peek());
-        if (symbolFunc == null) {
-            symbolFunc = environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.ambitNow.peek());
+        let symbolObj = environment.symbolTable.searchSymbolVar(this.idObj, environment.ambitNow.peek());
+        if (symbolObj == null) {
+            symbolObj = environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.acutalClass.name);
         }
-        // console.log(symbolFunc);
+
+        
+        let symbolFunc = environment.symbolTable.searchSymbolFuncProc(this.id, symbolObj.type.name); 
+        
+        // console.log("symbolAmbit",symbolAmbit);
+        // console.log("symbolObj", symbolObj);
+        // console.log("symbolFunc", symbolFunc);
+        
         
 
         const nodeId = new Identifier(this.positionToken, this.idObj, this.idObj, this.isThis);
-        nodeId.type = this.type;
+        nodeId.type = symbolObj.type;
+        // this.type = symbolObj.type;
+        
         const tTemp = nodeId.execute(environment);
         //Preparar el heap para el this
         const tTemp2 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp2);
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp2});
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "t"+tTemp2});
         const tTemp3 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp3);
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp3});
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: "0", result: "t"+tTemp3});
 
         environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tTemp, arg2: null, result: "t"+tTemp3});
 
@@ -221,39 +234,45 @@ export class CallFunctionObject extends Node {
                 environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "PREPARANDO EL PARAMETRO PARA "+this.id, arg2: null, result: null});
                 const tTemp4 = environment.addT();
                 environment.handlerQuartet.listTempsInt.push(tTemp4)
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp4});
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "t"+tTemp4});
 
                 const tTemp5 = environment.addT();
                 environment.handlerQuartet.listTempsInt.push(tTemp5)
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp, arg2: i+1+"", result: "t"+tTemp5});
-                environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: i+1+"", result: "t"+tTemp5});
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: tTemp, arg2: i+1+"", result: "t"+tTemp5});
+                environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: i+1+"", result: "t"+tTemp5});
                 
             }
         }
 
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolFuncParent.size, result: "ptr"});
-        environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: symbolFunc.type.name+"_"+this.id+this.genSubName(symbolFunc), arg2: null, result: null});
-        environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: symbolFuncParent.size, result: "ptr"});
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "ptr"});
+        environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: symbolFunc.nameCode+this.genSubName(symbolFunc), arg2: null, result: null});
+        environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: symbolAmbit.size, result: "ptr"});
 
-        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del return", arg2: null, result: null});
+        
+        
+        if (symbolFunc.isFunction) {
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del return", arg2: null, result: null});
 
+            //Mover el puntero temporalmente
+            const tTemp6 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp6);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "t"+tTemp6});
+    
+            const symbolReturn = environment.symbolTable.searchSymbolReturn(symbolFunc.nameCode)
+            // console.log("returnL: ",symbolReturn);
+            //Obtener la direcciones del return
+            const tTemp7 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp7);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp6, arg2: symbolReturn.direction, result: "t"+tTemp7});
+    
+            //Obtener el de valor del Return
+            const tTemp8 = environment.addT();
+            environment.handlerQuartet.listTempsFloat.push(tTemp8);
+            environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+    
+            return "t"+tTemp8;
+        }
 
-        //Mover el puntero temporalmente
-        const tTemp6 = environment.addT();
-        environment.handlerQuartet.listTempsInt.push(tTemp6);
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolFuncParent.size, result: "t"+tTemp6});
-
-        //Obtener la direcciones del return
-        const tTemp7 = environment.addT();
-        environment.handlerQuartet.listTempsInt.push(tTemp7);
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp6, arg2: symbolFunc.size, result: "t"+tTemp7});
-
-        //Obtener el de valor del Return
-        const tTemp8 = environment.addT();
-        environment.handlerQuartet.listTempsInt.push(tTemp8);
-        environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
-
-        return "t"+tTemp8;
 
     }
 }

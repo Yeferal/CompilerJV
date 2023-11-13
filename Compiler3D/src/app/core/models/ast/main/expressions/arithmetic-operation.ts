@@ -131,7 +131,7 @@ export class ArithmeticOperation extends Node {
                 const tTempConverte = environment.addT();
                 environment.handlerQuartet.listTempsString.push(tTempConverte);
                 // Convertir el val a cadena usando sprintf
-                environment.handlerQuartet.insertQuartet({operator: "concat", arg1: this.getAddMod(this.nodeRight.type), arg2: arg2, result: "t"+tTempConverte});
+                environment.handlerQuartet.insertQuartet({operator: "concat", arg1: "\""+this.getAddMod(this.nodeRight.type)+"\"", arg2: arg2, result: "t"+tTempConverte});
 
                 const tTemp = environment.addT();
                 environment.handlerQuartet.listTempsString.push(tTemp);
@@ -153,12 +153,12 @@ export class ArithmeticOperation extends Node {
                     const quartet: Quartet = {operator: this.getSignNode()+"f", arg1: arg1, arg2: arg2, result: "t"+tTemp};
                     environment.handlerQuartet.insertQuartet(quartet);
                 } else if (resType.name == "INTEGER") {
-                    environment.handlerQuartet.listTempsInt.push(tTemp);
-                    const quartet: Quartet = {operator: this.getSignNode()+"i", arg1: arg1, arg2: arg2, result: "t"+tTemp};
+                    environment.handlerQuartet.listTempsFloat.push(tTemp);
+                    const quartet: Quartet = {operator: this.getSignNode()+"f", arg1: arg1, arg2: arg2, result: "t"+tTemp};
                     environment.handlerQuartet.insertQuartet(quartet);
                 } else if (resType.name == "CHAR") {
                     environment.handlerQuartet.listTempsInt.push(tTemp);
-                    const quartet: Quartet = {operator: this.getSignNode()+"c", arg1: arg1, arg2: arg2, result: "t"+tTemp};
+                    const quartet: Quartet = {operator: this.getSignNode()+"i", arg1: arg1, arg2: arg2, result: "t"+tTemp};
                     environment.handlerQuartet.insertQuartet(quartet);
                 }
 
@@ -177,8 +177,8 @@ export class ArithmeticOperation extends Node {
                 const quartet: Quartet = {operator: this.getSignNode()+"f", arg1: arg1, arg2: arg2, result: "t"+tTemp};
                 environment.handlerQuartet.insertQuartet(quartet);
             } else if (this.type.name == "INTEGER") {
-                environment.handlerQuartet.listTempsInt.push(tTemp);
-                const quartet: Quartet = {operator: this.getSignNode()+"i", arg1: arg1, arg2: arg2, result: "t"+tTemp};
+                environment.handlerQuartet.listTempsFloat.push(tTemp);
+                const quartet: Quartet = {operator: this.getSignNode()+"f", arg1: arg1, arg2: arg2, result: "t"+tTemp};
                 environment.handlerQuartet.insertQuartet(quartet);
             } else if (this.type.name == "CHAR") {
                 environment.handlerQuartet.listTempsInt.push(tTemp);

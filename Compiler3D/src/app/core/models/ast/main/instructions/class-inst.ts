@@ -335,6 +335,17 @@ export class ClassInst extends Node {
             }
         }
 
+        //Cuarto preparar Main
+        for (let i = 0; i < this.instructions.length; i++) {
+            if (this.instructions[i] instanceof MainNode) {
+                
+                this.instructions[i].isClass = true;
+                this.instructions[i].nameClass = this.name;
+                // console.log(this.instructions[i]);
+                break;
+            }
+        }
+
         environment.ambitNow.pop();
         
     }

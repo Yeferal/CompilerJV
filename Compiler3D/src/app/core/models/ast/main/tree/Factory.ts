@@ -8,12 +8,20 @@ import { MainNode } from "../instructions/main-node";
 import { DynamicDataType } from "../utils/DynamicDataType";
 import { TreeAST } from "./TreeAST";
 import { ImportNode } from "../import-node";
+import { Node } from "../node";
+import { TreeDirectoryComponent } from "src/app/components/tree-directory/tree-directory.component";
+
+export interface DataFactory {
+    handlerComprobation: HandlerComprobation,
+    environment: Environment,
+    treeAst?: TreeAST
+}
 
 export class Factory {
     
-    constructor(public treeAst: TreeAST, public shareCodeEditorService: ShareCodeEditorService){}
+    constructor(public treeAst: TreeAST, public shareCodeEditorService: ShareCodeEditorService, public treeDirectoryComponent: TreeDirectoryComponent){}
 
-    factory(): HandlerComprobation{
+    factory(): DataFactory{
         //Inicializar Handler y Enviroment
         
         let handlerComprobation: HandlerComprobation = new HandlerComprobation();
@@ -24,8 +32,12 @@ export class Factory {
             this.collectFromTypes(handlerComprobation);
             this.executeComprobations(handlerComprobation);
             handlerComprobation.paintError();
+            if (handlerComprobation.listError.length>0) {
+                this.treeDirectoryComponent.openModalError("Se encontraron errores en el archivo");
+            }
         } catch (error) {
             console.error(error);
+            this.treeDirectoryComponent.openModalError("Se encontraron errores en el archivo");
         }
 
         this.shareCodeEditorService.setSymbolTable(handlerComprobation.symbolTable);
@@ -39,10 +51,11 @@ export class Factory {
                 this.compiler3dFactory(environment);
             } catch (error) {
                 console.error(error);
+                this.treeDirectoryComponent.openModalError("Se encontraron errores en el archivo");
             }
         }
 
-        return handlerComprobation;
+        return {handlerComprobation, environment};
     }
 
     /**
@@ -148,10 +161,6 @@ export class Factory {
 
 
     compiler3dFactory(environment: Environment): Environment{
-
-        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: "h"});
-        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: "ptr"});
-        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: "ps"});
         for (let i = 0; i < this.treeAst.listRoot.length; i++) {
             if (this.treeAst.listRoot[i] instanceof ClassInst) {
                 environment.acutalClass = this.treeAst.listRoot[i] as ClassInst;
@@ -162,16 +171,21 @@ export class Factory {
             }
         }
 
-        for (let i = 0; i < this.treeAst.listRoot.length; i++) {
-            if (this.treeAst.listRoot[i] instanceof MainNode) {
-                this.treeAst.listRoot[i].execute(environment);
-            }
-        }
+        // for (let i = 0; i < this.treeAst.listRoot.length; i++) {
+        //     if (this.treeAst.listRoot[i] instanceof MainNode) {
+        //         this.treeAst.listRoot[i].execute(environment);
+        //     }
+        // }
 
-        console.log("Codigo 3d");
+        // console.log("Codigo 3d");
         
-        environment.handlerQuartet.paint();
+        // environment.handlerQuartet.paint();
 
+        return environment;
+    }
+
+    compiler3dMain(environment: Environment, main: Node): Environment{
+        main.execute(environment);
         return environment;
     }
 

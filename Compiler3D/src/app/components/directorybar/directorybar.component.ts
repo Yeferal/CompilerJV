@@ -31,12 +31,16 @@ export class DirectorybarComponent {
   ]
 
   constructor(private sectionService: SectionService){
-
+    this.sectionService.data$.subscribe(
+      id => {
+        this.updateSection(id);
+      }
+    );
   }
 
 
   changeSection(id: number) {
-    this.updateSection(id);
+    // this.updateSection(id);
     this.sectionService.sendData(id);
   }
 

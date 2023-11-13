@@ -286,7 +286,7 @@ export class Identifier extends Node{
                 environment.handlerQuartet.insertQuartet({operator: "stack_string_declar", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
                 return "t"+tTemp3;
             } else if (this.type.name == "FLOAT") {
-                environment.handlerQuartet.listTempsInt.push(tTemp2);
+                environment.handlerQuartet.listTempsFloat.push(tTemp2);
                 environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
             } else if (this.type.name == "CHAR") {
                 environment.handlerQuartet.listTempsInt.push(tTemp2);

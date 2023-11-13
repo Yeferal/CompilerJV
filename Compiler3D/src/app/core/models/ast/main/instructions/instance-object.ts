@@ -162,9 +162,21 @@ export class InstanceObject extends Node {
     }
 
     public override execute(environment: Environment): any {
+
+        let symbolAmbit;
+        if (environment.isClass) {
+            symbolAmbit = environment.symbolTable.searchSymbolFuncProc(environment.voidNow.peek(), environment.acutalClass.name); 
+        } else {
+            symbolAmbit = environment.symbolTable.searchSymbolMain(environment.ambitNow.peek());
+        }
+        // console.log(symbolAmbit);
+        
+
         //Buscar el construtor
         const symbolConstructor = environment.symbolTable.searchSymbolConstructor(this.id);
         const sizeStack = environment.sizeMain;
+        // console.log(symbolConstructor);
+        
         
         if (this.params!= null && this.params.length>0) {
             //Preparar el heap
@@ -177,7 +189,7 @@ export class InstanceObject extends Node {
                 environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "PREPARANDO EL PARAMETRO PARA LA INSTANCIA DE "+this.id, arg2: null, result: null});
                 const tTemp = environment.addT();
                 environment.handlerQuartet.listTempsInt.push(tTemp)
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: sizeStack, result: "t"+tTemp});
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "t"+tTemp});
 
                 const tTemp2 = environment.addT();
                 environment.handlerQuartet.listTempsInt.push(tTemp2)
@@ -186,10 +198,31 @@ export class InstanceObject extends Node {
                 
             }
         }
+        
 
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: sizeStack, result: "ptr"});
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "ptr"});
         environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: symbolConstructor.name+"_"+symbolConstructor.name, arg2: null, result: null});
-        environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: sizeStack, result: "ptr"});
+        environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: symbolAmbit.size, result: "ptr"});
+
+
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del constructor", arg2: null, result: null});
+
+        //Mover el puntero temporalmente
+        const tTemp3 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp3);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "t"+tTemp3});
+
+        //Obtener la direcciones del this
+        const tTemp4 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp4);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp3, arg2: "0", result: "t"+tTemp4});
+
+        //Obtener la direcciones de valor this
+        const tTemp5 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp5);
+        environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp4, arg2: null, result: "t"+tTemp5});
+
+        return "t"+tTemp5;
 
     }
 }

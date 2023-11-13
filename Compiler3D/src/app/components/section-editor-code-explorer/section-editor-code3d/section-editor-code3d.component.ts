@@ -1,6 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { enterText } from 'src/app/Global/inputText';
+import { SectionService } from 'src/app/services/section.service';
 import { CursorCode, ShareCodeEditorService } from 'src/app/services/share-code-editor.service';
 
 @Component({
@@ -8,10 +9,10 @@ import { CursorCode, ShareCodeEditorService } from 'src/app/services/share-code-
   templateUrl: './section-editor-code3d.component.html',
   styleUrls: ['./section-editor-code3d.component.scss']
 })
-export class SectionEditorCode3dComponent {
+export class SectionEditorCode3dComponent implements OnInit {
   @ViewChild('editor') codeMirror: CodemirrorComponent;
 
-  code: string = enterText;
+  code: string = "";
 
   editorConfig = {
     lineNumbers: true,
@@ -20,10 +21,19 @@ export class SectionEditorCode3dComponent {
     // Agrega más opciones de configuración según tus necesidades
   };
 
-  constructor(private shareCodeEditorService: ShareCodeEditorService) {
-
+  constructor(private shareCodeEditorService: ShareCodeEditorService,
+    private sectionService: SectionService) {
+      this.sectionService.data3dTxt$.subscribe(
+        txt => {
+          this.code = this.sectionService.getText3D();
+        }
+      );
+  }
+  ngOnInit(): void {
+    this.code = this.sectionService.getText3D();
   }
 
+  
   
 
   compile(){

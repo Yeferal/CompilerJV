@@ -96,6 +96,11 @@ export class SymbolTable {
             const tableTemp = this.stackTable.peek();
             for (let i = 0; i < tableTemp.length; i++) {
                 const symbol = tableTemp[i];
+                // console.log(ambit, "==", symbol.ambit);
+                // if (ambit == symbol.ambit) {
+                //     console.log(symbol);
+                    
+                // }
                 if (ambit == symbol.ambit && symbol.symbolType == SymbolType.RETURN) {
                     return symbol;
                 }

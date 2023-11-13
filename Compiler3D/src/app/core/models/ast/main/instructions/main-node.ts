@@ -15,6 +15,7 @@ export class MainNode extends Node {
     private _packageNode: PackageNode;
     private _listImport: Array<ImportNode>;
     size: number = 0;
+    
 
 	constructor(positionToken: PositionToken, token: string, instructions: Array<Node>) {
 		super(positionToken, null, token);
@@ -154,10 +155,17 @@ export class MainNode extends Node {
         environment.actualPKG = this.packageNode;
 
         let nameAmbit = environment.actualPKG.path;
-        if (environment.acutalClass != null) {
-            nameAmbit += "."+environment.acutalClass.name
+        
+        // console.log(this.isClass);
+        
+        if (this.isClass) {
+            nameAmbit += "."+this.nameClass
         }
+        // console.log(nameAmbit);
+        
         const symbolMain = environment.symbolTable.searchSymbolMain(nameAmbit);
+        // console.log(symbolMain);
+        
         environment.sizeMain = symbolMain.size;
         
         environment.handlerQuartet.insertQuartet({operator: "main", arg1: "main", arg2: "", result: ""});

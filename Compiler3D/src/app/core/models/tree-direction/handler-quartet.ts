@@ -5,6 +5,7 @@ export class HandlerQuartet {
     public listTempsFloat: Array<number> = [];
     public listTempsInt: Array<number> = [];
     public listTempsString: Array<number> = [];
+    public listVoid: Array<Quartet> = [];
 
 	public get listQuartet(): Array<Quartet>  {
 		return this._listQuartet;
@@ -134,7 +135,9 @@ export class HandlerQuartet {
 
             // function => func, nameCode, type(void, int, etc), paramstype(int_int_string)
             case "function":
-                return "void " + quartet.arg1 + "_" + quartet.arg2 + "_" + quartet.result + "() {";
+                return "void " + quartet.arg1 + "_" + quartet.arg2 + "_" + quartet.result + "(void) {";
+            case "function_declar":
+                return "void " + quartet.arg1 + "();";
             // return -> (ret, t1, , )
 
             // close func

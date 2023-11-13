@@ -85,6 +85,6 @@ export class TostringNode extends Node {
     public override execute(environment: Environment): any {
         const tTemp = this.nodeId.execute(environment);
         
-        environment.handlerQuartet.insertQuartet({operator:"printfi", arg1: "\n", arg2: tTemp, result: null});
+        environment.handlerQuartet.insertQuartet({operator:"printfi", arg1: "\\n", arg2: tTemp, result: null});
     }
 }

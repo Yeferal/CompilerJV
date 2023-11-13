@@ -12,6 +12,9 @@ import { firstValueFrom } from 'rxjs';
 import { ShareCodeEditorService } from 'src/app/services/share-code-editor.service';
 import { MainNode } from 'src/app/core/models/ast/main/instructions/main-node';
 import { ModalComponent } from '../modal/modal.component';
+import { DataFactory } from 'src/app/core/models/ast/main/tree/Factory';
+import { GeneratedService } from 'src/app/services/generated.service';
+import { SectionService } from 'src/app/services/section.service';
 
 @Component({
   selector: 'app-tree-directory',
@@ -19,16 +22,27 @@ import { ModalComponent } from '../modal/modal.component';
   styleUrls: ['./tree-directory.component.scss']
 })
 export class TreeDirectoryComponent {
+  compiledFile: Blob | null = null;
   projectsNow: NodeDir;
   listMains: Array<MainNode> = [];
   isOpen: boolean = false;
+  isOpenError: boolean = false;
+  msgError = "";
+  dataFactory: DataFactory;
+  // 0: code 3d
+  // 1: downloada code 3d
+  // 2: code assm
+  // 3: downloada assm 3d
+  typeApi = 0; 
 
   handlerCompiler = new HandlerCompiler(this.shareCodeEditorService, this);
 
   constructor(private filesService: FilesService, 
     private shareProjectService: ShareProjectService, 
     private cookieService: CookieService, 
-    private shareCodeEditorService: ShareCodeEditorService){
+    private shareCodeEditorService: ShareCodeEditorService, 
+    private generatedService: GeneratedService, 
+    private sectionService: SectionService ){
       this.shareProjectService.dataRoot$.subscribe({
         next: (root) => {
           this.projectsNow = root;
@@ -37,32 +51,35 @@ export class TreeDirectoryComponent {
 
       this.filesService.dataGen3D$.subscribe({
         next: res => {
+          this.typeApi = 0;
           this.generateCode3D();
         }
       });
 
       this.filesService.dataGenAssem$.subscribe({
         next: res => {
-          this.generateCodeAssem();
+          this.typeApi = 2;
+          this.generateCode3D();
         }
       });
 
       this.filesService.dataDow3D$.subscribe({
         next: res => {
-          this.downloadCode3D();
+          this.typeApi = 1;
+          this.generateCode3D();
         }
       });
 
       this.filesService.dataDowAssem$.subscribe({
         next: res => {
-          this.downloadCodeAssem();
+          this.typeApi = 3;
+          this.generateCode3D();
         }
       });
     }
 
   ngOnInit() {
     this.verifyOpenProject();
-    // this.generateCode3D();
   }
 
   receiveCloseModal($event: boolean) {
@@ -71,6 +88,11 @@ export class TreeDirectoryComponent {
 
   openModal(){
     this.isOpen = true;
+  }
+
+  openModalError(msg: string){
+    this.msgError = msg;
+    this.isOpenError = true;
   }
 
   
@@ -99,6 +121,7 @@ export class TreeDirectoryComponent {
           
           this.shareProjectService.setRoot(newRoot);
           this.shareProjectService.sendDataRoot(newRoot);
+
           this.generateCode3D();
         },
         error: err => {
@@ -107,24 +130,6 @@ export class TreeDirectoryComponent {
       });
     }
   }
-
-  // generateCode3D(){
-  //   if (this.projectsNow == null) {
-  //     return ;
-  //   }
-  //   let listFile: Array<NodeDir> = [];
-  //   this.colletPath(this.projectsNow, listFile);
-  //   for (let i = 0; i < listFile.length; i++) {
-  //     this.filesService.getFileContent(listFile[i].path).subscribe({
-  //       next: res => {
-  //         listFile[i].text = res.data;
-  //       }
-  //     });
-  //   }
-    
-  //   this.compile3D(listFile);
-    
-  // }
 
   generateCode3D() {
     if (this.projectsNow == null) {
@@ -155,30 +160,141 @@ export class TreeDirectoryComponent {
   compile3D(list: Array<NodeDir>){
     this.handlerCompiler = new HandlerCompiler(this.shareCodeEditorService, this);
     this.handlerCompiler.compiler(list);
+    if (this.dataFactory.handlerComprobation.listMain.length == 0) {
+      //Enviar de una vez 
+      this.sendApi();
+    }
   }
 
   sendMain(i: number, modalChild: ModalComponent){
-    modalChild.closeModal();
-    this.handlerCompiler.compiler3D(this.listMains[i]);
+    modalChild.closeModal();    
+    this.handlerCompiler.compiler3D(this.listMains[i], this.dataFactory);
+    this.sendApi();
+  }
+
+  sendApi(){
+    switch(this.typeApi){
+      case 0:
+        this.sendGenCode3D();
+        break;
+      case 1:
+        this.downloadCode3D();
+        break;
+      case 2:
+        this.generateCodeAssem();
+        break;
+      case 3:
+        this.downloadCodeAssem();
+        break;
+    }
+  }
+
+  sendGenCode3D(){
+    if (this.projectsNow == null) {
+      return ;
+    }
+    const data = {
+      listQuartet: this.dataFactory.environment.handlerQuartet.listQuartet,
+      listInt: this.dataFactory.environment.handlerQuartet.listTempsInt,
+      listFloat: this.dataFactory.environment.handlerQuartet.listTempsFloat,
+      listString: this.dataFactory.environment.handlerQuartet.listTempsString,
+      listVoid: this.dataFactory.environment.handlerQuartet.listVoid,
+    }
+    
+    this.generatedService.postGenTreeDir(data).subscribe({
+      next: res => {
+        this.sectionService.setText3D(res.data.text);
+        this.sectionService.sendData3dTxt(res.data.text);
+        this.sectionService.sendData(2);
+      }, error: err => {
+        console.log(err);
+        
+      }
+    });
+    
   }
 
   generateCodeAssem(){
     if (this.projectsNow == null) {
       return ;
     }
-    // let listPath: Array<NodeDir> = [];
-    // this.colletPath(this.projectsNow, listPath);
-    // console.log(listPath);
+    const data = {
+      listQuartet: this.dataFactory.environment.handlerQuartet.listQuartet,
+      listInt: this.dataFactory.environment.handlerQuartet.listTempsInt,
+      listFloat: this.dataFactory.environment.handlerQuartet.listTempsFloat,
+      listString: this.dataFactory.environment.handlerQuartet.listTempsString,
+      listVoid: this.dataFactory.environment.handlerQuartet.listVoid
+    }
+
+    this.generatedService.postGenTreeAssm(data).subscribe({
+      next: res => {
+        this.sectionService.setTextAssm(res.data.text);
+        this.sectionService.sendData3dTxt(res.data.text);
+        this.sectionService.sendData(3);
+      }, error: err => {
+        console.log(err);
+        
+      }
+    });
     
   }
 
   downloadCode3D(){
+    console.log("Asdfasdfasd");
+    
     if (this.projectsNow == null) {
       return ;
     }
-    // let listPath: Array<NodeDir> = [];
-    // this.colletPath(this.projectsNow, listPath);
-    // console.log(listPath);
+    const data = {
+      listQuartet: this.dataFactory.environment.handlerQuartet.listQuartet,
+      listInt: this.dataFactory.environment.handlerQuartet.listTempsInt,
+      listFloat: this.dataFactory.environment.handlerQuartet.listTempsFloat,
+      listString: this.dataFactory.environment.handlerQuartet.listTempsString,
+      listVoid: this.dataFactory.environment.handlerQuartet.listVoid
+    }
+    // this.generatedService.postDownTreeDir(data).subscribe(
+    //   (response) => {
+    //     const blob = response.body as Blob;
+    //     const contentDispositionHeader = response.headers.get('content-disposition');
+    //     const filenameMatch = contentDispositionHeader?.match(/filename="(.+)"$/);
+    //     const filename = filenameMatch ? filenameMatch[1] : 'main';
+
+    //     // Agrega la extensión .c al nombre del archivo
+    //     const filenameWithExtension = filename + '';
+
+    //     // Crear un enlace para la descarga
+    //     const url = window.URL.createObjectURL(blob);
+    //     const link = document.createElement('a');
+    //     link.href = url;
+    //     link.setAttribute('download', filenameWithExtension);
+
+    //     // Simular un clic en el enlace para iniciar la descarga
+    //     document.body.appendChild(link);
+    //     link.click();
+
+    //     // Limpiar después de la descarga
+    //     document.body.removeChild(link);
+    //   },
+    //   (error) => {
+    //     console.error('Error en la solicitud POST:', error);
+    //   }
+    // );
+
+    this.generatedService.postDownTreeDir(data).subscribe(
+      (response) => {
+        const blob = response.body as Blob;
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'codigo.c');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+      (error) => {
+        console.error('Error en la descarga del archivo:', error);
+      }
+    );
     
   }
 
@@ -186,9 +302,21 @@ export class TreeDirectoryComponent {
     if (this.projectsNow == null) {
       return ;
     }
-    // let listPath: Array<NodeDir> = [];
-    // this.colletPath(this.projectsNow, listPath);
-    // console.log(listPath);
+    const data = {
+      listQuartet: this.dataFactory.environment.handlerQuartet.listQuartet,
+      listInt: this.dataFactory.environment.handlerQuartet.listTempsInt,
+      listFloat: this.dataFactory.environment.handlerQuartet.listTempsFloat,
+      listString: this.dataFactory.environment.handlerQuartet.listTempsString,
+      listVoid: this.dataFactory.environment.handlerQuartet.listVoid
+    }
+    this.generatedService.postGenTreeDir(data).subscribe({
+      next: res => {
+        console.log(res);
+      }, error: err => {
+        console.log(err);
+        
+      }
+    });
     
   }
   

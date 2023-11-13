@@ -335,7 +335,11 @@ export class FunctionProcedure extends Node {
             const symbolFunc = environment.symbolTable.searchSymbolFuncProc(this.id, environment.acutalClass.name);
             // console.log({operator: "function", arg1: environment.acutalClass.name, arg2: this.id, result: this.genSubName(symbolFunc)});
             
+            environment.handlerQuartet.listVoid.push({operator: "function_declar", arg1: environment.acutalClass.name+"_"+this.id+"_"+this.genSubName(symbolFunc), arg2: null, result: null});
             environment.handlerQuartet.insertQuartet({operator: "function", arg1: environment.acutalClass.name, arg2: this.id, result: this.genSubName(symbolFunc)});
+            // console.log("symbolFunc.nameCode:",symbolFunc.nameCode);
+            // console.log("this.id:", this.id);
+            
             environment.ambitNow.push(symbolFunc.nameCode);
             environment.voidNow.push(this.id);
             const etReturn = environment.addEt();

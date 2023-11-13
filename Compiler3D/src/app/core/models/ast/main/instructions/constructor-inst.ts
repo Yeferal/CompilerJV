@@ -220,6 +220,7 @@ export class ConstructorInst extends Node {
     public override execute(environment: Environment): any {
         let nameAmbit = this.id+"_"+this.id;
 
+        environment.handlerQuartet.listVoid.push({operator: "function_declar", arg1: this.id+"_"+this.id, arg2: null, result: null});
         environment.handlerQuartet.insertQuartet({operator: "constructor", arg1: this.id, arg2: this.id, result: null});
         environment.ambitNow.push(nameAmbit);
         environment.voidNow.push(this.id);

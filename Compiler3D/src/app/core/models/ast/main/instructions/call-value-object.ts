@@ -117,30 +117,33 @@ export class CallValueObject extends Node {
     }
 
     public override execute(environment: Environment): any {
-        let symbolFuncParent;
+
+        let symbolAmbit;
         if (environment.isClass) {
-            symbolFuncParent = environment.symbolTable.searchSymbolFuncProc(environment.voidNow.peek(), environment.acutalClass.name); 
+            symbolAmbit = environment.symbolTable.searchSymbolFuncProc(environment.voidNow.peek(), environment.acutalClass.name); 
         } else {
-            symbolFuncParent = environment.symbolTable.searchSymbolMain(environment.ambitNow.peek());
+            symbolAmbit = environment.symbolTable.searchSymbolMain(environment.ambitNow.peek());
         }
 
-        let symbolObject;
+        let symbolObj;
         if (environment.isClass) {
             if (this.isThis) {
-                symbolObject = environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.acutalClass.name);
+                symbolObj = environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.acutalClass.name);
+                // symbolObj= environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.ambitNow.peek());
             } else {
-                symbolObject = environment.symbolTable.searchSymbolVar(this.idObj, environment.ambitNow.peek());
-                if (symbolObject == null) {
-                    symbolObject = environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.acutalClass.name);
+                symbolObj = environment.symbolTable.searchSymbolVar(this.idObj, environment.ambitNow.peek());
+                if (symbolObj == null) {
+                    symbolObj = environment.symbolTable.searchSymbolAtribClass(this.idObj, environment.acutalClass.name);
                 }
             }
         } else {
-            symbolObject = environment.symbolTable.searchSymbolVar(this.idObj, environment.ambitNow.peek());
+            symbolObj = environment.symbolTable.searchSymbolVar(this.idObj, environment.ambitNow.peek());
         }
 
-        let symbolAtrib = environment.symbolTable.searchSymbolVar(this.id, symbolObject.type.name);
+        // let symbolAtrib = environment.symbolTable.searchSymbolVar(this.id, symbolObj.type.name);
+        let symbolAtrib = environment.symbolTable.searchSymbolAtribClass(this.id, symbolObj.type.name);
         if (symbolAtrib == null) {
-            symbolAtrib = environment.symbolTable.searchSymbolAtribClass(this.id, symbolObject.type.name);
+            symbolAtrib = environment.symbolTable.searchSymbolAtribClass(this.id, symbolObj.type.name);
         }
 
         const nodeId = new Identifier(this.positionToken, this.idObj, this.idObj, this.isThis);
@@ -150,7 +153,7 @@ export class CallValueObject extends Node {
         //Preparar el heap para el this
         const tTemp2 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp2);
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp2});
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "t"+tTemp2});
         const tTemp3 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp3);
         environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp3});
@@ -160,7 +163,7 @@ export class CallValueObject extends Node {
         //Mover el puntero temporalmente
         const tTemp4 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp4);
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: environment.sizeMain, result: "t"+tTemp4});
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "t"+tTemp4});
         const tTemp5 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp5);
         environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp5});
@@ -170,13 +173,14 @@ export class CallValueObject extends Node {
         //Obteniedno la posicion del heap del atributo
         const tTemp6 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp6);
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp5, arg2: symbolAtrib.direction, result: "t"+tTemp6});
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: tTemp, arg2: symbolAtrib.direction, result: "t"+tTemp6});
 
         //obteniendo el valor del heap
         const tTemp7 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp7);
         environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp6, arg2: null, result: "t"+tTemp7});
 
+        this.type = symbolAtrib.type;
         return "t"+tTemp7;
     }
 }

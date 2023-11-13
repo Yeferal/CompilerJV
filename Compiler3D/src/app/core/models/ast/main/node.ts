@@ -13,6 +13,8 @@ export abstract class Node {
     public isRunning: boolean = false;
     public isGen3D: boolean = false;
     public _typeVerifier: TypeVerifier = new TypeVerifier();
+    public isClass = false;
+    public nameClass = "";
 
     /**
      * @constructor

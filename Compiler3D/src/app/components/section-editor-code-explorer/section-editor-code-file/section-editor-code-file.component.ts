@@ -99,8 +99,8 @@ export class SectionEditorCodeFileComponent {
         }
       } else {
         console.log('Salida: \n\n',result);
-        let factory: Factory = new Factory(result, this.shareCodeEditorService);
-        factory.factory();
+        // let factory: Factory = new Factory(result, this.shareCodeEditorService);
+        // factory.factory();
         // let handlerComprobation: HandlerComprobation = new HandlerComprobation();
         // let listroot = result.listRoot;
         // for (let i = 0; i < listroot.length; i++) {

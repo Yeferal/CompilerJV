@@ -24,10 +24,23 @@
                     <ul class="list-projects col-12 p-0">
                         <ng-container *ngFor="let item of listMains; let i = index">
                             <li (dblclick)="sendMain(i, modalChild)" class="">
-                                <label>{{"main"}} => {{item.packageNode.path}}</label>
+                                <label>{{"main"}} => {{item.packageNode.path}}{{item.isClass? "."+item.nameClass:""}}</label>
                             </li>
                         </ng-container>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</app-modal>
+
+<app-modal [isShowModal]="isOpenError" [titleModal]="'Programa de Ejecucion'" (closeModalMsg)="receiveCloseModal($event)" #modalError>
+    <div class="container">
+        <h3 class="my-2">Ocurrio algun Error:</h3>
+        <div class="card">
+            <div class="card-body">
+                <div class="row content-list-projects scrolling-mode">
+                    {{msgError}}
                 </div>
             </div>
         </div>

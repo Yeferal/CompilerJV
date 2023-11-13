@@ -65,7 +65,7 @@ export class PrintNode extends Node {
     }
 
     public override execute(environment: Environment): any {
-        const ln = this.isLn? "\n" : "";
+        const ln = this.isLn? "\\n" : "";
         
         if (this.value instanceof Primitive) {
             if (this.value.type.name == "STRING") {
