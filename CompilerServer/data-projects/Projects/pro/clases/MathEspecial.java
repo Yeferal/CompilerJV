@@ -2,26 +2,32 @@ package pro.clases;
 
 import pro.clases.Operador;
 
-public class MathEspecial extends Operador {
+public class MathEspecial {
   
   private int res;
   
-  void main(){
-  	int num1= 3 + 8 * 1;
-    int num2= 2;
-  }
-  
-  public MathEspecial(int id, String name, int res) {
-  	super(id, name);
-    //this.res = res + 5 * 8 / 1;
+  public MathEspecial(int id, int res) {
+    this.res = res + 5 * 8 / 1;
   }
   
   public float sumar(float num1, float num2){
+    var ope = new Operador(10);
+    
+  	ope.pintar();
+  	ope.id = 2;
+    ope.pintar();
+    ope.id = 13;
+    System.out.println(ope.id);
+    
+    var ope2 = ope;
+    ope2.id = 15;
+    System.out.println(ope2.id);
     return num1 + num2;
   }
   
   @Override
   public void pintar(){
-		System.out.println("Resultado: "+ res);
+    System.out.print("Resultado: ");
+    System.out.println(res);
   }
 }

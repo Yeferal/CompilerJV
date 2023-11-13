@@ -2,9 +2,66 @@ package pro;
 import pro.clases.Operador;
 
 void main(){
-  var ope = new Operador(1, "Ope1");
+  var ope = new Operador(3);
+  ope.pintar();
+  MathEspecial mat = new MathEspecial(4, 3);
+  System.out.println(mat.sumar(4.3, 5.1));
+  /*int inpInt;
+  System.out.println("Ingresa un entero");
+  readint(inpInt);
+  ope.toString();
+  System.out.println(inpInt);
+  var valF = ope.getId();
+  System.out.println(valF);
+  var valI = ope.id;
+  System.out.println(valI);*/
+  //ope.id = 2;
+  ope.pintar();
+  
+  /*int a = 3;
+  int b = 2;
+  int c = (2*5)+a*b/a*2;
+  float res = Math.abs(c);
+  System.out.println(res);
+  res = Math.ceil(c);
+  System.out.println(res);
+  res = Math.floor(c);
+  System.out.println(res);
+  res = Math.round(c);
+  System.out.println(res);
+  res = Math.sqrt(c);
+  System.out.println(res);
+  res = Math.toRadians(c);
+  System.out.println(res);
+  res = Math.round(c);
+  System.out.println(res);
+  res = Math.acos(c);
+  System.out.println(res);
+  res = Math.sin(c);
+  System.out.println(res);
+  res = Math.atan(c);
+  System.out.println(res);
+  res = Math.exp(c);
+  System.out.println(res);
+
+
+  res = Math.max(a, b);
+  System.out.println(res);
+  res = Math.min(a, b);
+  System.out.println(res);
+  res = Math.pow(a, b);
+  System.out.println(res);
+
+  res = Math.random();
+  System.out.println(res);*/
+  
+  /*var ope = new Operador(1, "Ope1");
   int inpInt;
   readint(inpInt);
+  ope.toString();
+  System.out.println(inpInt);
+  var valF = ope.getId();
+  var valI = ope.id;*/
   //System.out.println("Resultado: "+ 10);
   //var st = "Resultado: "+ 10;
   //st = "d";

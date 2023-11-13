@@ -3,10 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 const routes = require('./routes');
 const { error404Handler, errorHandler } = require('./middleware');
 
 const app = express();
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(logger(config.get('logger')));
 app.use(express.json());
@@ -31,6 +34,9 @@ app.get('/', (req, res) => {
 });
 
 app.use('/', routes);
+
+
+
 app.use(error404Handler);
 app.use(errorHandler);
 
