@@ -6,6 +6,7 @@ import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Identifier } from "../expressions/identifier";
 import { LogicalOperation } from "../expressions/logical-operation";
 import { Node } from "../node";
+import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DataArray } from "./data-array";
 import { InstanceArray } from "./instance-array";
@@ -194,7 +195,15 @@ export class AsignationVar extends Node {
                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `La simbolo << ${identifier.id}>> es un variable de tipo arreglo.`, ErrorType.SEMANTIC);
                         handlerComprobation.listError.push(errorGramm);
                         return ;
+                    } else{
+                        if (symbol.numDims != symbolIdentifier.numDims) {
+                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de dimensiones validas para el arreglo son distintas del numero de la asignacion.`, ErrorType.SEMANTIC); 
+                            handlerComprobation.listError.push(errorGramm);
+                            return ;
+                        }
                     }
+                    
+                    return ;
                 }
 
                 if (symbol.isArray!= null && symbol.isArray) {
@@ -254,6 +263,21 @@ export class AsignationVar extends Node {
         throw new Error("Method not implemented.");
     }
 
+    private asigDimsArray(symbol: Symbol){
+        if (symbol.isArray) {
+            if (this.asignation instanceof Identifier) {
+                const identifier = this.asignation as Identifier;
+                symbol.listDimsTemps = identifier.dimsT;
+            } if (this.asignation instanceof DataArray) {
+                const dataArray = this.asignation as DataArray;
+                symbol.listDimsTemps = dataArray.dimsT;
+            } if (this.asignation instanceof InstanceArray) {
+                const instanceArray = this.asignation as InstanceArray;
+                symbol.listDimsTemps = instanceArray.dimsT;
+            }
+        }
+    }
+
     public override execute(environment: Environment): any {
         
         
@@ -288,6 +312,7 @@ export class AsignationVar extends Node {
         if (environment.isClass) {
             if (this.isThis) {
                 const symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+                this.asigDimsArray(symbol);
 
                 environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
 
@@ -299,7 +324,7 @@ export class AsignationVar extends Node {
                 environment.handlerQuartet.listTempsInt.push(tTemp2);
                 environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
                 
-                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del "+this.id, arg2: null, result: null});
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
                 const tTemp3 = environment.addT();
                 environment.handlerQuartet.listTempsInt.push(tTemp3);
                 environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
@@ -328,69 +353,72 @@ export class AsignationVar extends Node {
                 if (symbol == null) {
                     symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
                 }
+                this.asigDimsArray(symbol);
 
-                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+                if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del "+this.id, arg2: null, result: null});
 
-                const tTemp = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp);
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
-                
-                const tTemp2 = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp2);
-                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
-                
-                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del "+this.id, arg2: null, result: null});
-                const tTemp3 = environment.addT();
-                environment.handlerQuartet.listTempsInt.push(tTemp3);
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
+                    const tTemp = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
 
-                if (this.type.name == "STRING") {
+                    if (this.type.name == "STRING") {
                     
-                    const tTemp4 = environment.addT();
-                    environment.handlerQuartet.listTempsInt.push(tTemp4);
-                    // Tiene que ir a buscar el valor del string en la pila de strings
-                    // Obtenemos la posicion en el stackS
-                    if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
-                        environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
-                    } else {
-                        environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                        const tTemp4 = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp4);
+                        // Tiene que ir a buscar el valor del string en la pila de strings
+                        // Obtenemos la posicion en el stackS
+                        environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp4});
+
+                        environment.handlerQuartet.insertQuartet({operator: "stack_string_asig", arg1: tAsig, arg2: null, result: "t"+tTemp4});
+                    } else if (this.type.name == "FLOAT") {
+                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                    } else if (this.type.name == "CHAR" || this.type.name == "INTEGER") {
+                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                    }else {
+                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp});
                     }
-                    environment.handlerQuartet.insertQuartet({operator: "stack_string_asig", arg1: tAsig, arg2: null, result: "t"+tTemp4});
-                } else if (this.type.name == "FLOAT") {
-                    if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
-                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp3});
-                    } else {
-                        environment.handlerQuartet.insertQuartet({operator: "heap_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp3});
-                        
-                    }
-                } else if (this.type.name == "CHAR") {
-                    if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
-                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
-                    } else {
-                        environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
-                        
-                    }
-                } else if (this.type.name == "INTEGER") {
-                    if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
-                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
-                    } else {
-                        environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
-                        
-                    }
+
                 } else {
-                    if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
-                        //Si es un valor de tipo objeto y no primitivo
-                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
-                    } else {
-                        //Si es un valor de tipo objeto y no primitivo
+
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+
+                    const tTemp = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+                    
+                    const tTemp2 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp2);
+                    environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+                    
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del "+this.id, arg2: null, result: null});
+                    const tTemp3 = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp3);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
+
+                    if (this.type.name == "STRING") {
+                    
+                        const tTemp4 = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp4);
+                        // Tiene que ir a buscar el valor del string en la pila de strings
+                        // Obtenemos la posicion en el stackS
+                        environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+
+                        environment.handlerQuartet.insertQuartet({operator: "stack_string_asig", arg1: tAsig, arg2: null, result: "t"+tTemp4});
+                    } else if (this.type.name == "FLOAT") {
+                        environment.handlerQuartet.insertQuartet({operator: "heap_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp3});
+                    } else if (this.type.name == "CHAR" || this.type.name == "INTEGER") {
                         environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
-                    }
+                    }else {
+                        environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
+                    } 
                 }
 
             }
         } else {
             let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
 
+            this.asigDimsArray(symbol);
             // if (symbol == null) {
             //     symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
             // }
@@ -402,12 +430,6 @@ export class AsignationVar extends Node {
             environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
 
             if (this.type.name == "STRING") {
-                // environment.handlerQuartet.listTempsInt.push(tTemp2);
-                // // Tiene que ir a buscar el valor del string en la pila de strings
-                // const tTemp3 = environment.addT();
-                // environment.handlerQuartet.listTempsString.push(tTemp3);
-                // environment.handlerQuartet.insertQuartet({operator: "stack_string_declar", arg1: "t"+tTemp2, arg2: null, result: "t"+tTemp3});
-                // return "t"+tTemp3;
 
                 const tTemp2 = environment.addT();
                 environment.handlerQuartet.listTempsInt.push(tTemp2);

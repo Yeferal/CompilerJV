@@ -50,9 +50,9 @@ export class HandlerCompiler {
                 let dataFactory = factory.factory();
                 dataFactory.treeAst = factory.treeAst;
                 this.treeASTNow = treeAST;
+                // dataFactory.environment.handlerQuartet.paint();
                 
-                
-                //Verifica que Main se va a ejecutar
+                // Verifica que Main se va a ejecutar
                 if (dataFactory.handlerComprobation.listMain.length>0) {
                     this.treeDirectoryComponent.listMains = dataFactory.handlerComprobation.listMain;
                     this.treeDirectoryComponent.dataFactory = dataFactory;

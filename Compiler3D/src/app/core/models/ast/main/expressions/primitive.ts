@@ -56,6 +56,8 @@ export class Primitive extends Node{
         }else {
             if (this.type.name == "BOOLEAN") {
                 return this.value? 1 : 0;
+            } else if (this.type.name == "NULL") {
+                return -1;
             }
             return this.value;
         }

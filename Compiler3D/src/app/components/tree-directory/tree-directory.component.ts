@@ -122,7 +122,7 @@ export class TreeDirectoryComponent {
           this.shareProjectService.setRoot(newRoot);
           this.shareProjectService.sendDataRoot(newRoot);
 
-          // this.generateCode3D();
+          this.generateCode3D();
         },
         error: err => {
           console.log(err);
@@ -160,6 +160,7 @@ export class TreeDirectoryComponent {
   compile3D(list: Array<NodeDir>){
     this.handlerCompiler = new HandlerCompiler(this.shareCodeEditorService, this);
     this.handlerCompiler.compiler(list);
+    // this.sectionService.sendData(5); //Envia a los reportes
     if (this.dataFactory.handlerComprobation.listMain.length == 0) {
       //Enviar de una vez 
       this.sendApi();
@@ -240,7 +241,6 @@ export class TreeDirectoryComponent {
   }
 
   downloadCode3D(){
-    console.log("Asdfasdfasd");
     
     if (this.projectsNow == null) {
       return ;

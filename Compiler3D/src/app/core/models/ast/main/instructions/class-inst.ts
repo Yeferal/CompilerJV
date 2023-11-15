@@ -283,19 +283,19 @@ export class ClassInst extends Node {
     }
 
     public generatePrincipalQuartet(environment: Environment){
-        let symbolConstructor = environment.searchSymbolConstructor(this.name);
+        const symbolClass = environment.symbolTable.searchSymbolClass(this.name);
         // tm1 = h
         const nT1 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(nT1);
         environment.handlerQuartet.insertQuartet({operator: "=", arg1: "h", arg2: null, result: "t"+nT1});
-        // h = h + 2
-        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "h", arg2: symbolConstructor.size, result: "h"});
+        // h = h + tamanio clase
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "h", arg2: symbolClass.size, result: "h"});
         // tm2 = ptr + 0
         const nT2 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(nT2);
         environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+nT2});
         // stack[tm2] = tm1
-        environment.handlerQuartet.insertQuartet({operator: "stack", arg1: "t"+nT1, arg2: null, result: "t"+nT2});
+        environment.handlerQuartet.insertQuartet({operator: "stack_asig", arg1: "t"+nT1, arg2: null, result: "t"+nT2});
 
     }
 

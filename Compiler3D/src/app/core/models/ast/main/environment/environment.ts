@@ -7,6 +7,7 @@ import { SymbolTable } from "../table/symbol-table";
 
 export class Environment {
     public symbolTable: SymbolTable = new SymbolTable();
+    public symbolTableArray: SymbolTable = new SymbolTable();
     public typeTable: TypeTable = new TypeTable();
     private _handlerQuartet: HandlerQuartet = new HandlerQuartet();
     public isClass = false;

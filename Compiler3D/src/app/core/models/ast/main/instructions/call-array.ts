@@ -4,17 +4,19 @@ import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
 import { Node } from "../node";
+import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
 
 export class CallArray extends Node {
     private _id: string;
     private _dimensions: Array<Node>;
+    private _isThis: boolean;
 
-
-	constructor(positionToken: PositionToken, token: string, id: string, dimensions: Array<Node>) {
+	constructor(positionToken: PositionToken, token: string, id: string, dimensions: Array<Node>, isThis: boolean) {
 		super(positionToken, null, token);
         this._id = id;
 		this._dimensions = dimensions;
+        this._isThis = isThis;
 	}
 
     /**
@@ -47,6 +49,22 @@ export class CallArray extends Node {
      */
 	public set dimensions(value: Array<Node>) {
 		this._dimensions = value;
+	}
+
+    /**
+     * Getter isThis
+     * @return {boolean}
+     */
+	public get isThis(): boolean {
+		return this._isThis;
+	}
+
+    /**
+     * Setter isThis
+     * @param {boolean} value
+     */
+	public set isThis(value: boolean) {
+		this._isThis = value;
 	}
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
@@ -106,7 +124,135 @@ export class CallArray extends Node {
         throw new Error("Method not implemented.");
     }
 
+    private generatePosAsignDim(environment: Environment, listDimsTemp: Array<string>): string{
+        let direction = "0";
+        let multiplier = "1";
+
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de asignacion de arreglos", arg2: null, result: null});
+        for (let i = listDimsTemp.length - 1; i >= 0 ; i--) {
+            let sizeDim = listDimsTemp[i];
+            let coordinate = this.dimensions[i].execute(environment);
+
+            // direccion = direccion + (coordenada * multiplicador);
+            const tTemp = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp);
+            environment.handlerQuartet.insertQuartet({operator: "*i", arg1: coordinate, arg2: multiplier, result: "t"+tTemp});
+
+            const tTemp2 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp2);
+            environment.handlerQuartet.insertQuartet({operator: "+i", arg1: direction, arg2: "t"+tTemp, result: "t"+tTemp2});
+            direction = "t"+tTemp2;
+
+
+            // multiplicador = multiplicador * tamañoDimension;
+            const tTemp3 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp3);
+            environment.handlerQuartet.insertQuartet({operator: "*i", arg1: multiplier, arg2: sizeDim, result: "t"+tTemp3});
+            multiplier = "t"+tTemp3
+            
+        }
+
+        return direction;
+    }
+
     public override execute(environment: Environment): any {
-        // throw new Error("Method not implemented.");
+        
+
+        if (this.isThis) {
+            const symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+            console.log(symbol);
+            
+            const tPosition = this.generatePosAsignDim(environment, symbol.listDimsTemps);
+
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+
+            const tTemp = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+            
+            const tTemp2 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp2);
+            environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+            
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
+            const tTemp3 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp3);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
+
+            const tTemp4 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp4);
+            environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+
+            const tTemp5 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp5);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp4, arg2: tPosition, result: "t"+tTemp5});
+
+            const tTempReturn = environment.addT();
+            environment.handlerQuartet.listTempsFloat.push(tTempReturn);
+            environment.handlerQuartet.insertQuartet({operator: "heap_declar_f", arg1: "t"+tTemp5, arg2: null, result: "t"+tTempReturn});
+
+            return "t"+tTempReturn;
+
+        } else {
+            let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+            if (symbol == null) {
+                symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+            }
+            const tPosition = this.generatePosAsignDim(environment, symbol.listDimsTemps);
+
+            if (symbol.symbolType == SymbolType.PARAM || symbol.symbolType == SymbolType.VAR) {
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del "+this.id, arg2: null, result: null});
+
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
+
+                const tTemp2 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp2);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
+                const tTemp3 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp3);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: tPosition, result: "t"+tTemp3});
+
+                const tTempReturn = environment.addT();
+                environment.handlerQuartet.listTempsFloat.push(tTempReturn);
+                environment.handlerQuartet.insertQuartet({operator: "heap_declar_f", arg1: "t"+tTemp3, arg2: null, result: "t"+tTempReturn});
+
+                return "t"+tTempReturn;
+
+            } else {
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+                
+                const tTemp2 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp2);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+                
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
+                const tTemp3 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp3);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
+
+                const tTemp4 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp4);
+                environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+
+                const tTemp5 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp5);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp4, arg2: tPosition, result: "t"+tTemp5});
+
+                const tTempReturn = environment.addT();
+                environment.handlerQuartet.listTempsFloat.push(tTempReturn);
+                environment.handlerQuartet.insertQuartet({operator: "heap_declar_f", arg1: "t"+tTemp5, arg2: null, result: "t"+tTempReturn});
+
+                return "t"+tTempReturn;
+            }
+        }
+        
     }
 }

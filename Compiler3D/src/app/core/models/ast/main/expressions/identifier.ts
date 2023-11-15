@@ -11,6 +11,7 @@ export class Identifier extends Node{
     private _id: string;
     private _value: any;
     private _isThis: boolean;
+    public dimsT: Array<string> = [];
 
     constructor(positionToken: PositionToken, toke: string, id: any, isThis: boolean) {
         super(positionToken, null, toke);
@@ -93,6 +94,9 @@ export class Identifier extends Node{
         if (environment.isClass) {
             if (this.isThis) {
                 const symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+                if (symbol.listDimsTemps!=null) {
+                    this.dimsT = symbol.listDimsTemps;
+                }
 
                 environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
 
@@ -142,7 +146,14 @@ export class Identifier extends Node{
                 let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
                 if (symbol == null) {
                     symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+                    // console.log(this.id, environment.ambitNow.peek());
+                    // console.log(symbol);
                     
+                    
+                    if (symbol.listDimsTemps!=null) {
+                        this.dimsT = symbol.listDimsTemps;
+                    }
+
                     environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
 
                     const tTemp = environment.addT();
@@ -188,8 +199,10 @@ export class Identifier extends Node{
                         return "t"+tTemp4;
                     }
                 }else {
+                    if (symbol.listDimsTemps!=null) {
+                        this.dimsT = symbol.listDimsTemps;
+                    }
                     environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
-    
                     // const tTemp = environment.addT();
                     // environment.handlerQuartet.listTempsInt.push(tTemp);
                     // environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
@@ -269,6 +282,9 @@ export class Identifier extends Node{
 
         } else {
             let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+            if (symbol.listDimsTemps!=null) {
+                this.dimsT = symbol.listDimsTemps;
+            }
 
             environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
 

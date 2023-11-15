@@ -8,6 +8,7 @@ import { DynamicDataType } from "../utils/DynamicDataType";
 
 export class DataArray extends Node {
     private _contentList: Array<Node>;
+    public dimsT: Array<string> = [];
 
     constructor(positionToken: PositionToken, token: string, contentList: Array<Node>){
         super(positionToken, null, token);

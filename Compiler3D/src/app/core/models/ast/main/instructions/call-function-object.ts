@@ -94,6 +94,11 @@ export class CallFunctionObject extends Node {
         return typesCorrect.includes(typeAsig);
     }
 
+    public isTypeCorrectPrimitive(name: string): boolean{
+        const typesCorrect = ["FLOAT", "INTEGER", "BOOLEAN", "CHAR"];
+        return typesCorrect.includes(name);
+    }
+
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         //buscar el objeto en la tabla de tipos por ambitos
         //is es this entonces que lo busque como un atributo
@@ -113,8 +118,15 @@ export class CallFunctionObject extends Node {
 
         //buscar la funciones para comprobar si existe
         const symbolFunc = handlerComprobation.searchSymbolAtribClass(this.id, symbolObj.type.name);
+
+        if (symbolFunc == null) {
+            const errorGramm = new ErrorGramm(this.positionToken, this.idObj, `No existe una funcion con el nombre << ${this.id} >> dentro de la clase: ${symbolObj.type.name}. Verifique que el IMPORT sea correcto, o que existe la funcion`, ErrorType.SEMANTIC); 
+            handlerComprobation.listError.push(errorGramm);
+            return ;
+        }
+
+
         this.type = symbolFunc.type;
-        // console.log(this.type);
         
 
         //Verificar que sea una funcion o procedimiento
@@ -142,11 +154,17 @@ export class CallFunctionObject extends Node {
                 for (let i = 0; i < listParamsOfNode.length; i++) {
                     // console.log(listParamsOfNode[i], "!=", paramSymbol[i]);
                     
-                    if (listParamsOfNode[i].name != paramSymbol[i].name) {
-                        //Error no son del mismo tipo
-                        const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros no coincide en la funcion << ${this.token} >>.`, ErrorType.SEMANTIC); 
-                        handlerComprobation.listError.push(errorGramm);
-                        return ;
+                    
+                    
+                    if (listParamsOfNode[i].name != paramSymbol[i].name ) {
+                        // console.log(this.isTypeCorrectPrimitive(paramSymbol[i].name), "&&", listParamsOfNode[i].name=="NULL");
+                        if ((this.isTypeCorrectPrimitive(paramSymbol[i].name) && listParamsOfNode[i].name=="NULL")) {
+                            //Error no son del mismo tipo
+                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros no coincide en la funcion << ${this.token} >>.`, ErrorType.SEMANTIC); 
+                            handlerComprobation.listError.push(errorGramm);
+                            return ;
+                            
+                        }
                     }
                 }
             }
@@ -238,7 +256,7 @@ export class CallFunctionObject extends Node {
 
                 const tTemp5 = environment.addT();
                 environment.handlerQuartet.listTempsInt.push(tTemp5)
-                environment.handlerQuartet.insertQuartet({operator: "+", arg1: tTemp, arg2: i+1+"", result: "t"+tTemp5});
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp4, arg2: i+1+"", result: "t"+tTemp5});
                 environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: i+1+"", result: "t"+tTemp5});
                 
             }
@@ -249,7 +267,7 @@ export class CallFunctionObject extends Node {
         environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: symbolAmbit.size, result: "ptr"});
 
         
-        
+        // console.log(this.type);
         if (symbolFunc.isFunction) {
             environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el valor del return", arg2: null, result: null});
 
@@ -267,9 +285,28 @@ export class CallFunctionObject extends Node {
     
             //Obtener el de valor del Return
             const tTemp8 = environment.addT();
-            environment.handlerQuartet.listTempsFloat.push(tTemp8);
-            environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            // environment.handlerQuartet.listTempsFloat.push(tTemp8);
+            // environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
     
+            if (symbolReturn.type.name == "STRING") {
+                
+            } else if (this.type.name == "FLOAT") {
+                environment.handlerQuartet.listTempsFloat.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            } else if (this.type.name == "INTEGER") {
+                environment.handlerQuartet.listTempsInt.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            } else if (this.type.name == "CHAR") {
+                environment.handlerQuartet.listTempsInt.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            } else if (this.type.name == "BOOLEAN") {
+                environment.handlerQuartet.listTempsInt.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            } else {
+                // environment.handlerQuartet.listTempsFloat.push(tTemp8);
+                // environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            }
+            
             return "t"+tTemp8;
         }
 

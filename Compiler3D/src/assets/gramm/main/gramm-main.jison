@@ -2034,7 +2034,7 @@ STRUCT_FOR
 
 ASIG_STATE_FOR
     :DATATYPE_PRIMITIVE id equal_mark STATE_VALUE
-    {$$ = new DeclarationAtribute(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $2, $4);}
+    {$$ = new DeclarationVarible(new PositionToken(this._$.first_line, this._$.first_column), $1, $2, $2, $4);}
     |id equal_mark STATE_VALUE {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $3, false, false);}
     |var id equal_mark STATE_VALUE {$$ = new DeclarationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, false);}
     |this id equal_mark STATE_VALUE {$$ = new AsignationVar(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $4, true, false); }
@@ -2361,6 +2361,15 @@ STRUCT_FUNCTION
     |static DATATYPE_PRIMITIVE id parentheses_l PARAMS_FUNC_METOD parentheses_r keys_l CODE_FUNC_METOD keys_r
     {$$ = new FunctionProcedure(new PositionToken(this._$.first_line, this._$.first_column), $2, $3, true, true, $3, $5, $8);}
 
+    |id id parentheses_l parentheses_r keys_l CODE_FUNC_METOD keys_r
+    {$$ = new FunctionProcedure(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1, $1, 1), $2, false, true, $2, [], $6);}
+    |id id parentheses_l PARAMS_FUNC_METOD parentheses_r keys_l CODE_FUNC_METOD keys_r
+    {$$ = new FunctionProcedure(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1, $1, 1), $2, false, true, $2, $4, $7);}
+    |static id id parentheses_l parentheses_r keys_l CODE_FUNC_METOD keys_r
+    {$$ = new FunctionProcedure(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1, $2, 1), $3, true, true, $3, [], $7);}
+    |static id id parentheses_l PARAMS_FUNC_METOD parentheses_r keys_l CODE_FUNC_METOD keys_r
+    {$$ = new FunctionProcedure(new PositionToken(this._$.first_line, this._$.first_column), new DynamicDataType(1, $2, 1), $3, true, true, $3, $5, $8);}
+
     |error parentheses_l PARAMS_FUNC_METOD parentheses_r keys_l CODE_FUNC_METOD keys_r {
         addError(this._$.first_line, this._$.first_column, $1, "Error en la Expresion", ErrorType.SYNTACTIC);
     }
@@ -2558,8 +2567,8 @@ STATE_RETURN
 ;
 
 STRUCT_CALL_ARRAY
-    :id STRUCT_VALUE_DIMS_VAR_ARRAY {$$ = new CallArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2);}
-    |this id STRUCT_VALUE_DIMS_VAR_ARRAY {$$ = new CallArray(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3);}
+    :id STRUCT_VALUE_DIMS_VAR_ARRAY {$$ = new CallArray(new PositionToken(this._$.first_line, this._$.first_column), $1, $1, $2, false);}
+    |this id STRUCT_VALUE_DIMS_VAR_ARRAY {$$ = new CallArray(new PositionToken(this._$.first_line, this._$.first_column), $2, $2, $3, true);}
 ;
 
 STRUCT_CALL_OBJECT_VALUE

@@ -23,4 +23,13 @@
 	</proyecto>
 	<proyecto nombre="arbol">
 	</proyecto>
+	<proyecto nombre="Pila">
+		<archivo path="Main">Main.java</archivo>
+		<archivo path="Pila">Pila.java</archivo>
+	</proyecto>
+	<proyecto nombre="lista">
+		<archivo path="main">main.java</archivo>
+		<archivo path="Nodo">Nodo.java</archivo>
+		<archivo path="ListaDoble">ListaDoble.java</archivo>
+	</proyecto>
 </libreria>

@@ -30,6 +30,7 @@ export class Factory {
         
         try {
             this.collectFromTypes(handlerComprobation);
+            
             this.executeComprobations(handlerComprobation);
             handlerComprobation.paintError();
             if (handlerComprobation.listError.length>0) {
@@ -46,6 +47,7 @@ export class Factory {
 
         if (handlerComprobation.listError.length==0) {
             try {
+                console.log("Archivo sin Errores");
                 environment.symbolTable = handlerComprobation.symbolTable;
                 environment.typeTable = handlerComprobation.typeTable;
                 this.compiler3dFactory(environment);
@@ -94,6 +96,7 @@ export class Factory {
         for (let i = 0; i < this.treeAst.listRoot.length; i++) {
             if (this.treeAst.listRoot[i] instanceof ClassInst) {
                 const classInst = this.treeAst.listRoot[i] as ClassInst;
+                
                 if (classInst.listImport!= null && classInst.listImport.length>0) {
                     this.searchForImportClass(handlerComprobation, classInst.listImport);
                 }   

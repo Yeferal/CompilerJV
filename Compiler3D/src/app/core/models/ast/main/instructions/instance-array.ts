@@ -9,6 +9,7 @@ import { DynamicDataType } from "../utils/DynamicDataType";
 export class InstanceArray extends Node {
     private _id: string;
     private _dims: Array<Node>;
+    public dimsT: Array<string> = [];
 
 	constructor(positionToken: PositionToken, type: DynamicDataType, token: string, dims: Array<Node>) {
 		super(positionToken, type, token);
@@ -84,7 +85,39 @@ export class InstanceArray extends Node {
         throw new Error("Method not implemented.");
     }
 
+    private getTotalSize(environment: Environment): string {
+        let tBase: string;
+
+        for (let i = 0; i < this.dims.length; i++) {
+            const tRes = this.dims[i].execute(environment);
+            if (i == 0) {
+                tBase = tRes;
+                this.dimsT.push(tRes);
+            } else {
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp);
+                environment.handlerQuartet.insertQuartet({operator: "*i", arg1: tBase, arg2: tRes, result: "t"+tTemp});
+                tBase = "t"+tTemp;
+                this.dimsT.push(tRes);
+            }
+        }
+        return tBase;
+    }
+
     public override execute(environment: Environment): any {
-        // throw new Error("Method not implemented.");
+        //Ejecutar las Dims y obtener el valor de cada una
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo los valore de las dimensiones", arg2: null, result: ""});
+        const tSize = this.getTotalSize(environment);
+
+        //Apartar el tamanio en el heap
+        const nT1 = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(nT1);
+        environment.handlerQuartet.insertQuartet({operator: "=", arg1: "h", arg2: null, result: "t"+nT1});
+        // h = h + tamanio clase
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "h", arg2: tSize, result: "h"});
+
+        //Retornar la posicion en el heap
+        return "t"+nT1;
+        
     }
 }

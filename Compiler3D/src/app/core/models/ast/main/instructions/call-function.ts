@@ -268,8 +268,29 @@ export class CallFunction extends Node {
     
             //Obtener el de valor del Return
             const tTemp8 = environment.addT();
-            environment.handlerQuartet.listTempsInt.push(tTemp8);
-            environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            
+            
+            
+
+            if (symbolReturn.type.name == "STRING") {
+                
+            } else if (this.type.name == "FLOAT") {
+                environment.handlerQuartet.listTempsFloat.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            } else if (this.type.name == "INTEGER") {
+                environment.handlerQuartet.listTempsInt.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            } else if (this.type.name == "CHAR") {
+                environment.handlerQuartet.listTempsInt.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            } else if (this.type.name == "BOOLEAN") {
+                environment.handlerQuartet.listTempsInt.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            } else {
+                // environment.handlerQuartet.listTempsFloat.push(tTemp8);
+                // environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+            }
+            
     
             return "t"+tTemp8;
         }

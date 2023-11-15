@@ -213,6 +213,24 @@ export class Symbol {
 		this._isStatic = value;
 	}
 
+
+    /**
+     * Getter listDimsTemps
+     * @return {Array<string>}
+     */
+	public get listDimsTemps(): Array<string> {
+		return this._listDimsTemps;
+	}
+
+    /**
+     * Setter listDimsTemps
+     * @param {Array<string>} value
+     */
+	public set listDimsTemps(value: Array<string>) {
+		this._listDimsTemps = value;
+	}
+
+
     /**
      * Getter parent
      * @return {any}
@@ -261,6 +279,26 @@ export class Symbol {
 		this._packageS = value;
 	}
 
+    clone(): Symbol {
+        return new Symbol(
+            this._id,
+            this._nameCode,
+            this._name,
+            this._symbolType,
+            this._isFunction,
+            this._type,
+            this._numParams,
+            this._listParams,
+            this._direction,
+            this._size,
+            this._isArray,
+            this._listDims,
+            this._isReference,
+            this._encapsulation,
+            this._fullName,
+            this._isConst,
+        );
+    }
     
 
 }

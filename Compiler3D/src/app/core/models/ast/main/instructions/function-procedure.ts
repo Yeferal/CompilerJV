@@ -343,7 +343,7 @@ export class FunctionProcedure extends Node {
             environment.ambitNow.push(symbolFunc.nameCode);
             environment.voidNow.push(this.id);
             const etReturn = environment.addEt();
-            environment.etsReturn.push("t"+etReturn);
+            environment.etsReturn.push("et"+etReturn);
 
             //Parametros nada
 

@@ -206,7 +206,7 @@ export class ConstructorInst extends Node {
         const nT1 = environment.addT();
         environment.handlerQuartet.listTempsInt.push(nT1);
         environment.handlerQuartet.insertQuartet({operator: "=", arg1: "h", arg2: null, result: "t"+nT1});
-        // h = h + 2
+        // h = h + tamanio clase
         environment.handlerQuartet.insertQuartet({operator: "+", arg1: "h", arg2: symbolClass.size, result: "h"});
         // tm2 = ptr + 0
         const nT2 = environment.addT();

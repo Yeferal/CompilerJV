@@ -379,7 +379,108 @@ export class DeclarationArray extends Node{
         throw new Error("Method not implemented.");
     }
 
-    public override execute(environment: Environment): any {
+    public gen3DGeneral(environment: Environment){
+        let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
         
+        const tTemp = environment.addT();
+        environment.handlerQuartet.listTempsInt.push(tTemp);
+        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbol.direction, result: "t"+tTemp});
+
+        return tTemp;
+    }
+
+    public override execute(environment: Environment): any {
+        if (this.asignation != null) {
+
+            environment.isAsig = true;
+            let tAsig = this.asignation.execute(environment);
+            environment.isAsig = false;
+
+            let symbolArray;
+            if (this.isAtrib) {
+                symbolArray = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+            } else {
+                symbolArray = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
+                if (symbolArray == null) {
+                    symbolArray = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+                }
+            }
+
+            if (this.isAtrib) {
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+                
+                const tTemp2 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp2);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
+                const tTemp3 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp3);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbolArray.direction, result: "t"+tTemp3});
+
+                environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
+            } else {
+                if (environment.isClass) {
+
+                    if (symbolArray.symbolType == SymbolType.PARAM || symbolArray.symbolType == SymbolType.VAR) {
+                        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicon de "+this.id, arg2: null, result: null});
+    
+                        const tTemp = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp);
+                        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolArray.direction, result: "t"+tTemp});
+
+                        environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                    } else {
+                        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+    
+                        const tTemp = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp);
+                        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+                        
+                        const tTemp2 = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp2);
+                        environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+                        
+                        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion del "+this.id, arg2: null, result: null});
+                        const tTemp3 = environment.addT();
+                        environment.handlerQuartet.listTempsInt.push(tTemp3);
+                        environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbolArray.direction, result: "t"+tTemp3});
+
+                        //Si es un valor de tipo objeto y no primitivo
+                        environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
+                    }
+                } else {
+                    environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicon de "+this.id, arg2: null, result: null});
+    
+                    const tTemp = environment.addT();
+                    environment.handlerQuartet.listTempsInt.push(tTemp);
+                    environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolArray.direction, result: "t"+tTemp});
+
+                    environment.handlerQuartet.insertQuartet({operator: "stack_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp});
+                }
+                
+
+            }
+            
+            //Guardar el listado de etiquetas de dimensiones
+            if (this.asignation instanceof Identifier) {
+                const identifier = this.asignation as Identifier;
+                symbolArray.listDimsTemps = identifier.dimsT;
+            } if (this.asignation instanceof DataArray) {
+                const dataArray = this.asignation as DataArray;
+                symbolArray.listDimsTemps = dataArray.dimsT;
+            } if (this.asignation instanceof InstanceArray) {
+                const instanceArray = this.asignation as InstanceArray;
+                symbolArray.listDimsTemps = instanceArray.dimsT;
+            } else {
+                
+            }
+        }
     }
 }
