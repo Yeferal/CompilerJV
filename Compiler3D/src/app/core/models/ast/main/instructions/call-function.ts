@@ -76,6 +76,11 @@ export class CallFunction extends Node {
         return typesCorrect.includes(typeAsig);
     }
 
+    public isTypeCorrectPrimitive(name: string): boolean{
+        const typesCorrect = ["FLOAT", "INTEGER", "BOOLEAN", "CHAR"];
+        return typesCorrect.includes(name);
+    }
+
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
 
         //buscar la funciones para comprobar si existe
@@ -142,6 +147,8 @@ export class CallFunction extends Node {
         //Ejecutar las comprobaciones para obtener los tipos de datos de los parametros
         let listParamsOfNode = new Array<DynamicDataType>;
         for (let i = 0; i < this.params.length; i++) {
+            // console.log(this.params[i]);
+            
             listParamsOfNode.push(this.params[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation));
         }
 
@@ -155,9 +162,13 @@ export class CallFunction extends Node {
                 const paramSymbol = symbolFunc.listParams;
                 for (let i = 0; i < listParamsOfNode.length; i++) {
                     if (listParamsOfNode[i].name != paramSymbol[i].name) {
-                        //Error no son del mismo tipo
-                        const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros no coincide en la funcion << ${this.token} >>.`, ErrorType.SEMANTIC); 
-                        handlerComprobation.listError.push(errorGramm);
+                        if ((this.isTypeCorrectPrimitive(paramSymbol[i].name) && listParamsOfNode[i].name=="NULL")) {
+                            //Error no son del mismo tipo
+                            const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros no coincide en la funcion << ${this.token} >>.`, ErrorType.SEMANTIC); 
+                            handlerComprobation.listError.push(errorGramm);
+                            return ;
+                            
+                        }
                     }
                 }
             }
@@ -287,8 +298,8 @@ export class CallFunction extends Node {
                 environment.handlerQuartet.listTempsInt.push(tTemp8);
                 environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
             } else {
-                // environment.handlerQuartet.listTempsFloat.push(tTemp8);
-                // environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+                environment.handlerQuartet.listTempsFloat.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
             }
             
     

@@ -216,7 +216,7 @@ export class DeclarationVarible extends Node{
     public gen3DGeneral(environment: Environment){
         let symbol = environment.symbolTable.searchSymbolVar(this.id, environment.ambitNow.peek());
 
-        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de d"+this.id, arg2: null, result: null});
+        environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
         
         const tTemp = environment.addT();
         environment.handlerQuartet.listTempsInt.push(tTemp);

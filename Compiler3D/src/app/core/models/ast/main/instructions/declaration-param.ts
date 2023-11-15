@@ -114,12 +114,16 @@ export class DeclarationParam extends Node {
     }
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        
         //Verifica que no exista otra simbolo con el mismo nombre
         const resName = handlerComprobation.searchSymbol(this.id);
+        console.log(handlerComprobation.symbolAmbit.stackTable.peek());
+        console.log(resName);
+        
         if (resName != null) {
             if (resName.symbolType != SymbolType.ATRIBUT) {
                 //error de nombre, ya existe un simbolo en el ambito con el mismo nombre
-                const errorGramm = new ErrorGramm(this.positionToken, this.token, `Ya existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
+                const errorGramm = new ErrorGramm(this.positionToken, this.token, `ddddddYa existe una variable con el nombre: << ${this.id}>>, dentro del mismo ambito.`, ErrorType.SEMANTIC); 
                 handlerComprobation.listError.push(errorGramm);
                 return this.type;
             }

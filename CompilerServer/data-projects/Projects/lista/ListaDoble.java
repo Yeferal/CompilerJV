@@ -27,14 +27,13 @@ public class ListaDoble {
     }
    
     public boolean esVacia() {
-      return true;
-        //return primero == null;
+        return primero == null;
     }
 
     public int obtenerContenido(int index) {
-      //Nodo node = obtenerNodo(index);
-      //int val = node.getContenido();
-        //return val;
+      Nodo node = obtenerNodo(index);
+      int val = node.getContenido();
+      return val;
     }
     
     public void eliminarUltimo() {
@@ -61,36 +60,38 @@ public class ListaDoble {
         } else {
         
             Nodo actual = primero;
-            //while(actual.getSiguiente() != null) {
-                //System.out.println("contenido: " + actual.getContenido());
-                //actual = actual.getSiguiente();
-            //}
-            //System.out.println("contenido: " + actual.getContenido());
+            while(actual.getSiguiente() != null) {
+              	System.out.print("contenido: ");
+                System.out.println(actual.getContenido());
+                actual = actual.getSiguiente();
+            }
+            System.out.print("contenido: " );
+          System.out.println(actual.getContenido());
         }
     }
 
     public Nodo obtenerNodo(int index) {
-        /*if (esVacia()) {
+        if (esVacia()) {
             System.out.println("La lista esta vacia.");
-            //return null;
+            return null;
         }
         if (index >= size || index < 0) {
             System.out.println("El indice esta fuera del tama;o de la lista.");
-            //return null;
+            return null;
         }
         
         int medio = size / 2;
         if (index < medio) {
-            //return obtenerNodoAvanzando(index);
+            return obtenerNodoAvanzando(index);
         } else {
-            //return  obtenerNodoRetrocediendo(index);
-        }*/
+            return obtenerNodoRetrocediendo(index);
+        }
         
     }
     
-    private Nodo obtenerNodoAvanzando(int index) {
+    private Nodo obtenerNodoAvanzando(int index2) {
         Nodo actual = primero;
-        for (int i = 0; i < index; i++) {
+        for (int i = 0; i < index2; i++) {
 
             actual = actual.getSiguiente();
         }
@@ -98,9 +99,9 @@ public class ListaDoble {
         return actual;
     }
     
-    private Nodo obtenerNodoRetrocediendo(int index) {
+    private Nodo obtenerNodoRetrocediendo(int index3) {
         int indiceFinal = size - 1;
-        int limite = indiceFinal - index;
+        int limite = indiceFinal - index3;
         Nodo actual = ultimo;
         for (int i = 0; i < limite; i++) {
             actual = actual.getAnterior();

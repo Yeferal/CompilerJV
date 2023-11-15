@@ -303,8 +303,8 @@ export class CallFunctionObject extends Node {
                 environment.handlerQuartet.listTempsInt.push(tTemp8);
                 environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
             } else {
-                // environment.handlerQuartet.listTempsFloat.push(tTemp8);
-                // environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
+                environment.handlerQuartet.listTempsFloat.push(tTemp8);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp7, arg2: null, result: "t"+tTemp8});
             }
             
             return "t"+tTemp8;

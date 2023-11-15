@@ -317,16 +317,18 @@ export class ClassInst extends Node {
             environment.handlerQuartet.insertQuartet({operator: "constructor", arg1: this.name, arg2: this.name, result: null});
 
             this.generatePrincipalQuartet(environment);
+
+            // Segunto los atributos
+            for (let i = 0; i < this.instructions.length; i++) {
+                if (this.instructions[i] instanceof ListDeclaration) {
+                    this.instructions[i].execute(environment);
+                }
+            }
             
             environment.handlerQuartet.insertQuartet({operator: "close", arg1: null, arg2: null, result: null});
         }
 
-        // Segunto los atributos
-        for (let i = 0; i < this.instructions.length; i++) {
-            if (this.instructions[i] instanceof ListDeclaration) {
-                // this.instructions[i].execute(environment);
-            }
-        }
+        
 
         //Tercero las funciones
         for (let i = 0; i < this.instructions.length; i++) {

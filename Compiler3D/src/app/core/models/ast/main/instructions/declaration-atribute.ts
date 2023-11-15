@@ -3,11 +3,15 @@ import { ErrorGramm } from "../../error/error-gramm";
 import { PositionToken } from "../../error/position-token";
 import { Environment } from "../environment/environment";
 import { HandlerComprobation } from "../environment/handler-comprobation";
+import { Identifier } from "../expressions/identifier";
+import { LogicalOperation } from "../expressions/logical-operation";
 import { Node } from "../node";
 import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
 import { EncapsulationType } from "../utils/encapsulation-type";
+import { DataArray } from "./data-array";
+import { InstanceArray } from "./instance-array";
 export class DeclarationAtribute extends Node{
 
     //Atributos propios de una Declaracion de un Atributo
@@ -225,8 +229,119 @@ export class DeclarationAtribute extends Node{
         }
     }
 
+    private asigDimsArray(symbol: Symbol){
+        if (symbol.isArray) {
+            if (this.asignation instanceof Identifier) {
+                const identifier = this.asignation as Identifier;
+                symbol.listDimsTemps = identifier.dimsT;
+            } if (this.asignation instanceof DataArray) {
+                const dataArray = this.asignation as DataArray;
+                symbol.listDimsTemps = dataArray.dimsT;
+            } if (this.asignation instanceof InstanceArray) {
+                const instanceArray = this.asignation as InstanceArray;
+                symbol.listDimsTemps = instanceArray.dimsT;
+            }
+        }
+    }
+
     public override execute(environment: Environment): any {
         
         this.addPointString(environment);
+
+        if (this.asignation != null) {
+            environment.isAsig = true;
+            let tAsig = this.asignation.execute(environment);
+            environment.isAsig = false;
+
+            if (this.asignation instanceof LogicalOperation) {
+                tAsig = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tAsig);
+                tAsig = "t"+tAsig;
+                const etJump = environment.addEt();
+                if (!environment.etTrue.isEmpty()) {
+                    while (!environment.etTrue.isEmpty()) {
+                        environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etTrue.pop()});
+                    }
+                }
+                //Aqui va el valor del t verdadero
+                environment.handlerQuartet.insertQuartet({operator: "=", arg1: "1", arg2: null, result: tAsig});
+                environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: "et"+etJump});
+
+                if (!environment.etFalse.isEmpty()) {
+                    while (!environment.etFalse.isEmpty()) {
+                        environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etFalse.pop()});
+                    }
+                }
+                //Aqui va el valor del t FALSO
+                environment.handlerQuartet.insertQuartet({operator: "=", arg1: "0", arg2: null, result: tAsig});
+                environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: "et"+etJump});
+            }
+
+            const symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+
+            const tTemp = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+            
+            const tTemp2 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp2);
+            environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+            
+            environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
+            const tTemp3 = environment.addT();
+            environment.handlerQuartet.listTempsInt.push(tTemp3);
+            environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
+
+            if (this.type.name == "STRING") {
+                const tTemp4 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp4);
+                // Tiene que ir a buscar el valor del string en la pila de strings
+                // Obtenemos la posicion en el stackS
+                environment.handlerQuartet.insertQuartet({operator: "heap_declar_i", arg1: "t"+tTemp3, arg2: null, result: "t"+tTemp4});
+                environment.handlerQuartet.insertQuartet({operator: "stack_string_asig", arg1: tAsig, arg2: null, result: "t"+tTemp4});
+            } else if (this.type.name == "FLOAT") {
+                environment.handlerQuartet.insertQuartet({operator: "heap_asig_f", arg1: tAsig, arg2: null, result: "t"+tTemp3});
+            } else if (this.type.name == "CHAR") {
+                environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
+            } else if (this.type.name == "INTEGER") {
+                environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
+            } else {
+                //Si es un valor de tipo objeto y no primitivo
+                environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: tAsig, arg2: null, result: "t"+tTemp3});
+            }
+        } else {
+            const symbol = environment.symbolTable.searchSymbolAtribClass(this.id, environment.acutalClass.name);
+
+            if (this.type.name == "STRING") {
+                
+            } else if (this.type.name == "FLOAT") {
+                
+            } else if (this.type.name == "CHAR") {
+                
+            } else if (this.type.name == "INTEGER") {
+                
+            } else {
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo el This", arg2: null, result: null});
+
+                const tTemp = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: "0", result: "t"+tTemp});
+                
+                const tTemp2 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp2);
+                environment.handlerQuartet.insertQuartet({operator: "stack_declar_i", arg1: "t"+tTemp, arg2: null, result: "t"+tTemp2});
+                
+                environment.handlerQuartet.insertQuartet({operator: "comment", arg1: "Obteniendo la posicion de "+this.id, arg2: null, result: null});
+                const tTemp3 = environment.addT();
+                environment.handlerQuartet.listTempsInt.push(tTemp3);
+                environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp2, arg2: symbol.direction, result: "t"+tTemp3});
+
+                //Si es un valor de tipo objeto y no primitivo
+                environment.handlerQuartet.insertQuartet({operator: "heap_asig_i", arg1: "-1", arg2: null, result: "t"+tTemp3});
+            }
+        }
+
+
     }
 }

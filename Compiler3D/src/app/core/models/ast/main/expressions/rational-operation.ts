@@ -60,7 +60,11 @@ export class RationalOperation extends Node{
         let resRight = this.nodeRight.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
         if (resLeft!= null && resRight!= null) {
             //Comprobacion de tipos
+            // console.log(resLeft, resRight);
+            
             const resType: DynamicDataType = this._typeVerifier.verifierTypeRationalNode(resLeft, resRight, this.rationalType);
+            // console.log(resType);
+            
             if (resLeft) {
                 this.type = resType;
                 return resType;
@@ -110,6 +114,9 @@ export class RationalOperation extends Node{
         const arg1 = this.nodeLeft.execute(environment);
         const arg2 = this.nodeRight.execute(environment);
         const tTemp = environment.addT();
+        // console.log(this.nodeLeft);
+        // console.log(this.nodeRight);
+        
 
         environment.handlerQuartet.listTempsInt.push(tTemp);
         const quartet: Quartet = {operator: this.getSignNode(), arg1: arg1, arg2: arg2, result: "t"+tTemp};

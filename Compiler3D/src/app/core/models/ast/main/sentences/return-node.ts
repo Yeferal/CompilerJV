@@ -29,7 +29,11 @@ export class ReturnNode extends Node {
 
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
+        // console.log(this.value);
+        
         const resReturn = this.value.executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
+        // console.log(resReturn);
+        
         this.type = resReturn;
         return resReturn;
     }

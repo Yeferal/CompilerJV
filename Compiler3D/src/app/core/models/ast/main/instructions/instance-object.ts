@@ -62,6 +62,11 @@ export class InstanceObject extends Node {
         return list;
     }
 
+    public isTypeCorrectPrimitive(name: string): boolean{
+        const typesCorrect = ["FLOAT", "INTEGER", "BOOLEAN", "CHAR"];
+        return typesCorrect.includes(name);
+    }
+
 
     public override executeComprobationTypeNameAmbitUniqueness(handlerComprobation: HandlerComprobation): any {
         
@@ -101,7 +106,6 @@ export class InstanceObject extends Node {
                 
                 if (element.name == this.id) {
                     isExisteClass = true;
-                    // console.log(this.type);
                     // Busca el constructor
                     for (let j = 0; j < element.instructions.length; j++) {
                         if (element.instructions[j] instanceof ConstructorInst) {
@@ -122,17 +126,25 @@ export class InstanceObject extends Node {
                                 return ;
                             }else {
                                 for (let k = 0; k < listTypeParamsConst.length; k++) {
-                                    if (listTypeParamsConst[k].name != listTypeParams[k].name) {
+                                    if ((this.isTypeCorrectPrimitive(listTypeParamsConst[k].name) && listTypeParams[k].name=="NULL")) {
+                                        //Error no son del mismo tipo
                                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros de la clase no es el mismo << ${this.id} >>.`, ErrorType.SEMANTIC); 
                                         handlerComprobation.listError.push(errorGramm);
                                         return ;
+                                        
                                     }
+                                    // if (listTypeParamsConst[k].name != listTypeParams[k].name) {
+                                    //     const errorGramm = new ErrorGramm(this.positionToken, this.token, `El tipo de dato de los parametros de la clase no es el mismo << ${this.id} >>.`, ErrorType.SEMANTIC); 
+                                    //     handlerComprobation.listError.push(errorGramm);
+                                    //     return ;
+                                    // }
                                 }
                                 return this.type;
                             }
                         }
                         
                     }
+                    
                     if (!isExisteConstructor) {
                         if (listTypeParams.length > 0) {
                             const errorGramm = new ErrorGramm(this.positionToken, this.token, `El numero de parametros del construtor de la clase no es el mismo << ${this.id} >> no es el mismo.`, ErrorType.SEMANTIC); 
@@ -140,7 +152,9 @@ export class InstanceObject extends Node {
                             return ;
                         }
                     }
-                    return ;
+                    // console.log(this.type);
+                    
+                    return this.type;
                 }
                 // return ;
             }
@@ -175,7 +189,7 @@ export class InstanceObject extends Node {
         //Buscar el construtor
         const symbolConstructor = environment.symbolTable.searchSymbolConstructor(this.id);
         const sizeStack = environment.sizeMain;
-        // console.log(symbolConstructor);
+        
         
         
         if (this.params!= null && this.params.length>0) {
@@ -201,7 +215,8 @@ export class InstanceObject extends Node {
         
 
         environment.handlerQuartet.insertQuartet({operator: "+", arg1: "ptr", arg2: symbolAmbit.size, result: "ptr"});
-        environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: symbolConstructor.name+"_"+symbolConstructor.name, arg2: null, result: null});
+        // environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: symbolConstructor.name+"_"+symbolConstructor.name, arg2: null, result: null});
+        environment.handlerQuartet.insertQuartet({operator: "call_func", arg1: this.id+"_"+this.id, arg2: null, result: null});
         environment.handlerQuartet.insertQuartet({operator: "-", arg1: "ptr", arg2: symbolAmbit.size, result: "ptr"});
 
 
@@ -218,11 +233,11 @@ export class InstanceObject extends Node {
         environment.handlerQuartet.insertQuartet({operator: "+", arg1: "t"+tTemp3, arg2: "0", result: "t"+tTemp4});
 
         //Obtener la direcciones de valor this
-        const tTemp5 = environment.addT();
-        environment.handlerQuartet.listTempsInt.push(tTemp5);
-        environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp4, arg2: null, result: "t"+tTemp5});
+        // const tTemp5 = environment.addT();
+        // environment.handlerQuartet.listTempsInt.push(tTemp5);
+        environment.handlerQuartet.insertQuartet({operator: "stack_declar_f", arg1: "t"+tTemp4, arg2: null, result: "t"+tTemp4});
 
-        return "t"+tTemp5;
+        return "t"+tTemp4;
 
     }
 }

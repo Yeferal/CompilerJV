@@ -133,7 +133,8 @@ export class ConditionalDoWhile extends Node {
         }
 
         if (!environment.etsInit.isEmpty()) {
-            environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: environment.etsInit.pop()});
+            // environment.handlerQuartet.insertQuartet({operator: "jump", arg1: null, arg2: null, result: environment.etsInit.pop()});
+            environment.etsInit.pop()
         }
         environment.handlerQuartet.insertQuartet({operator: "label", arg1: null, arg2: null, result: environment.etsBack.pop()});
 

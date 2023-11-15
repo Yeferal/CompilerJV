@@ -6,7 +6,6 @@ public class Main {
 
 	void main() {
 	    Pila pila = new Pila(6);
-        //Pila pila = new Pila(6);
 	    
 	    pila.desapilar();
 	    pila.apilar(11);

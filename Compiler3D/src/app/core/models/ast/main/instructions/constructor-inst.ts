@@ -8,6 +8,7 @@ import { Symbol } from "../table/symbol";
 import { SymbolType } from "../table/symbol-type";
 import { DynamicDataType } from "../utils/DynamicDataType";
 import { EncapsulationType } from "../utils/encapsulation-type";
+import { ListDeclaration } from "./list-declaration";
 import { SuperInst } from "./super-inst";
 
 export class ConstructorInst extends Node {
@@ -237,6 +238,14 @@ export class ConstructorInst extends Node {
         //Obtener Parametros
         for (let i = 0; i < this.listParams.length; i++) {
             this.listParams[i].execute(environment);
+        }
+
+        for (let i = 0; i < environment.acutalClass.instructions.length; i++) {
+            if (environment.acutalClass.instructions[i] instanceof ListDeclaration) {
+                const listDeclaration = environment.acutalClass.instructions[i] as ListDeclaration;
+                listDeclaration.execute(environment);
+            }
+            
         }
 
         //Ejecutar las instrucciones

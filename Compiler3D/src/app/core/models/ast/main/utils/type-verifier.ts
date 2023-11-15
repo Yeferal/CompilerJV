@@ -235,12 +235,20 @@ export class TypeVerifier {
     public verifierTypeRationalNode(typeLeft: DynamicDataType, typeRight: DynamicDataType, rationalType: RationalType): DynamicDataType{
         const typeL = typeLeft.name;
         const typeR = typeRight.name;
+        
+        
         switch(rationalType){
             case RationalType.EQUAL:
                 if (typeL != "FLOAT" && typeL != "INTEGER" && typeL != "STRING" && typeL != "CHAR" && typeL != "BOOLEAN") {
+                    if (typeL == "NULL" || typeR == "NULL" || typeL == typeR) {
+                        return new DynamicDataType(5,"BOOLEAN", 1);
+                    }
                     return null;
                 }
                 if (typeR != "FLOAT" && typeR != "INTEGER" && typeR != "STRING" && typeR != "CHAR" && typeR != "BOOLEAN") {
+                    // if (typeL == "NULL" || typeR == "NUll" || typeL == typeR) {
+                    //     return new DynamicDataType(5,"BOOLEAN", 1);
+                    // }
                     return null;
                 }
 
@@ -257,6 +265,9 @@ export class TypeVerifier {
                 return new DynamicDataType(5,"BOOLEAN", 1);
             case RationalType.NOT_EQUAL:
                 if (typeL != "FLOAT" && typeL != "INTEGER" && typeL != "STRING" && typeL != "CHAR" && typeL != "BOOLEAN") {
+                    if (typeL == "NULL" || typeR == "NULL" || typeL == typeR) {
+                        return new DynamicDataType(5,"BOOLEAN", 1);
+                    }
                     return null;
                 }
                 if (typeR != "FLOAT" && typeR != "INTEGER" && typeR != "STRING" && typeR != "CHAR" && typeR != "BOOLEAN") {

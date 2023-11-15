@@ -6,9 +6,9 @@ import lista.ListaDoble;
 public class Main {
 
 	void main() {
-	    //ListaDoble listaString = new ListaDoble();
+	    ListaDoble listaString = new ListaDoble();
 
-           /* listaString.agregar(1);
+           	listaString.agregar(1);
             listaString.agregar(2);
             listaString.agregar(3);
             listaString.imprimirLista();
@@ -18,7 +18,7 @@ public class Main {
             listaString.imprimirLista();
             
             listaString.eliminarUltimo();
-            listaString.imprimirLista();*/
+            listaString.imprimirLista();
         
 	}
 }

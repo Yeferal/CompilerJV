@@ -259,6 +259,10 @@ export class FunctionProcedure extends Node {
         let listTypeParams: Array<DynamicDataType> = new Array<DynamicDataType>;
         //Verificar que los parametros sean correctos
         for (let j = 0; j < this.listParams.length; j++) {
+            console.log(this.id);
+            
+            console.log(this.listParams[j]);
+            
             const resParam = this.listParams[j].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             listTypeParams.push(resParam);
         }
@@ -268,6 +272,8 @@ export class FunctionProcedure extends Node {
             this.instructions[i].executeComprobationTypeNameAmbitUniqueness(handlerComprobation);
             if (this.instructions[i] instanceof ReturnNode) {
                 if (this.isFunction) {
+                    // console.log(this.instructions[i]);
+                    
                     const returnNode = this.instructions[i] as ReturnNode;
                     if (returnNode.type.name != this.type.name) {
                         const errorGramm = new ErrorGramm(this.positionToken, this.token, `EL metodo << ${this.id} >>no es del mismo tipo que el valor de retorno.`, ErrorType.SEMANTIC); 
